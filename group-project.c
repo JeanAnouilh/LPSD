@@ -81,6 +81,10 @@ PROCESS_THREAD(design_project_process, ev, data)
   static uint8_t        packet_len; /* packet length, in Bytes */
   static uint16_t       timeout_ms; /* packet receive timeout, in ms */
 
+	static std::vector<uint8_t> my_parents;  				/* parent slot IDs */
+  static uint8_t        			my_dst;     				/* packet destination ID */
+	static uint8_t							my_slot;						/* used slot ID */
+
   PROCESS_BEGIN();
 
   /* initialize the data generator */
@@ -96,89 +100,132 @@ PROCESS_THREAD(design_project_process, ev, data)
 
  
 
-if(sinkaddress == 22)
-{
-  if(node_id == )
-  {
+	if(sinkaddress == 22) {
+		if(node_id == 1) {
+			my_dst = 33;
+			my_slot = 14;
+		} else if(node_id == 2) {
+			my_dst = 33;
+			my_slot = 21;
+		} else if(node_id == 3) {
+			my_parents.push_back(10);
+			my_parents.push_back(15);
+			my_dst = 22;
+			my_slot = 9;
+		} else if(node_id == 4) {
+			my_dst = 33;
+			my_slot = 23;
+		} else if(node_id == 6) {
+			my_dst = 22;
+			my_slot = 24;
+		} else if(node_id == 8) {
+			my_dst = 28;
+			my_slot = 19;
+		} else if(node_id == 10) {
+			my_dst = 3;
+			my_slot = 22;
+		} else if(node_id == 15) {
+			my_dst = 3;
+			my_slot = 25;
+		} else if(node_id == 16) {
+			my_dst = 22;
+			my_slot = 16;
+		} else if(node_id == 18) {
+			my_dst = 22;
+			my_slot = 20;
+		} else if(node_id == 22) {
+			my_slot = 0;
+		} else if(node_id == 28) {
+			my_parents.push_back(8);
+			my_parents.push_back(31);
+			my_dst = 22;
+			my_slot = 1;
+		} else if(node_id == 31) {
+			my_parents.push_back(32);
+			my_dst = 28;
+			my_slot = 12;
+		} else if(node_id == 32) {
+			my_dst = 31;
+			my_slot = 15;
+		} else if(node_id == 33) {
+			my_parents.push_back(1);
+			my_parents.push_back(2);
+			my_parents.push_back(4);
+			my_dst = 22;
+			my_slot = 5;
+		}
+		
+		 while(1) {
 
-  }
-  else if()
-  
-   while(1) {
+		  /* listen for incoming packet */
+		  packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
 
-    /* listen for incoming packet */
-    packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
+		  /* if we received something, retransmit */
+		  if(packet_len){
+		    if(node_id == sinkaddress) {
+					/* --- SINK --- */
+					/* Write received message to serial */
+					LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload);
+		    } else {
+					/* --- SOURCE --- */
+					/* Forward the packet */
+					radio_send(((uint8_t*)&packet_rcv),packet_len,1);
+					LOG_INFO("Packet received and forwarded...\n");
+		    }
+		  }
 
-    /* if we received something, retransmit */
-    if(packet_len){
-      if(node_id == sinkaddress) {
-        /* --- SINK --- */
-        /* Write received message to serial */
-        LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload);
+		  /* Check for packet in queue */
+		  while(is_data_in_queue()) {
+		    packet = pop_data();
+		    if(node_id == sinkaddress) {
+					/* --- SINK --- */
+					/* Write our own message to serial */
+					LOG_INFO("Pkt:%u,%u,%u\n", packet->src_id,packet->seqn, packet->payload);
+		    } else {
+					/* --- SOURCE --- */
+					/* Send our packet */
+					radio_send(((uint8_t*)packet),sizeof(lpsd_packet_t),1);
+					LOG_INFO("Packet sent (seqn: %u)\n", packet->seqn);
+		    }
+		  }
+		}
+	}
+	else {
+		 while(1) {
 
-      } else {
-        /* --- SOURCE --- */
-        /* Forward the packet */
-        radio_send(((uint8_t*)&packet_rcv),packet_len,1);
-        LOG_INFO("Packet received and forwarded...\n");
-      }
-    }
+		  /* listen for incoming packet */
+		  packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
 
-    /* Check for packet in queue */
-    while(is_data_in_queue()){
-      packet = pop_data();
-      if(node_id == sinkaddress) {
-        /* --- SINK --- */
-        /* Write our own message to serial */
-        LOG_INFO("Pkt:%u,%u,%u\n", packet->src_id,packet->seqn, packet->payload);
-      } else {
-        /* --- SOURCE --- */
-        /* Send our packet */
-        radio_send(((uint8_t*)packet),sizeof(lpsd_packet_t),1);
-        LOG_INFO("Packet sent (seqn: %u)\n", packet->seqn);
-      }
-    }
-  }
-}
-else
-{
-   while(1) {
+		  /* if we received something, retransmit */
+		  if(packet_len) {
+		    if(node_id == sinkaddress) {
+					/* --- SINK --- */
+					/* Write received message to serial */
+					LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload);
+		    } else {
+					/* --- SOURCE --- */
+					/* Forward the packet */
+					radio_send(((uint8_t*)&packet_rcv),packet_len,1);
+					LOG_INFO("Packet received and forwarded...\n");
+		    }
+		  }
 
-    /* listen for incoming packet */
-    packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
-
-    /* if we received something, retransmit */
-    if(packet_len){
-      if(node_id == sinkaddress) {
-        /* --- SINK --- */
-        /* Write received message to serial */
-        LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload);
-
-      } else {
-        /* --- SOURCE --- */
-        /* Forward the packet */
-        radio_send(((uint8_t*)&packet_rcv),packet_len,1);
-        LOG_INFO("Packet received and forwarded...\n");
-      }
-    }
-
-    /* Check for packet in queue */
-    while(is_data_in_queue()){
-      packet = pop_data();
-	//this is a test
-      if(node_id == sinkaddress) {
-        /* --- SINK --- */
-        /* Write our own message to serial */
-        LOG_INFO("Pkt:%u,%u,%u\n", packet->src_id,packet->seqn, packet->payload);
-      } else {
-        /* --- SOURCE --- */
-        /* Send our packet */
-        radio_send(((uint8_t*)packet),sizeof(lpsd_packet_t),1);
-        LOG_INFO("Packet sent (seqn: %u)\n", packet->seqn);
-      }
-    }
-  }
-}
+		  /* Check for packet in queue */
+		  while(is_data_in_queue()) {
+		    packet = pop_data();
+		    if(node_id == sinkaddress) {
+					/* --- SINK --- */
+					/* Write our own message to serial */
+					LOG_INFO("Pkt:%u,%u,%u\n", packet->src_id,packet->seqn, packet->payload);
+		    } else {
+					/* --- SOURCE --- */
+					/* Send our packet */
+					radio_send(((uint8_t*)packet),sizeof(lpsd_packet_t),1);
+					LOG_INFO("Packet sent (seqn: %u)\n", packet->seqn);
+		    }
+		  }
+		}
+	}
   PROCESS_END();
 }
 /*---------------------------------------------------------------------------*/
