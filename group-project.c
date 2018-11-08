@@ -165,6 +165,7 @@ else
     /* Check for packet in queue */
     while(is_data_in_queue()){
       packet = pop_data();
+	//this is a test
       if(node_id == sinkaddress) {
         /* --- SINK --- */
         /* Write our own message to serial */
