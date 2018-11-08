@@ -100,6 +100,7 @@ PROCESS_THREAD(design_project_process, ev, data)
   static uint16_t       timeout_ms; /* packet receive timeout, in ms */
   static uint8_t		firstpacket = 1; // First packet for the initiator
   static struct etimer  synctimer;
+  static uint8_t		is_sync = 0;
 
 	static std::vector<uint8_t> my_parents;  				/* parent slot IDs */
   static uint8_t        			my_dst;     				/* packet destination ID */
@@ -204,108 +205,25 @@ PROCESS_THREAD(design_project_process, ev, data)
 			/* --- FORWARDER --- */
 
 			if(is_sync) {
+				LOG_INFO("In Sync");
 				/* Wait for the periodic timer to expire and then reset the timer. */
-				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&timer));
-				etimer_reset(&timer);
-			}
-
-			/* listen for incoming packet */
-			LOG_INFO("Listening...\n");
-			while(packet_len) {
-				LED_ON(LED_STATUS);
-				packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
-				LED_OFF(LED_STATUS);
-				if((packet_len) &&
-				(packet_rcv.dst_id == node_id  ) &&
-				(packet_rcv.src_id == my_parent)) {
-				break;
-				}
-			}
-
-			if(packet_len) {
-
-				if(!is_sync) {
-				/* start the periodic timer for the forwarder */
-				etimer_restart(&timer);
-
-				/* retard the timer by a 1 ms (~ reception time of our packet) */
-				int offset = (-1 * (int)CLOCK_SECOND)/1000;
-				/* if clock resolution is not big enough, set the offset to be at least one tick*/
-				if(!offset) {
-					offset = -1;
-				}
-				etimer_adjust(&timer, offset);
-				/* mark the node as synced */
-				is_sync = 1;
-				}
-
-				LOG_INFO("Success!\n");
-				LOG_INFO("Packet received from node %u after %u hops.\n\n",
-						packet_rcv.src_id,
-						packet_rcv.payload.hop_count+1);
-				/* Update packet content */
-				packet.src_id = node_id;
-				packet.dst_id = my_dst;
-				packet.payload.hop_count    = packet_rcv.payload.hop_count+1;
-				packet.payload.round_count  = packet_rcv.payload.round_count;
-
-				/* Send */
-				LED_ON(LED_STATUS);
-				radio_send(((uint8_t*)&packet),packet_len,1);
-				LED_OFF(LED_STATUS);
-
-				/* Toggle the LED based on the received round_count */
-				static uint8_t i;
-				etimer_restart(&timer_LED);
-				for(i=0; i< ((packet.payload.round_count)%3 + 1) ; i++) {
-				LED_ON(LED_STATUS);
-				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&timer_LED));
-				etimer_reset(&timer_LED);
-				LED_OFF(LED_STATUS);
-				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&timer_LED));
-				etimer_reset(&timer_LED);
-				}
+				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&synctimer));
+				etimer_reset(&synctimer);
 			} else {
-				LOG_INFO("Failure!\n\n");
-				/* reset for next packet */
-				packet_len = 1;
+				/* listen for incoming packet */
+				LOG_INFO("Listening...\n");
+				while(packet_len) {
+					LED_ON(LED_STATUS);
+					packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
+					LED_OFF(LED_STATUS);
+					if(packet_len) {
+						break;
+					}
+				}
+				etimer_restart(&synctimer);
+				is_sync = 1;
+				LOG_INFO("Packet received");
 			}
-			}
-		}
-
-		 while(1) {
-
-		  /* listen for incoming packet */
-		  packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
-
-		  /* if we received something, retransmit */
-		  if(packet_len){
-		    if(node_id == sinkaddress) {
-					/* --- SINK --- */
-					/* Write received message to serial */
-					LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload);
-		    } else {
-					/* --- SOURCE --- */
-					/* Forward the packet */
-					radio_send(((uint8_t*)&packet_rcv),packet_len,1);
-					LOG_INFO("Packet received and forwarded...\n");
-		    }
-		  }
-
-		  /* Check for packet in queue */
-		  while(is_data_in_queue()) {
-		    packet = pop_data();
-		    if(node_id == sinkaddress) {
-					/* --- SINK --- */
-					/* Write our own message to serial */
-					LOG_INFO("Pkt:%u,%u,%u\n", packet->src_id,packet->seqn, packet->payload);
-		    } else {
-					/* --- SOURCE --- */
-					/* Send our packet */
-					radio_send(((uint8_t*)packet),sizeof(lpsd_packet_t),1);
-					LOG_INFO("Packet sent (seqn: %u)\n", packet->seqn);
-		    }
-		  }
 		}
 	}
 	else {
