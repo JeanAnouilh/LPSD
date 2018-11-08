@@ -69,7 +69,7 @@ typedef struct {
   uint8_t         hop_count;
   uint8_t         round_count;
   uint16_t        data;
-  uint16_t        payload1;
+  uint16_t        payload;
   uint16_t        payload2;
   uint16_t        payload3;
   uint16_t        payload4;
@@ -94,7 +94,7 @@ AUTOSTART_PROCESSES(&design_project_process);
 /*---------------------------------------------------------------------------*/
 PROCESS_THREAD(design_project_process, ev, data)
 {
-  static lpsd_packet_t* packet;     /* packet pointer */
+  static lpsd_packet_t  packet;     /* packet buffer */
   static lpsd_packet_t  packet_rcv; /* received packet buffer */
   static uint8_t        packet_len; /* packet length, in Bytes */
   static uint16_t       timeout_ms; /* packet receive timeout, in ms */
@@ -102,7 +102,7 @@ PROCESS_THREAD(design_project_process, ev, data)
   static struct etimer  synctimer;
   static uint8_t		is_sync = 0;
 
-	static std::vector<uint8_t> my_parents;  				/* parent slot IDs */
+	//static std::vector<uint8_t> my_parents;  				/* parent slot IDs */
   static uint8_t        			my_dst;     				/* packet destination ID */
 	static uint8_t							my_slot;						/* used slot ID */
 
@@ -122,56 +122,56 @@ PROCESS_THREAD(design_project_process, ev, data)
 	etimer_set(&synctimer, CLOCK_SECOND);
 
 	if(sinkaddress == 22) {
-		if(node_id == 1) {
+		if(node_id == NODE_1) {
 			my_dst = 33;
 			my_slot = 14;
-		} else if(node_id == 2) {
+		} else if(node_id == NODE_2) {
 			my_dst = 33;
 			my_slot = 19;
-		} else if(node_id == 3) {
-			my_parents.push_back(10);
-			my_parents.push_back(15);
+		} else if(node_id == NODE_3) {
+		//	my_parents.push_back(10);
+		//	my_parents.push_back(15);
 			my_dst = 22;
 			my_slot = 9;
-		} else if(node_id == 4) {
+		} else if(node_id == NODE_4) {
 			my_dst = 33;
 			my_slot = 21;
-		} else if(node_id == 6) {
+		} else if(node_id == NODE_6) {
 			my_dst = 22;
 			my_slot = 22;
-		} else if(node_id == 8) {
+		} else if(node_id == NODE_8) {
 			my_dst = 28;
 			my_slot = 17;
-		} else if(node_id == 10) {
+		} else if(node_id == NODE_10) {
 			my_dst = 3;
 			my_slot = 20;
-		} else if(node_id == 15) {
+		} else if(node_id == NODE_15) {
 			my_dst = 3;
 			my_slot = 23;
-		} else if(node_id == 16) {
+		} else if(node_id == NODE_16) {
 			my_dst = 22;
 			my_slot = 16;
-		} else if(node_id == 18) {
+		} else if(node_id == NODE_18) {
 			my_dst = 22;
 			my_slot = 18;
-		} else if(node_id == 22) {
+		} else if(node_id == NODE_22) {
 			my_slot = 0;
-		} else if(node_id == 28) {
-			my_parents.push_back(8);
-			my_parents.push_back(31);
+		} else if(node_id == NODE_28) {
+		//	my_parents.push_back(8);
+		//	my_parents.push_back(31);
 			my_dst = 22;
 			my_slot = 1;
-		} else if(node_id == 31) {
-			my_parents.push_back(32);
+		} else if(node_id == NODE_31) {
+		//	my_parents.push_back(32);
 			my_dst = 28;
 			my_slot = 12;
-		} else if(node_id == 32) {
+		} else if(node_id == NODE_32) {
 			my_dst = 31;
 			my_slot = 15;
-		} else if(node_id == 33) {
-			my_parents.push_back(1);
-			my_parents.push_back(2);
-			my_parents.push_back(4);
+		} else if(node_id == NODE_33) {
+		//	my_parents.push_back(1);
+		//	my_parents.push_back(2);
+		//	my_parents.push_back(4);
 			my_dst = 22;
 			my_slot = 5;
 		}
@@ -179,50 +179,54 @@ PROCESS_THREAD(design_project_process, ev, data)
 		packet_len =  sizeof(packet);
 		while(1) {
 
-			if(node_id == sinkaddress {
-			/* --- INITIATOR --- */
-			/* send the first packet */
-			
-			if(firstpacket) {
-				etimer_restart(&synctimer);
-				firstpacket = 0;
-			}
-			//packet_len =  sizeof(packet);
-			radio_send(((uint8_t*)&packet),packet_len,1);
-			LOG_INFO("sync_round: %u\n", packet.payload.round_count);
+			if(node_id == sinkaddress) {
+				/* --- INITIATOR --- */
+				/* send the first packet */
+				
+				if(firstpacket) {
+					etimer_restart(&synctimer);
+					firstpacket = 0;
+				}
+				//packet_len =  sizeof(packet);
+				radio_send(((uint8_t*)&packet),packet_len,1);
+				LOG_INFO("sync_round: %u\n", packet.payload.round_count);
 
-			/* increment round counter */
-			packet.payload.round_count++;
-			if(packet.payload.round_count == 11){
-				break;
-			}
-			/* Wait for the periodic timer to expire and then reset the timer. */
-			PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&synctimer));
-			etimer_reset(&synctimer);
-
-			} else {
-
-			/* --- FORWARDER --- */
-
-			if(is_sync) {
-				LOG_INFO("In Sync");
+				/* increment round counter */
+				packet.payload.round_count++;
+				if(packet.payload.round_count == 11){
+					break;
+				}
 				/* Wait for the periodic timer to expire and then reset the timer. */
 				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&synctimer));
 				etimer_reset(&synctimer);
+
 			} else {
-				/* listen for incoming packet */
-				LOG_INFO("Listening...\n");
-				while(packet_len) {
-					LED_ON(LED_STATUS);
-					packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
-					LED_OFF(LED_STATUS);
-					if(packet_len) {
-						break;
+
+				/* --- FORWARDER --- */
+
+				if(is_sync) {
+					LOG_INFO("In Sync");
+					/* Wait for the periodic timer to expire and then reset the timer. */
+					PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&synctimer));
+					etimer_reset(&synctimer);
+				} else {
+					/* listen for incoming packet */
+					LOG_INFO("Listening...\n");
+					LOG_INFO("Myslot = %u \n",my_slot);
+					LOG_INFO("Mydst = %u \n",my_dst);
+					
+					while(packet_len) {
+						LED_ON(LED_STATUS);
+						packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
+						LED_OFF(LED_STATUS);
+						if(packet_len) {
+							break;
+						}
 					}
+					etimer_restart(&synctimer);
+					is_sync = 1;
+					LOG_INFO("Packet received");
 				}
-				etimer_restart(&synctimer);
-				is_sync = 1;
-				LOG_INFO("Packet received");
 			}
 		}
 	}
@@ -237,7 +241,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 		    if(node_id == sinkaddress) {
 					/* --- SINK --- */
 					/* Write received message to serial */
-					LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload);
+					//LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload);
 		    } else {
 					/* --- SOURCE --- */
 					/* Forward the packet */
@@ -252,12 +256,12 @@ PROCESS_THREAD(design_project_process, ev, data)
 		    if(node_id == sinkaddress) {
 					/* --- SINK --- */
 					/* Write our own message to serial */
-					LOG_INFO("Pkt:%u,%u,%u\n", packet->src_id,packet->seqn, packet->payload);
+					//LOG_INFO("Pkt:%u,%u,%u\n", packet->src_id,packet->seqn, packet->payload);
 		    } else {
 					/* --- SOURCE --- */
 					/* Send our packet */
 					radio_send(((uint8_t*)packet),sizeof(lpsd_packet_t),1);
-					LOG_INFO("Packet sent (seqn: %u)\n", packet->seqn);
+				//	LOG_INFO("Packet sent (seqn: %u)\n", packet->seqn);
 		    }
 		  }
 		}
