@@ -95,6 +95,7 @@ AUTOSTART_PROCESSES(&design_project_process);
 PROCESS_THREAD(design_project_process, ev, data)
 {
   static lpsd_packet_t  packet;     /* packet buffer */
+  static lpsd_packet_t* packet2;    /* packet pointer */
   static lpsd_packet_t  packet_rcv; /* received packet buffer */
   static uint8_t        packet_len; /* packet length, in Bytes */
   static uint16_t       timeout_ms; /* packet receive timeout, in ms */
@@ -122,53 +123,53 @@ PROCESS_THREAD(design_project_process, ev, data)
 	etimer_set(&synctimer, CLOCK_SECOND);
 
 	if(sinkaddress == 22) {
-		if(node_id == NODE_1) {
+		if(node_id == 1) {
 			my_dst = 33;
 			my_slot = 14;
-		} else if(node_id == NODE_2) {
+		} else if(node_id == 2) {
 			my_dst = 33;
 			my_slot = 19;
-		} else if(node_id == NODE_3) {
+		} else if(node_id == 3) {
 		//	my_parents.push_back(10);
 		//	my_parents.push_back(15);
 			my_dst = 22;
 			my_slot = 9;
-		} else if(node_id == NODE_4) {
+		} else if(node_id == 4) {
 			my_dst = 33;
 			my_slot = 21;
-		} else if(node_id == NODE_6) {
+		} else if(node_id == 6) {
 			my_dst = 22;
 			my_slot = 22;
-		} else if(node_id == NODE_8) {
+		} else if(node_id == 8) {
 			my_dst = 28;
 			my_slot = 17;
-		} else if(node_id == NODE_10) {
+		} else if(node_id == 10) {
 			my_dst = 3;
 			my_slot = 20;
-		} else if(node_id == NODE_15) {
+		} else if(node_id == 15) {
 			my_dst = 3;
 			my_slot = 23;
-		} else if(node_id == NODE_16) {
+		} else if(node_id == 16) {
 			my_dst = 22;
 			my_slot = 16;
-		} else if(node_id == NODE_18) {
+		} else if(node_id == 18) {
 			my_dst = 22;
 			my_slot = 18;
-		} else if(node_id == NODE_22) {
+		} else if(node_id == 22) {
 			my_slot = 0;
-		} else if(node_id == NODE_28) {
+		} else if(node_id == 28) {
 		//	my_parents.push_back(8);
 		//	my_parents.push_back(31);
 			my_dst = 22;
 			my_slot = 1;
-		} else if(node_id == NODE_31) {
+		} else if(node_id == 31) {
 		//	my_parents.push_back(32);
 			my_dst = 28;
 			my_slot = 12;
-		} else if(node_id == NODE_32) {
+		} else if(node_id == 32) {
 			my_dst = 31;
 			my_slot = 15;
-		} else if(node_id == NODE_33) {
+		} else if(node_id == 33) {
 		//	my_parents.push_back(1);
 		//	my_parents.push_back(2);
 		//	my_parents.push_back(4);
@@ -189,7 +190,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 				}
 				//packet_len =  sizeof(packet);
 				radio_send(((uint8_t*)&packet),packet_len,1);
-				LOG_INFO("sync_round: %u\n", packet.payload.round_count);
+				LOG_INFO("sync_round: %u\n", packet.seqn);
 
 				/* increment round counter */
 				packet.payload.round_count++;
@@ -252,16 +253,16 @@ PROCESS_THREAD(design_project_process, ev, data)
 
 		  /* Check for packet in queue */
 		  while(is_data_in_queue()) {
-		    packet = pop_data();
+		    packet2 = pop_data();
 		    if(node_id == sinkaddress) {
 					/* --- SINK --- */
 					/* Write our own message to serial */
-					//LOG_INFO("Pkt:%u,%u,%u\n", packet->src_id,packet->seqn, packet->payload);
+					//LOG_INFO("Pkt:%u,%u,%u\n", packet2->src_id,packet2->seqn, packet2->payload);
 		    } else {
 					/* --- SOURCE --- */
-					/* Send our packet */
-					radio_send(((uint8_t*)packet),sizeof(lpsd_packet_t),1);
-				//	LOG_INFO("Packet sent (seqn: %u)\n", packet->seqn);
+					/* Send our packet2 */
+					radio_send(((uint8_t*)packet2),sizeof(lpsd_packet_t),1);
+				//	LOG_INFO("Packet2 sent (seqn: %u)\n", packet2->seqn);
 		    }
 		  }
 		}
