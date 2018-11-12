@@ -88,6 +88,9 @@ typedef struct {
   uint8_t         seqn;
   lpsd_payload_t  payload;
 } lpsd_packet_t;
+typedef struct {
+  uint8_t         synccount;
+} lpsd_syncpacket_t;
 /*---------------------------------------------------------------------------*/
 PROCESS(design_project_process, "Skeleton code - LPSD Design Project");
 AUTOSTART_PROCESSES(&design_project_process);
@@ -101,7 +104,10 @@ PROCESS_THREAD(design_project_process, ev, data)
   static uint16_t       timeout_ms; /* packet receive timeout, in ms */
   static uint8_t		firstpacket = 1; // First packet for the initiator
   static struct etimer  synctimer;
+  static struct etimer  periodtimer;
   static uint8_t		is_sync = 0;
+  static u_int8_t		synctransmit = 2;
+
 
 	//static std::vector<uint8_t> my_parents;  				/* parent slot IDs */
   static uint8_t        			my_dst;     				/* packet destination ID */
@@ -120,7 +126,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 
   timeout_ms = 100;
 
-	etimer_set(&synctimer, CLOCK_SECOND);
+	etimer_set(&periodtimer, CLOCK_SECOND);
 
 	if(sinkaddress == 22) {
 		if(node_id == 1) {
@@ -218,9 +224,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 					LOG_INFO("Mydst = %u \n",my_dst);
 					
 					while(1) {  	//Solange in der Schleife bleiben bis ein Sync Packet empfangen wird
-						LED_ON(LED_STATUS);
 						packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
-						LED_OFF(LED_STATUS);
 						if(packet_len) {
 							break;
 						}
