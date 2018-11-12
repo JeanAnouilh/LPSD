@@ -97,32 +97,31 @@ AUTOSTART_PROCESSES(&design_project_process);
 /*---------------------------------------------------------------------------*/
 PROCESS_THREAD(design_project_process, ev, data)
 {
-  static lpsd_packet_t  packet;     /* packet buffer */
-  static lpsd_packet_t* packet2;    /* packet pointer */
-  static lpsd_packet_t  packet_rcv; /* received packet buffer */
+  //static lpsd_packet_t  packet;     /* packet buffer */
+  //static lpsd_packet_t* packet2;    /* packet pointer */
+  //static lpsd_packet_t  packet_rcv; /* received packet buffer */
 
   //Syncronization Packet
   static lpsd_syncpacket_t  sync_packet;            /* packet buffer */
-  static lpsd_syncpacket_t* sync_packet_pointer;    /* packet pointer */
   static lpsd_syncpacket_t  sync_packet_rcv;        /* received packet buffer */
 
   static uint8_t        packet_len; /* packet length, in Bytes */
   static uint16_t       timeout_ms; /* packet receive timeout, in ms */
-  static uint8_t		firstpacket = 1; // First packet for the initiator
-  static struct etimer  synctimer;
-  static struct etimer  periodtimer;
-  static uint8_t		sync = 2;
-  static uint8_t		synccount;
-  static uint8_t		syncdist;
-  static uint8_t		last_sync = 0;
-  static uint8_t		first_sync = 0;
-  static uint8_t		last_time = 0;
-  static uint8_t		first_time = 0;
+  static uint8_t	firstpacket = 1; // First packet for the initiator
+  //static struct etimer  synctimer;
+  //static struct etimer  periodtimer;
+  static uint8_t	sync = 10;
+  //static uint8_t	synccount;
+  //static uint8_t	syncdist;
+  static uint8_t	last_sync = 0;
+  static uint8_t	first_sync = 0;
+  //static uint8_t	last_time = 0;
+  //static uint8_t	first_time = 0;
 
 
-	//static std::vector<uint8_t> my_parents;  				/* parent slot IDs */
-  static uint8_t        			my_dst;     				/* packet destination ID */
-	static uint8_t							my_slot;						/* used slot ID */
+  //static std::vector<uint8_t> my_parents;  					/* parent slot IDs */
+  //static uint8_t        			my_dst;     			/* packet destination ID */
+  //static uint8_t				my_slot;			/* used slot ID */
 
   PROCESS_BEGIN();
 
@@ -136,11 +135,8 @@ PROCESS_THREAD(design_project_process, ev, data)
   PIN_CFG_OUT(LED_STATUS);
 
   timeout_ms = 10;
-
-	etimer_set(&periodtimer, CLOCK_SECOND);
-
 	if(sinkaddress == 22) {
-		if(node_id == 1) {
+		/*if(node_id == 1) {
 			my_dst = 33;
 			my_slot = 14;
 		} else if(node_id == 2) {
@@ -192,11 +188,8 @@ PROCESS_THREAD(design_project_process, ev, data)
 		//	my_parents.push_back(4);
 			my_dst = 22;
 			my_slot = 5;
-		}
-		packet.payload.round_count  = 1;
-		packet_len =  sizeof(packet);
+		}*/
 		while(sync) {
-
 			if(node_id == sinkaddress) {
 				/* --- INITIATOR --- */
 				/* send the first packet */
@@ -205,7 +198,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 					sync_packet.synccount = 0;
 					packet_len =  sizeof(sync_packet);
 					radio_send(((uint8_t*)&sync_packet),packet_len,1);
-					etimer_restart(&synctimer);
+					//etimer_restart(&synctimer);
 					LOG_INFO("sync_round: %u\n", sync_packet.synccount);
 					--sync;
 				}
@@ -246,71 +239,13 @@ PROCESS_THREAD(design_project_process, ev, data)
 					radio_send(((uint8_t*)&sync_packet),packet_len,1);
 					LOG_INFO("send_packet_round: %u\n",sync_packet.synccount);
 					--sync;
-					if(!firstsync) {
-						firstsync = sync_packet_rcv.synccount;
+					if(!first_sync) {
+						first_sync = sync_packet_rcv.synccount;
 						}
 					last_sync = sync_packet_rcv.synccount;
 				}
-
-				if(is_sync) {
-					LOG_INFO("In Sync");
-					
-					/* Wait for the periodic timer to expire and then reset the timer. */
-					/*PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&synctimer));
-					etimer_reset(&synctimer);*/
-				if(!is_sync) {
-					/* listen for incoming packet */
-					LOG_INFO("Listening...\n");
-					LOG_INFO("Myslot = %u \n",my_slot);
-					LOG_INFO("Mydst = %u \n",my_dst);
-					
-					while(1) {  	//Solange in der Schleife bleiben bis ein Sync Packet empfangen wird
-						packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
-						if(packet_len) {
-							break;
-						}
-					}
-					etimer_restart(&synctimer);
-					is_sync = 1;
-					LOG_INFO("SyncPacket received");
-				}
+				last_sync = last_sync - first_sync;
 			}
-		}
-	}
-	else if(!(sinkaddress == 22)) {
-		 while(1) {
-
-		  /* listen for incoming packet */
-		  packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
-
-		  /* if we received something, retransmit */
-		  if(packet_len) {
-		    if(node_id == sinkaddress) {
-					/* --- SINK --- */
-					/* Write received message to serial */
-					//LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload);
-		    } else {
-					/* --- SOURCE --- */
-					/* Forward the packet */
-					radio_send(((uint8_t*)&packet_rcv),packet_len,1);
-					LOG_INFO("Packet received and forwarded...\n");
-		    }
-		  }
-
-		  /* Check for packet in queue */
-		  while(is_data_in_queue()) {
-		    packet2 = pop_data();
-		    if(node_id == sinkaddress) {
-					/* --- SINK --- */
-					/* Write our own message to serial */
-					//LOG_INFO("Pkt:%u,%u,%u\n", packet2->src_id,packet2->seqn, packet2->payload);
-		    } else {
-					/* --- SOURCE --- */
-					/* Send our packet2 */
-					radio_send(((uint8_t*)packet2),sizeof(lpsd_packet_t),1);
-				//	LOG_INFO("Packet2 sent (seqn: %u)\n", packet2->seqn);
-		    }
-		  }
 		}
 	}
   PROCESS_END();
