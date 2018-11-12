@@ -105,8 +105,13 @@ PROCESS_THREAD(design_project_process, ev, data)
   static uint8_t		firstpacket = 1; // First packet for the initiator
   static struct etimer  synctimer;
   static struct etimer  periodtimer;
-  static uint8_t		is_sync = 0;
-  static u_int8_t		synctransmit = 2;
+  static uint8_t		sync = 2;
+  static uint8_t		synccount;
+  static uint8_t		syncdist;
+  static uint8_t		last_sync = 0;
+  static uint8_t		first_sync = 0;
+  static uint8_t		last_time = 0;
+  static uint8_t		first_time = 0;
 
 
 	//static std::vector<uint8_t> my_parents;  				/* parent slot IDs */
@@ -210,6 +215,27 @@ PROCESS_THREAD(design_project_process, ev, data)
 			} else {
 
 				/* --- FORWARDER --- */
+				while(sync) {  	//Solange in der Schleife bleiben bis ein Sync Packet empfangen wird
+					LOG_INFO("Listening...");
+					while(1) {
+						packet_len = radio_rcv(((uint8_t*)&sync_packet_rcv), timeout_ms);
+						if(packet_len){
+							break;
+						}
+					}
+					LOG_INFO("receive_packet_round: %u\n",sync_packet_rcv.synccount);
+					sync_packet = sync_packet_rcv;
+					/*increment counter and resend packet*/
+					++sync_packet.synccount;	
+					packet_len = sizeof(sync_packet);		
+					radio_send(((uint8_t*)&sync_packet),packet_len,1);
+					LOG_INFO("send_packet_round: %u\n",sync_packet.synccount);
+					--sync;
+					if(!firstsync) {
+						firstsync = sync_packet_rcv.synccount;
+						}
+					last_sync = sync_packet_rcv.synccount;
+				}
 
 				if(is_sync) {
 					LOG_INFO("In Sync");
