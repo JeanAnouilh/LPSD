@@ -190,7 +190,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 				}
 				//packet_len =  sizeof(packet);
 				radio_send(((uint8_t*)&packet),packet_len,1);
-				LOG_INFO("sync_round: %u\n", packet.payload.round_count);
+				LOG_INFO("sync_round: %u\n", packet.seqn);
 
 				/* increment round counter */
 				packet.payload.round_count++;
@@ -207,6 +207,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 
 				if(is_sync) {
 					LOG_INFO("In Sync");
+					
 					/* Wait for the periodic timer to expire and then reset the timer. */
 					PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&synctimer));
 					etimer_reset(&synctimer);
@@ -216,7 +217,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 					LOG_INFO("Myslot = %u \n",my_slot);
 					LOG_INFO("Mydst = %u \n",my_dst);
 					
-					while(packet_len) {
+					while(1) {  	//Solange in der Schleife bleiben bis ein Sync Packet empfangen wird
 						LED_ON(LED_STATUS);
 						packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
 						LED_OFF(LED_STATUS);
@@ -226,12 +227,12 @@ PROCESS_THREAD(design_project_process, ev, data)
 					}
 					etimer_restart(&synctimer);
 					is_sync = 1;
-					LOG_INFO("Packet received");
+					LOG_INFO("SyncPacket received");
 				}
 			}
 		}
 	}
-	else {
+	else if(!(sinkaddress == 22)) {
 		 while(1) {
 
 		  /* listen for incoming packet */
