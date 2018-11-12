@@ -100,6 +100,12 @@ PROCESS_THREAD(design_project_process, ev, data)
   static lpsd_packet_t  packet;     /* packet buffer */
   static lpsd_packet_t* packet2;    /* packet pointer */
   static lpsd_packet_t  packet_rcv; /* received packet buffer */
+
+  //Syncronization Packet
+  static lpsd_syncpacket_t  sync_packet;            /* packet buffer */
+  static lpsd_syncpacket_t* sync_packet_pointer;    /* packet pointer */
+  static lpsd_syncpacket_t  sync_packet_rcv;        /* received packet buffer */
+
   static uint8_t        packet_len; /* packet length, in Bytes */
   static uint16_t       timeout_ms; /* packet receive timeout, in ms */
   static uint8_t		firstpacket = 1; // First packet for the initiator
@@ -124,7 +130,7 @@ PROCESS_THREAD(design_project_process, ev, data)
   PIN_CFG_OUT(RADIO_TX_PIN);
   PIN_CFG_OUT(LED_STATUS);
 
-  timeout_ms = 100;
+  timeout_ms = 10;
 
 	etimer_set(&periodtimer, CLOCK_SECOND);
 
@@ -184,29 +190,38 @@ PROCESS_THREAD(design_project_process, ev, data)
 		}
 		packet.payload.round_count  = 1;
 		packet_len =  sizeof(packet);
-		while(1) {
+		while(sync) {
 
 			if(node_id == sinkaddress) {
 				/* --- INITIATOR --- */
 				/* send the first packet */
-				
 				if(firstpacket) {
-					etimer_restart(&synctimer);
 					firstpacket = 0;
+					sync_packet.synccount = 0;
+					packet_len =  sizeof(sync_packet);
+					radio_send(((uint8_t*)&sync_packet),packet_len,1);
+					etimer_restart(&synctimer);
+					LOG_INFO("sync_round: %u\n", sync_packet.synccount);
+					--sync;
 				}
-				//packet_len =  sizeof(packet);
-				radio_send(((uint8_t*)&packet),packet_len,1);
-				LOG_INFO("sync_round: %u\n", packet.seqn);
 
-				/* increment round counter */
-				packet.payload.round_count++;
-				if(packet.payload.round_count == 11){
-					break;
+				/* listen for incoming packet */
+				LOG_INFO("Listening...\n");
+				while(1) {  	//Solange in der Schleife bleiben bis ein Sync Packet empfangen wird
+					packet_len = radio_rcv(((uint8_t*)&sync_packet_rcv), timeout_ms);
+					if(packet_len) {
+						break;
+					}
 				}
-				/* Wait for the periodic timer to expire and then reset the timer. */
-				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&synctimer));
-				etimer_reset(&synctimer);
-
+				LOG_INFO("receive_packet_round: %u\n", sync_packet_rcv.synccount);
+			
+				/* increment sync counter and resend packet */
+				sync_packet = sync_packet_rcv;
+				++sync_packet.synccount;
+				packet_len =  sizeof(sync_packet);
+				radio_send(((uint8_t*)&sync_packet),packet_len,1);
+				LOG_INFO("send_packet_round: %u\n", sync_packet.synccount);
+				--sync;
 			} else {
 
 				/* --- FORWARDER --- */
@@ -215,9 +230,9 @@ PROCESS_THREAD(design_project_process, ev, data)
 					LOG_INFO("In Sync");
 					
 					/* Wait for the periodic timer to expire and then reset the timer. */
-					PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&synctimer));
-					etimer_reset(&synctimer);
-				} else {
+					/*PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&synctimer));
+					etimer_reset(&synctimer);*/
+				if(!is_sync) {
 					/* listen for incoming packet */
 					LOG_INFO("Listening...\n");
 					LOG_INFO("Myslot = %u \n",my_slot);
