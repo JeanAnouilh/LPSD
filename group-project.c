@@ -190,7 +190,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 				}
 				//packet_len =  sizeof(packet);
 				radio_send(((uint8_t*)&packet),packet_len,1);
-				LOG_INFO("sync_round: %u\n", packet.seqn);
+				LOG_INFO("sync_round: %u\n", packet.payload.round_count);
 
 				/* increment round counter */
 				packet.payload.round_count++;
