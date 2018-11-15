@@ -108,7 +108,7 @@ PROCESS_THREAD(design_project_process, ev, data)
   static uint8_t        packet_len; /* packet length, in Bytes */
   static uint16_t       timeout_ms; /* packet receive timeout, in ms */
   static uint8_t	firstpacket = 1; // First packet for the initiator
-  //static struct etimer  synctimer;
+  static struct etimer  sync_timer;
   //static struct etimer  periodtimer;
   static uint8_t	sync = 10;
   //static uint8_t	synccount;
@@ -134,7 +134,11 @@ PROCESS_THREAD(design_project_process, ev, data)
   PIN_CFG_OUT(RADIO_TX_PIN);
   PIN_CFG_OUT(LED_STATUS);
 
-  timeout_ms = 10;
+  /* Setup a periodic timer that expires after 10 milli-seconds. */
+  etimer_set(&sync_timer, CLOCK_SECOND / 100);
+  timeout_ms = 11;
+
+
 	if(sinkaddress == 22) {
 		/*if(node_id == 1) {
 			my_dst = 33;
@@ -212,6 +216,10 @@ PROCESS_THREAD(design_project_process, ev, data)
 					}
 				}
 				LOG_INFO("receive_packet_round: %u\n", sync_packet_rcv.synccount);
+
+				/* Restart the timer and than wait to expire. */
+				etimer_restart(&sync_timer);
+      				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&sync_timer));
 			
 				/* increment sync counter and resend packet */
 				sync_packet = sync_packet_rcv;
@@ -232,6 +240,11 @@ PROCESS_THREAD(design_project_process, ev, data)
 						}
 					}
 					LOG_INFO("receive_packet_round: %u\n",sync_packet_rcv.synccount);
+
+					/* Restart the timer and than wait to expire. */
+					etimer_restart(&sync_timer);
+      					PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&sync_timer));
+
 					sync_packet = sync_packet_rcv;
 					/*increment counter and resend packet*/
 					++sync_packet.synccount;	
