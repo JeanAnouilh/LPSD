@@ -110,13 +110,14 @@ PROCESS_THREAD(design_project_process, ev, data)
   static uint8_t	firstpacket = 1; // First packet for the initiator
   static struct etimer  sync_timer;
   //static struct etimer  periodtimer;
-  static uint8_t	sync = 10;
+  static uint8_t	sync = 10;  /*mindestens 3 Runden*/
   //static uint8_t	synccount;
   //static uint8_t	syncdist;
   static uint8_t	last_sync = 0;
   static uint8_t	first_sync = 0;
-  //static uint8_t	last_time = 0;
-  //static uint8_t	first_time = 0;
+  static uint8_t	last_time = 0;
+  static uint8_t	first_time = 0;
+  static uint8_t	timestamp;
 
 
   //static std::vector<uint8_t> my_parents;  					/* parent slot IDs */
@@ -134,9 +135,9 @@ PROCESS_THREAD(design_project_process, ev, data)
   PIN_CFG_OUT(RADIO_TX_PIN);
   PIN_CFG_OUT(LED_STATUS);
 
-  /* Setup a periodic timer that expires after 2 milli-seconds. */
-  etimer_set(&sync_timer, CLOCK_SECOND / 500);
-  timeout_ms = 15;
+  /* Setup a periodic timer that expires after 10 milli-seconds. */
+  etimer_set(&sync_timer, CLOCK_SECOND / 100);
+  timeout_ms = 11;
 
 
 	if(sinkaddress == 22) {
@@ -193,18 +194,16 @@ PROCESS_THREAD(design_project_process, ev, data)
 			my_dst = 22;
 			my_slot = 5;
 		}*/
+
 		while(sync) {
 			if(node_id == sinkaddress) {
 				/* --- INITIATOR --- */
 				/* send the first packet */
 				if(firstpacket) {
-					/* Wait 11 ms to be sure that all other nodes are ready. */
-					etimer_restart(&sync_timer);
-      				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&sync_timer));
-
 					firstpacket = 0;
 					sync_packet.synccount = 0;
 					packet_len =  sizeof(sync_packet);
+					timestamp=clock_time();
 					radio_send(((uint8_t*)&sync_packet),packet_len,1);
 					//etimer_restart(&synctimer);
 					LOG_INFO("sync_round: %u\n", sync_packet.synccount);
@@ -220,50 +219,52 @@ PROCESS_THREAD(design_project_process, ev, data)
 					}
 				}
 				LOG_INFO("receive_packet_round: %u\n", sync_packet_rcv.synccount);
-
+				etimer_pending
 				/* Restart the timer and than wait to expire. */
 				etimer_restart(&sync_timer);
-      			PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&sync_timer));
+      				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&sync_timer));
 			
 				/* increment sync counter and resend packet */
 				sync_packet = sync_packet_rcv;
 				++sync_packet.synccount;
 				packet_len =  sizeof(sync_packet);
+				timestamp=clock_time();
 				radio_send(((uint8_t*)&sync_packet),packet_len,1);
 				LOG_INFO("send_packet_round: %u\n", sync_packet.synccount);
 				--sync;
 			} else {
 
 				/* --- FORWARDER --- */
-				while(sync) {  	//Solange in der Schleife bleiben bis ein Sync Packet empfangen wird
-					LOG_INFO("Listening...");
-					while(1) {
-						packet_len = radio_rcv(((uint8_t*)&sync_packet_rcv), timeout_ms);
-						if(packet_len){
-							break;
-						}
+				
+				LOG_INFO("Listening...");
+				while(1) {
+					packet_len = radio_rcv(((uint8_t*)&sync_packet_rcv), timeout_ms);
+					if(packet_len){
+						break;
 					}
-					LOG_INFO("receive_packet_round: %u\n",sync_packet_rcv.synccount);
-
-					/* Restart the timer and than wait to expire. */
-					etimer_restart(&sync_timer);
-      					PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&sync_timer));
-
-					sync_packet = sync_packet_rcv;
-					/*increment counter and resend packet*/
-					++sync_packet.synccount;	
-					packet_len = sizeof(sync_packet);		
-					radio_send(((uint8_t*)&sync_packet),packet_len,1);
-					LOG_INFO("send_packet_round: %u\n",sync_packet.synccount);
-					--sync;
-					if(!first_sync) {
-						first_sync = sync_packet_rcv.synccount;
-						}
-					last_sync = sync_packet_rcv.synccount;
 				}
-				last_sync = last_sync - first_sync;
+				LOG_INFO("receive_packet_round: %u\n",sync_packet_rcv.synccount);
+
+				/* Restart the timer and than wait to expire. */
+				etimer_restart(&sync_timer);
+      			PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&sync_timer));
+
+				sync_packet = sync_packet_rcv;
+				/*increment counter and resend packet*/
+				++sync_packet.synccount;	
+				packet_len = sizeof(sync_packet);
+				/*get actual timestamp before sending*/
+				timestamp=clock_time();	  	
+				radio_send(((uint8_t*)&sync_packet),packet_len,1);
+				LOG_INFO("send_packet_round: %u\n",sync_packet.synccount);
+				--sync;
+				if(!first_sync) {
+					first_sync = sync_packet_rcv.synccount;
+					}
+				last_sync = sync_packet_rcv.synccount;
 			}
 		}
+
 	}
   PROCESS_END();
 }
