@@ -110,6 +110,7 @@ PROCESS_THREAD(design_project_process, ev, data)
   static uint8_t	firstpacket = 1; // First packet for the initiator
   static struct etimer  sync_timer;
   static struct etimer  wait_timer;
+  static struct etimer  first_wait_timer;
   //static struct etimer  slot_timer;
   //static struct etimer  periodtimer;
   static uint8_t	sync = 10;  /*mindestens 3 Runden*/
@@ -138,10 +139,11 @@ PROCESS_THREAD(design_project_process, ev, data)
   PIN_CFG_OUT(RADIO_TX_PIN);
   PIN_CFG_OUT(LED_STATUS);
 
-  /* Setup a periodic timer that expires after 2 milli-seconds. */
-  etimer_set(&wait_timer, CLOCK_SECOND / 500);
+  /* Setup periodic timers that expire after 10/50/1000 milli-seconds. */
+  etimer_set(&first_wait_timer, CLOCK_SECOND / 20);
+  etimer_set(&wait_timer, CLOCK_SECOND / 100);
   etimer_set(&sync_timer, CLOCK_SECOND);
-  timeout_ms = 15;
+  timeout_ms = 100;
 
 
 	if(sinkaddress == 22) {
@@ -203,9 +205,9 @@ PROCESS_THREAD(design_project_process, ev, data)
 		while(sync) {
 			if(firstpacket && node_id == sinkaddress) {
 				/* --- INITIATOR --- */
-				/* Wait 11 ms to be sure that all other nodes are ready. */
-				etimer_restart(&wait_timer);
-  				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&wait_timer));
+				/* Wait 50 ms to be sure that all other nodes are ready. */
+				etimer_restart(&first_wait_timer);
+  				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&first_wait_timer));
 
   				/* prepare first packet */
 				firstpacket = 0;
