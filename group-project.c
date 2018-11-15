@@ -110,7 +110,7 @@ PROCESS_THREAD(design_project_process, ev, data)
   static uint8_t	firstpacket = 1; // First packet for the initiator
   static struct etimer  sync_timer;
   static struct etimer  wait_timer;
-  static struct etimer  slot_timer;
+  //static struct etimer  slot_timer;
   //static struct etimer  periodtimer;
   static uint8_t	sync = 10;  /*mindestens 3 Runden*/
   //static uint8_t	synccount;
@@ -258,8 +258,8 @@ PROCESS_THREAD(design_project_process, ev, data)
 			}
 		}
 
-		static clock_time_t delta_t = (last_time - first_time) / (last_sync - first_sync);
-		static clock_time_t t_zero = first_time - (first_sync * delta_t);
+		clock_time_t delta_t = (last_time - first_time) / (last_sync - first_sync);
+		clock_time_t t_zero = first_time - (first_sync * delta_t);
 
 		etimer_adjust(&sync_timer, (int16_t) (t_zero - etimer_start_time(&sync_timer)));
 
