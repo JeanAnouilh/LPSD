@@ -62,218 +62,220 @@ uint16_t sinkaddress = SINK_ADDRESS;
 #endif /* RANDOM_SEED */
 uint16_t randomseed = RANDOM_SEED;
 /*---------------------------------------------------------------------------*/
-/**
- * @brief     Struct to store packet information
- */
+
+/* Structs for the different packets */
+// Single data value 
 typedef struct {
-  uint8_t         hop_count;
-  uint8_t         round_count;
-  uint16_t        data;
-  uint16_t        payload;
-  uint16_t        payload2;
-  uint16_t        payload3;
-  uint16_t        payload4;
-  uint16_t        payload5;
-  uint16_t        payload6;
-  uint16_t        payload7;
-  uint16_t        payload8;
-  uint16_t        payload9;
-  uint16_t        payload10;
-  uint16_t        payload11;
-  uint16_t        payload12;
-  uint16_t        payload13;
-} lpsd_payload_t;
+	uint16_t					src_id;							/* TODO: is this really necessary? */
+	uint8_t						seqn;							/* TODO: is this really necessary? */
+	uint16_t					data;
+	uint8_t						error_correction;
+} lpsd_data_struct_t;
+// Ten data values collected
 typedef struct {
-  uint16_t        src_id;
-  uint8_t         seqn;
-  lpsd_payload_t  payload;
-} lpsd_packet_t;
+	lpsd_data_struct_t[10]		data_payload;
+	uint16_t					error_correction;
+} lpsd_data_t;
+// Ten data packets collected
 typedef struct {
-  uint8_t         synccount;
-} lpsd_syncpacket_t;
+	lpsd_data_t[10]				super_payload;
+	uint32_t					error_correction;
+} lpsd_super_t;
+// Sync packet
+typedef struct {
+	uint8_t						sync_count;
+} lpsd_sync_t;
+
 /*---------------------------------------------------------------------------*/
 PROCESS(design_project_process, "Skeleton code - LPSD Design Project");
 AUTOSTART_PROCESSES(&design_project_process);
 /*---------------------------------------------------------------------------*/
 PROCESS_THREAD(design_project_process, ev, data)
 {
-  //static lpsd_packet_t  packet;     /* packet buffer */
-  //static lpsd_packet_t* packet2;    /* packet pointer */
-  //static lpsd_packet_t  packet_rcv; /* received packet buffer */
+	/* --- Packets --- */
+	//Syncronization Packet
+	static lpsd_sync_t			sync_packet;					/* packet buffer */
+	static lpsd_sync_t			sync_packet_rcv;				/* received packet buffer */
+	//Structure Packet
+	static lpsd_structure_t		structure_packet;				/* packet buffer */
+	static lpsd_structure_t		structure_packet_rcv;			/* received packet buffer */
+	//Data Packet
+	static lpsd_data_t			data_packet;					/* packet buffer */
+	static lpsd_data_t			data_packet_rcv;				/* received packet buffer */
+	//Super Packet
+	static lpsd_super_t			super_packet;					/* packet buffer */
+	static lpsd_super_t			super_packet_rcv;				/* received packet buffer */
 
-  //Syncronization Packet
-  static lpsd_syncpacket_t  sync_packet;            /* packet buffer */
-  static lpsd_syncpacket_t  sync_packet_rcv;        /* received packet buffer */
+	static uint8_t				packet_len;						/* packet length, in Bytes */
+	static uint16_t				timeout_ms = 100;				/* packet receive timeout, in ms */
+	static uint32_t				slot_time = CLOCK_SECOND / 28;
+	static uint8_t				firstpacket = 1;				/* First packet for the initiator */
+	static struct etimer		sync_timer;
+	static struct etimer		wait_timer;
+	static struct etimer		first_wait_timer;
+	static struct etimer[27]	slot_timer;
+	static uint8_t				sync = 10;						/* in minimum 3 rounds */
+	static uint8_t				last_sync = 0;
+	static uint8_t				first_sync = 0;
+	static uint8_t				test_count = 0;
+	static clock_time_t			last_time = 0;
+	static clock_time_t			first_time = 0;
+	static clock_time_t			timestamp;
 
-  static uint8_t        packet_len; /* packet length, in Bytes */
-  static uint16_t       timeout_ms; /* packet receive timeout, in ms */
-  static uint8_t	firstpacket = 1; // First packet for the initiator
-  static struct etimer  sync_timer;
-  static struct etimer  wait_timer;
-  static struct etimer  first_wait_timer;
-  //static struct etimer  slot_timer;
-  //static struct etimer  periodtimer;
-  static uint8_t	sync = 10;  /*mindestens 3 Runden*/
-  //static uint8_t	synccount;
-  //static uint8_t	syncdist;
-  static uint8_t	last_sync = 0;
-  static uint8_t	first_sync = 0;
-  static uint8_t	test_count = 0;
-  static clock_time_t	last_time = 0;
-  static clock_time_t	first_time = 0;
-  static clock_time_t	timestamp;
+	static uint8_t				my_slot;						/* used slot ID */
+	static uint8_t[27]			slot_mapping = {1,2,3,4,6,7,8,10,11,13,14,15,16,17,18,19,20,22,23,24,25,26,27,28,31,32,33};
+	static uint8_t[27]			slots;
 
+	PROCESS_BEGIN();
 
-  //static std::vector<uint8_t> my_parents;  					/* parent slot IDs */
-  //static uint8_t        			my_dst;     			/* packet destination ID */
-  //static uint8_t				my_slot;			/* used slot ID */
+	/* initialize the data generator */
+	data_generation_init();
 
-  PROCESS_BEGIN();
+	/* configure GPIO as outputs */
+	//PIN_CFG_OUT(RADIO_START_PIN);
+	PIN_CFG_OUT(RADIO_RX_PIN);
+	PIN_CFG_OUT(RADIO_TX_PIN);
+	PIN_CFG_OUT(LED_STATUS);
 
-  /* initialize the data generator */
-  data_generation_init();
+	/* Setup periodic timers that expire after 10/50/1000 milli-seconds. */
+	etimer_set(&first_wait_timer, CLOCK_SECOND / 20);			// 50 milliseconds
+	etimer_set(&wait_timer, CLOCK_SECOND / 100);				// 10 milliseconds
+	etimer_set(&sync_timer, CLOCK_SECOND);						// 1 second
 
-  /* configure GPIO as outputs */
-  //PIN_CFG_OUT(RADIO_START_PIN);
-  PIN_CFG_OUT(RADIO_RX_PIN);
-  PIN_CFG_OUT(RADIO_TX_PIN);
-  PIN_CFG_OUT(LED_STATUS);
-
-  /* Setup periodic timers that expire after 10/50/1000 milli-seconds. */
-  etimer_set(&first_wait_timer, CLOCK_SECOND / 20);
-  etimer_set(&wait_timer, CLOCK_SECOND / 100);
-  etimer_set(&sync_timer, CLOCK_SECOND);
-  timeout_ms = 100;
-
-
-	if(sinkaddress == 22) {
-		/*if(node_id == 1) {
-			my_dst = 33;
-			my_slot = 14;
-		} else if(node_id == 2) {
-			my_dst = 33;
-			my_slot = 19;
-		} else if(node_id == 3) {
-		//	my_parents.push_back(10);
-		//	my_parents.push_back(15);
-			my_dst = 22;
-			my_slot = 9;
-		} else if(node_id == 4) {
-			my_dst = 33;
-			my_slot = 21;
-		} else if(node_id == 6) {
-			my_dst = 22;
-			my_slot = 22;
-		} else if(node_id == 8) {
-			my_dst = 28;
-			my_slot = 17;
-		} else if(node_id == 10) {
-			my_dst = 3;
-			my_slot = 20;
-		} else if(node_id == 15) {
-			my_dst = 3;
-			my_slot = 23;
-		} else if(node_id == 16) {
-			my_dst = 22;
-			my_slot = 16;
-		} else if(node_id == 18) {
-			my_dst = 22;
-			my_slot = 18;
-		} else if(node_id == 22) {
-			my_slot = 0;
-		} else if(node_id == 28) {
-		//	my_parents.push_back(8);
-		//	my_parents.push_back(31);
-			my_dst = 22;
-			my_slot = 1;
-		} else if(node_id == 31) {
-		//	my_parents.push_back(32);
-			my_dst = 28;
-			my_slot = 12;
-		} else if(node_id == 32) {
-			my_dst = 31;
-			my_slot = 15;
-		} else if(node_id == 33) {
-		//	my_parents.push_back(1);
-		//	my_parents.push_back(2);
-		//	my_parents.push_back(4);
-			my_dst = 22;
-			my_slot = 5;
-		}*/
-		etimer_restart(&sync_timer);
-
-		while(sync) {
-			if(firstpacket && node_id == sinkaddress) {
-				/* --- INITIATOR --- */
-				/* Wait 50 ms to be sure that all other nodes are ready. */
-				etimer_restart(&first_wait_timer);
-  				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&first_wait_timer));
-
-  				/* prepare first packet */
-				firstpacket = 0;
-				sync_packet.synccount = 0;
-				packet_len = sizeof(sync_packet);
-				--sync;
-
-				/* get Timestamp and send first packet */
-				timestamp = clock_time();
-				radio_send(((uint8_t*)&sync_packet),packet_len,1);
-				LOG_INFO("sync_round: %u\n", sync_packet.synccount);
-			} else {
-				/* --- FORWARDER --- */
-
-				LOG_INFO("Listening...");
-				while(1) {
-					packet_len = radio_rcv(((uint8_t*)&sync_packet_rcv), timeout_ms);
-					if(packet_len){
-						break;
-					}
-				}
-				/* Restart the timer */
-				etimer_restart(&wait_timer);
-
-				LOG_INFO("receive_packet_round: %u\n",sync_packet_rcv.synccount);
-
-				if(timestamp) {
-					if(!first_sync) {
-						first_sync = sync_packet.synccount;
-						first_time = timestamp;
-					} else {
-						last_sync = sync_packet.synccount;
-						last_time = timestamp;
-					}
-				}
-
-				/* increment counter and resend packet */
-				sync_packet = sync_packet_rcv;
-				++sync_packet.synccount;	
-				packet_len = sizeof(sync_packet);
-				--sync;
-
-				/* Wait for send */
-				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&wait_timer));
-
-				/* get Timestamp and send packet */
-				timestamp = clock_time();
-				radio_send(((uint8_t*)&sync_packet),packet_len,1);
-				LOG_INFO("send_packet_round: %u\n",sync_packet.synccount);
-			}
+	/* set my_slot and all slot timers */
+	uint8_t i = 0;
+	while(i < 27) {
+		etimer_set(&slot_timer[i], slot_time * (i + 1));
+		if(node_id == slot_mapping[i]) {
+			my_slot = i + 1;
+			slots[i] = 1;
 		}
+		++i;
+	}
 
-		clock_time_t delta_t = (last_time - first_time) / (last_sync - first_sync);
-		clock_time_t t_zero = first_time - (first_sync * delta_t);
+	etimer_restart(&sync_timer);
 
-		etimer_adjust(&sync_timer, (int16_t) (t_zero - etimer_start_time(&sync_timer)));
+	while(sync) {
+		if(firstpacket && node_id == sinkaddress) {
+			/* --- INITIATOR --- */
+			/* Wait 50 ms to be sure that all other nodes are ready. */
+			etimer_restart(&first_wait_timer);
+				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&first_wait_timer));
 
+				/* prepare first packet */
+			firstpacket = 0;
+			sync_packet.sync_count = 0;
+			packet_len = sizeof(sync_packet);
+			--sync;
 
+			/* get Timestamp and send first packet */
+			timestamp = clock_time();
+			radio_send(((uint8_t*)&sync_packet),packet_len,1);
+			LOG_INFO("sync_round: %u\n", sync_packet.sync_count);
+		} else {
+			/* --- FORWARDER --- */
 
-		while(1) {
-  			PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&sync_timer));
-			LOG_INFO("Round: %u\n",test_count);
-			++test_count;
-			etimer_reset(&sync_timer);
+			LOG_INFO("Listening...");
+			while(1) {
+				packet_len = radio_rcv(((uint8_t*)&sync_packet_rcv), timeout_ms);
+				if(packet_len){
+					break;
+				}
+			}
+			/* Restart the timer */
+			etimer_restart(&wait_timer);
+
+			LOG_INFO("receive_packet_round: %u\n",sync_packet_rcv.sync_count);
+
+			if(timestamp) {
+				if(!first_sync) {
+					first_sync = sync_packet.sync_count;
+					first_time = timestamp;
+				} else {
+					last_sync = sync_packet.sync_count;
+					last_time = timestamp;
+				}
+			}
+
+			/* increment counter and resend packet */
+			sync_packet = sync_packet_rcv;
+			++sync_packet.sync_count;	
+			packet_len = sizeof(sync_packet);
+			--sync;
+
+			/* Wait for send */
+			PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&wait_timer));
+
+			/* get Timestamp and send packet */
+			timestamp = clock_time();
+			radio_send(((uint8_t*)&sync_packet),packet_len,1);
+			LOG_INFO("send_packet_round: %u\n",sync_packet.sync_count);
 		}
 	}
-  PROCESS_END();
+
+	/* calculate t zero and set the sync_timer */
+	clock_time_t delta_t = (last_time - first_time) / (last_sync - first_sync);
+	clock_time_t t_zero = first_time - (first_sync * delta_t);
+
+	etimer_adjust(&sync_timer, (int16_t) (t_zero - etimer_start_time(&sync_timer)));
+
+	/* ----------------------- HERE WE ARE SYNCED ----------------------- */
+	if(sinkaddress == 22) {
+		/* --- Scenario 1 --- */
+		if(node_id == 1) {
+		} else if(node_id == 3) {
+			slots[7] = 1;				// 10
+			slots[11] = 1;				// 15
+		} else if(node_id == 28) {
+			slots[6] = 1;				// 8
+			slots[24] = 1;				// 31
+		} else if(node_id == 31) {
+			slots[25] = 1;				// 32
+		} else if(node_id == 33) {
+			slots[0] = 1;				// 1
+			slots[1] = 1;				// 2
+			slots[3] = 1;				// 4
+		}
+	} else {
+		/* --- Scenario 2 --- */
+
+		//TODO
+		// - discover Network
+		// - set parents
+	}
+
+	while(1) {
+		uint8_t i = 0;
+		PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&sync_timer));
+		etimer_reset(&sync_timer);
+		while(i < 27) {
+			etimer_restart(&slot_timer[i]);
+			++i;
+		}
+
+		//TODO
+		// - packet handle functions
+		handle_packets();								//make a small packet out of the generated data
+		handle_multi_packets(&my_packet);				//make a big packet out of all the big packets
+
+		/* go through all event timers that have to be listen to */
+		i = 0;
+		while(i < 27) {
+			if(slots[i]) {
+				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer[i]));
+				if(my_slot == i) {
+					send(my_packet);
+				} else {
+					receive();
+				}
+			}
+			++i;
+		}
+
+		//TODO
+		// -reason to break the while loop
+		if(0) break;
+	}
+	PROCESS_END();
 }
 /*---------------------------------------------------------------------------*/
