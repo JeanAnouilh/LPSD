@@ -134,9 +134,9 @@ PROCESS_THREAD(design_project_process, ev, data)
   PIN_CFG_OUT(RADIO_TX_PIN);
   PIN_CFG_OUT(LED_STATUS);
 
-  /* Setup a periodic timer that expires after 10 milli-seconds. */
-  etimer_set(&sync_timer, CLOCK_SECOND / 100);
-  timeout_ms = 11;
+  /* Setup a periodic timer that expires after 2 milli-seconds. */
+  etimer_set(&sync_timer, CLOCK_SECOND / 500);
+  timeout_ms = 15;
 
 
 	if(sinkaddress == 22) {
@@ -198,6 +198,10 @@ PROCESS_THREAD(design_project_process, ev, data)
 				/* --- INITIATOR --- */
 				/* send the first packet */
 				if(firstpacket) {
+					/* Wait 11 ms to be sure that all other nodes are ready. */
+					etimer_restart(&sync_timer);
+      				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&sync_timer));
+
 					firstpacket = 0;
 					sync_packet.synccount = 0;
 					packet_len =  sizeof(sync_packet);
@@ -219,7 +223,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 
 				/* Restart the timer and than wait to expire. */
 				etimer_restart(&sync_timer);
-      				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&sync_timer));
+      			PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&sync_timer));
 			
 				/* increment sync counter and resend packet */
 				sync_packet = sync_packet_rcv;
