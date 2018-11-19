@@ -66,9 +66,9 @@ uint16_t randomseed = RANDOM_SEED;
 /* Structs for the different packets */
 // Single data value 
 typedef struct {
-	uint16_t					src_id;							/* TODO: is this really necessary? */
-	uint8_t						seqn;							/* TODO: is this really necessary? */
-	uint16_t					data;
+	uint16_t					src_id;
+	uint8_t						seqn;
+	uint16_t					payload;
 	uint8_t						error_correction;
 } lpsd_data_struct_t;
 // Ten data values collected
@@ -85,6 +85,12 @@ typedef struct {
 typedef struct {
 	uint8_t						sync_count;
 } lpsd_sync_t;
+// Normal packet
+typedef struct {
+	uint16_t					src_id;
+	uint8_t						seqn;
+	uint16_t					payload;
+} lpsd_packet_t;
 
 /*---------------------------------------------------------------------------*/
 PROCESS(design_project_process, "Skeleton code - LPSD Design Project");
@@ -97,14 +103,14 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static lpsd_sync_t			sync_packet;					/* packet buffer */
 	static lpsd_sync_t			sync_packet_rcv;				/* received packet buffer */
 	//Structure Packet
-	static lpsd_structure_t		structure_packet;				/* packet buffer */
-	static lpsd_structure_t		structure_packet_rcv;			/* received packet buffer */
+	static lpsd_data_struct_t	structure_packet;				/* packet buffer */
 	//Data Packet
 	static lpsd_data_t			data_packet;					/* packet buffer */
-	static lpsd_data_t			data_packet_rcv;				/* received packet buffer */
 	//Super Packet
 	static lpsd_super_t			super_packet;					/* packet buffer */
 	static lpsd_super_t			super_packet_rcv;				/* received packet buffer */
+	//Normal Packet
+	static lpsd_packet_t*		packet;							/* packet pointer */
 
 	static uint8_t				packet_len;						/* packet length, in Bytes */
 	static uint16_t				timeout_ms = 100;				/* packet receive timeout, in ms */
@@ -253,10 +259,53 @@ PROCESS_THREAD(design_project_process, ev, data)
 			++i;
 		}
 
-		//TODO
-		// - packet handle functions
-		handle_packets();								//make a small packet out of the generated data
-		handle_multi_packets(&my_packet);				//make a big packet out of all the big packets
+		/* prepare the super packet to send */
+		uint8_t structure_number = 0;
+		uint8_t data_number = 0;
+		i = 0;
+		while(i < 10) {
+			&data_packet.data_payload[i] = null;
+			&super_packet.super_payload[data_number] = null;
+			++i;
+		}
+
+		while(is_data_in_queue()){
+			packet = pop_data();
+			if(node_id == sinkaddress) {
+				/* --- SINK --- */
+				/* Write our own message to serial */
+				LOG_INFO("Pkt:%u,%u,%u\n", packet->src_id,packet->seqn, packet->payload);
+			} else {
+				/* --- SOURCE --- */
+				/* Prepare our packet */
+				if(structure_number == 10) {
+					super_packet.super_payload[data_number] = data_packet;
+					structure_number = 0;
+					++data_number;
+					i = 0;
+					while(i < 10) {
+						&data_packet.data_payload[i] = null;
+						++i;
+					}
+				}
+				structure_packet.src_id = packet->src_id;
+				structure_packet.seqn = packet->seqn;
+				structure_packet.payload = packet->payload;
+				data_packet.data_payload[structure_number] = structure_packet;
+				++structure_number;
+			}
+		}
+		super_packet.super_payload[data_number] = data_packet;
+
+		i = 0;
+		++data_number;
+		while(i < 10) {
+			if(super_packet_rcv.super_payload[i] != null) {
+				super_packet.super_payload[data_number] = super_packet_rcv.super_payload[i];
+				++data_number;
+			}
+			++i;
+		}
 
 		/* go through all event timers that have to be listen to */
 		i = 0;
@@ -264,9 +313,9 @@ PROCESS_THREAD(design_project_process, ev, data)
 			if(slots[i]) {
 				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer[i]));
 				if(my_slot == i) {
-					send(my_packet);
+					radio_send(((uint8_t*)packet),sizeof(lpsd_packet_t),1);
 				} else {
-					receive();
+					radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
 				}
 			}
 			++i;
@@ -277,5 +326,9 @@ PROCESS_THREAD(design_project_process, ev, data)
 		if(0) break;
 	}
 	PROCESS_END();
+}
+
+handle_packets() {
+
 }
 /*---------------------------------------------------------------------------*/
