@@ -241,6 +241,16 @@ PROCESS_THREAD(design_project_process, ev, data)
 	} else {
 		while(1) {
 			/* go through all event timers that have to be listen to */
+			/* wait for sync timer to expire */
+			i = 0;
+			PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&sync_timer));
+			/* reset sync timer and restart all slot timers */
+			while(i < 27) {
+				etimer_restart(&slot_timer[i]);
+				++i;
+			}
+			etimer_reset(&sync_timer);
+
 			i = 0;
 			while(i < 27) {
 				if(slots[i]) {
