@@ -64,23 +64,6 @@ uint16_t randomseed = RANDOM_SEED;
 /*---------------------------------------------------------------------------*/
 
 /* Structs for the different packets */
-// Single data value 
-typedef struct {
-	uint16_t					src_id;
-	uint8_t						seqn;
-	uint16_t					payload;
-	uint8_t						error_correction;
-} lpsd_data_struct_t;
-// Ten data values collected
-typedef struct {
-	lpsd_data_struct_t[10]		data_payload;
-	uint16_t					error_correction;
-} lpsd_data_t;
-// Ten data packets collected
-typedef struct {
-	lpsd_data_t[10]				super_payload;
-	uint32_t					error_correction;
-} lpsd_super_t;
 // Sync packet
 typedef struct {
 	uint8_t						sync_count;
@@ -102,15 +85,9 @@ PROCESS_THREAD(design_project_process, ev, data)
 	//Syncronization Packet
 	static lpsd_sync_t			sync_packet;					/* packet buffer */
 	static lpsd_sync_t			sync_packet_rcv;				/* received packet buffer */
-	//Structure Packet
-	static lpsd_data_struct_t	structure_packet;				/* packet buffer */
-	//Data Packet
-	static lpsd_data_t			data_packet;					/* packet buffer */
-	//Super Packet
-	static lpsd_super_t			super_packet;					/* packet buffer */
-	static lpsd_super_t			super_packet_rcv;				/* received packet buffer */
 	//Normal Packet
 	static lpsd_packet_t*		packet;							/* packet pointer */
+	static lpsd_packet_t*		packet_rcv;						/* received packet buffer */
 
 	static uint8_t				packet_len;						/* packet length, in Bytes */
 	static uint16_t				timeout_ms = 30;				/* packet receive timeout, in ms */
@@ -120,19 +97,18 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static struct etimer		sync_timer;
 	static struct etimer		wait_timer;
 	static struct etimer		first_wait_timer;
-	static struct etimer[27]	slot_timer;
-	static uint8_t				sync = 50;						/* in minimum 3 rounds */
+	static struct etimer		slot_timer[27];
+	static uint8_t				sync = 10;						/* in minimum 3 rounds */
 	static uint8_t				last_sync = 0;
 	static uint8_t				first_sync = 0;
-	static uint8_t				test_count = 0;
 	static uint8_t				i = 0;
 	static clock_time_t			last_time = 0;
 	static clock_time_t			first_time = 0;
 	static clock_time_t			timestamp;
 
 	static uint8_t				my_slot;						/* used slot ID */
-	static uint8_t[27]			slot_mapping = {1,2,3,4,6,7,8,10,11,13,14,15,16,17,18,19,20,22,23,24,25,26,27,28,31,32,33};
-	static uint8_t[27]			slots;
+	static uint8_t				slot_mapping[27] = {1,2,3,4,6,7,8,10,11,13,14,15,16,17,18,19,20,22,23,24,25,26,27,28,31,32,33};
+	static uint8_t				slots[27] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 	PROCESS_BEGIN();
 
@@ -151,7 +127,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	etimer_set(&sync_timer, CLOCK_SECOND);						// 1 second
 
 	/* set my_slot and all slot timers */
-	uint8_t i = 0;
+	i = 0;
 	while(i < 27) {
 		etimer_set(&slot_timer[i], slot_time * (i + 1));
 		if(node_id == slot_mapping[i]) {
@@ -299,9 +275,5 @@ PROCESS_THREAD(design_project_process, ev, data)
 		}
 	}
 	PROCESS_END();
-}
-
-handle_packets() {
-
 }
 /*---------------------------------------------------------------------------*/
