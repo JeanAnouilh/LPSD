@@ -92,7 +92,8 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static uint8_t				packet_len;						/* packet length, in Bytes */
 	static uint16_t				timeout_ms = 30;				/* packet receive timeout, in ms */
 	static uint16_t				timeout_sink_ms = 47;			/* packet sink receive timeout, in ms */
-	static uint32_t				slot_time = CLOCK_SECOND / 28;
+	static uint8_t				slot_number = 27;
+	static uint32_t				slot_time = CLOCK_SECOND / (slot_number + 1);
 	static uint8_t				firstpacket = 1;				/* First packet for the initiator */
 	static struct etimer		sync_timer;
 	static struct etimer		wait_timer;
@@ -107,8 +108,8 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static clock_time_t			timestamp;
 
 	static uint8_t				my_slot;						/* used slot ID */
-	static uint8_t				slot_mapping[27] = {1,2,3,4,6,7,8,10,11,13,14,15,16,17,18,19,20,22,23,24,25,26,27,28,31,32,33};
-	static uint8_t				slots[27] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	static uint8_t				slot_mapping[slot_number] = {8,2,3,4,6,7,1,10,11,13,14,15,31,17,18,19,20,22,23,24,25,26,27,28,16,32,33};
+	static uint8_t				slots[slot_number] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 	PROCESS_BEGIN();
 
@@ -128,7 +129,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	etimer_set(&slot_timer, slot_time);							// slot time 35 ms 
 	/* set my_slot */
 	i = 0;
-	while(i < 27) {
+	while(i < slot_number) {
 		if(node_id == slot_mapping[i]) {
 			my_slot = i;
 			slots[i] = 1;
@@ -209,12 +210,12 @@ PROCESS_THREAD(design_project_process, ev, data)
 			slots[7] = 1;				// 10
 			slots[11] = 1;				// 15
 		} else if(node_id == 28) {
-			slots[6] = 1;				// 8
-			slots[24] = 1;				// 31
+			slots[0] = 1;				// 8
+			slots[12] = 1;				// 31
 		} else if(node_id == 31) {
 			slots[25] = 1;				// 32
 		} else if(node_id == 33) {
-			slots[0] = 1;				// 1
+			slots[6] = 1;				// 1
 			slots[1] = 1;				// 2
 			slots[3] = 1;				// 4
 		}
@@ -234,8 +235,10 @@ PROCESS_THREAD(design_project_process, ev, data)
 				packet = pop_data();
 				LOG_INFO("Pkt:%u,%u,%u\n", packet->src_id,packet->seqn, packet->payload);
 			}
-			radio_rcv(((uint8_t*)&packet_rcv), timeout_sink_ms);
-			LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv->src_id,packet_rcv->seqn, packet_rcv->payload);
+			packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_sink_ms);
+			if(packet_len) {
+				LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv->src_id,packet_rcv->seqn, packet_rcv->payload);
+			}
 		}
 	} else {
 		while(1) {
@@ -246,7 +249,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 			etimer_restart(&slot_timer);
 			etimer_reset(&sync_timer);
 			i = 0;
-			while(i < 27) {
+			while(i < slot_number) {
 				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer));
 				etimer_reset(&slot_timer);
 				if(slots[i]) {
@@ -256,8 +259,10 @@ PROCESS_THREAD(design_project_process, ev, data)
 						radio_send(((uint8_t*)packet),sizeof(lpsd_packet_t),1);
 						LOG_INFO("TRM Pkt:%u,%u,%u\n", packet->src_id,packet->seqn, packet->payload);
 					} else if(my_slot != i){
-						radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
-						LOG_INFO("REC Pkt:%u,%u,%u\n", packet_rcv->src_id,packet_rcv->seqn, packet_rcv->payload);
+						packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
+						if(packet_len) {
+							LOG_INFO("REC Pkt:%u,%u,%u\n", packet_rcv->src_id,packet_rcv->seqn, packet_rcv->payload);
+						}
 					}
 				}
 				++i;
