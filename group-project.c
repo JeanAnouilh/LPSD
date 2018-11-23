@@ -108,8 +108,8 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static clock_time_t			timestamp;
 
 	static uint8_t				my_slot;						/* used slot ID */
-	static uint8_t				slot_mapping[slot_number] = {8,2,3,4,6,7,1,10,11,13,14,15,31,17,18,19,20,22,23,24,25,26,27,28,16,32,33};
-	static uint8_t				slots[slot_number] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	static uint8_t				slot_mapping[27] = {8,2,3,4,6,7,1,10,11,13,14,15,31,17,18,19,20,22,23,24,25,26,27,28,16,32,33};
+	static uint8_t				slots[27] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 	PROCESS_BEGIN();
 
