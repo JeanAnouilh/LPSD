@@ -90,7 +90,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static lpsd_packet_t*		packet_rcv;						/* received packet buffer */
 
 	static uint8_t				packet_len;						/* packet length, in Bytes */
-	static uint16_t				timeout_ms = 30;				/* packet receive timeout, in ms */
+	static uint16_t				timeout_ms = 25;				/* packet receive timeout, in ms */
 	static uint16_t				timeout_sink_ms = 47;			/* packet sink receive timeout, in ms */
 	static uint32_t				slot_time = CLOCK_SECOND / 28;
 	static uint8_t				firstpacket = 1;				/* First packet for the initiator */
@@ -167,6 +167,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 			}
 			/* Restart the timer */
 			etimer_restart(&wait_timer);
+			LED_ON(LED_STATUS);
 
 			LOG_INFO("receive_packet_round: %u\n",sync_packet_rcv.sync_count);
 
@@ -188,6 +189,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 
 			/* Wait for send */
 			PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&wait_timer));
+			LED_OFF(LED_STATUS);
 
 			/* get Timestamp and send packet */
 			timestamp = clock_time();
@@ -247,13 +249,19 @@ PROCESS_THREAD(design_project_process, ev, data)
 			/* reset sync timer and restart all slot timers */
 			etimer_restart(&slot_timer);
 			etimer_reset(&sync_timer);
+			LOG_INFO("Second Sync");
 			i = 0;
 			while(i < 27) {
 				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer));
 				etimer_reset(&slot_timer);
+				LOG_INFO("Slot Sync");
+				LED_TOGGLE(LED_STATUS);
 				if(slots[i]) {
 					if(my_slot == i && is_data_in_queue()) {
 						packet = pop_data();
+						/* Wait for send */
+						etimer_restart(&wait_timer);
+						PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&wait_timer));
 						/* --- SOURCE --- */
 						radio_send(((uint8_t*)packet),sizeof(lpsd_packet_t),1);
 						LOG_INFO("TRM Pkt:%u,%u,%u\n", packet->src_id,packet->seqn, packet->payload);
