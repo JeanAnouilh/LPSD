@@ -87,7 +87,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static lpsd_sync_t			sync_packet_rcv;				/* received packet buffer */
 	//Normal Packet
 	static lpsd_packet_t*		packet;							/* packet pointer */
-	static lpsd_packet_t*		packet_rcv;						/* received packet buffer */
+	static lpsd_packet_t		packet_rcv;						/* received packet buffer */
 
 	static uint8_t				packet_len;						/* packet length, in Bytes */
 	static uint16_t				timeout_ms = 25;				/* packet receive timeout, in ms */
@@ -238,7 +238,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 			}
 			packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_sink_ms);
 			if(packet_len) {
-				LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv->src_id,packet_rcv->seqn, packet_rcv->payload);
+				LOG_INFO("REC Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv->src_id,packet_rcv->seqn, packet_rcv->payload, i, node_id);
 			}
 		}
 	} else {
@@ -249,13 +249,10 @@ PROCESS_THREAD(design_project_process, ev, data)
 			/* reset sync timer and restart all slot timers */
 			etimer_restart(&slot_timer);
 			etimer_reset(&sync_timer);
-			LOG_INFO("Second Sync");
 			i = 0;
 			while(i < 27) {
 				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer));
 				etimer_reset(&slot_timer);
-				LOG_INFO("Slot Sync");
-				LED_TOGGLE(LED_STATUS);
 				if(slots[i]) {
 					if(my_slot == i && is_data_in_queue()) {
 						packet = pop_data();
@@ -264,11 +261,11 @@ PROCESS_THREAD(design_project_process, ev, data)
 						PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&wait_timer));
 						/* --- SOURCE --- */
 						radio_send(((uint8_t*)packet),sizeof(lpsd_packet_t),1);
-						LOG_INFO("TRM Pkt:%u,%u,%u\n", packet->src_id,packet->seqn, packet->payload);
+						LOG_INFO("TRM Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv->src_id,packet_rcv->seqn, packet_rcv->payload, i, node_id);
 					} else if(my_slot != i){
 						packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
 						if(packet_len) {
-							LOG_INFO("REC Pkt:%u,%u,%u\n", packet_rcv->src_id,packet_rcv->seqn, packet_rcv->payload);
+							LOG_INFO("REC Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv->src_id,packet_rcv->seqn, packet_rcv->payload, i, node_id);
 						}
 					}
 				}
