@@ -123,7 +123,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 
 	/* Setup periodic timers that expire after 10/50/1000 milli-seconds and the slottimer. */
 	etimer_set(&first_wait_timer, CLOCK_SECOND / 20);			// 50 milliseconds
-	etimer_set(&wait_timer, CLOCK_SECOND / 200);				// 5 milliseconds
+	etimer_set(&wait_timer, CLOCK_SECOND / 100);				// 10 milliseconds
 	etimer_set(&sync_timer, CLOCK_SECOND);						// 1 second
 	etimer_set(&slot_timer, slot_time);							// slot time 35 ms 
 	/* set my_slot */
