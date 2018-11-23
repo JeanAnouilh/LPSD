@@ -92,8 +92,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static uint8_t				packet_len;						/* packet length, in Bytes */
 	static uint16_t				timeout_ms = 30;				/* packet receive timeout, in ms */
 	static uint16_t				timeout_sink_ms = 47;			/* packet sink receive timeout, in ms */
-	static uint8_t				slot_number = 27;
-	static uint32_t				slot_time = CLOCK_SECOND / (slot_number + 1);
+	static uint32_t				slot_time = CLOCK_SECOND / 28;
 	static uint8_t				firstpacket = 1;				/* First packet for the initiator */
 	static struct etimer		sync_timer;
 	static struct etimer		wait_timer;
