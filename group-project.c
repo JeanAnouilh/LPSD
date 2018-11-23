@@ -238,7 +238,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 			}
 			packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_sink_ms);
 			if(packet_len) {
-				LOG_INFO("REC Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv->src_id,packet_rcv->seqn, packet_rcv->payload, i, node_id);
+				LOG_INFO("REC Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i, node_id);
 			}
 		}
 	} else {
@@ -261,11 +261,11 @@ PROCESS_THREAD(design_project_process, ev, data)
 						PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&wait_timer));
 						/* --- SOURCE --- */
 						radio_send(((uint8_t*)packet),sizeof(lpsd_packet_t),1);
-						LOG_INFO("TRM Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv->src_id,packet_rcv->seqn, packet_rcv->payload, i, node_id);
+						LOG_INFO("TRM Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i, node_id);
 					} else if(my_slot != i){
 						packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
 						if(packet_len) {
-							LOG_INFO("REC Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv->src_id,packet_rcv->seqn, packet_rcv->payload, i, node_id);
+							LOG_INFO("REC Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i, node_id);
 						}
 					}
 				}
