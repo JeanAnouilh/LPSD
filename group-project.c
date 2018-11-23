@@ -128,7 +128,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	etimer_set(&slot_timer, slot_time);							// slot time 35 ms 
 	/* set my_slot */
 	i = 0;
-	while(i < slot_number) {
+	while(i < 27) {
 		if(node_id == slot_mapping[i]) {
 			my_slot = i;
 			slots[i] = 1;
@@ -248,7 +248,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 			etimer_restart(&slot_timer);
 			etimer_reset(&sync_timer);
 			i = 0;
-			while(i < slot_number) {
+			while(i < 27) {
 				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer));
 				etimer_reset(&slot_timer);
 				if(slots[i]) {
