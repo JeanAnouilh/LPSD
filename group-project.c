@@ -158,7 +158,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 		} else {
 			/* --- FORWARDER --- */
 
-			LOG_INFO("Listening...");
+			//LOG_INFO("Listening...");
 			while(1) {
 				packet_len = radio_rcv(((uint8_t*)&sync_packet_rcv), timeout_ms);
 				if(packet_len){
@@ -194,7 +194,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 			/* get Timestamp and send packet */
 			timestamp = clock_time();
 			radio_send(((uint8_t*)&sync_packet),packet_len,1);
-			LOG_INFO("send_packet_round: %u\n",sync_packet.sync_count);
+			//LOG_INFO("send_packet_round: %u\n",sync_packet.sync_count);
 		}
 	}
 
