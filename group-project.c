@@ -93,7 +93,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static uint16_t				timeout_ms = 25;				/* packet receive timeout, in ms */
 	static uint32_t				slot_time = CLOCK_SECOND / 28;
 	static uint8_t				firstpacket = 1;				/* First packet for the initiator */
-	static struct etimer		sync_timer;
 	static struct etimer		wait_timer;
 	static struct etimer		first_wait_timer;
 	static struct etimer		slot_timer;
@@ -135,7 +134,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 		++i;
 	}
 
-	etimer_restart(&sync_timer);
 	rtimer_ext_schedule(RTIMER_EXT_LF_1, RTIMER_EXT_SECOND_LF, 0, NULL);
 
 	while(sync) {
@@ -201,11 +199,9 @@ PROCESS_THREAD(design_project_process, ev, data)
 	/* calculate t zero and set the sync_timer */
 	rtimer_ext_clock_t delta_t = (last_time - first_time) / (last_sync - first_sync);
 	rtimer_ext_clock_t t_zero = first_time - (first_sync * delta_t);
-	rtimer_ext_clock_t expiration;
 
-	rtimer_ext_next_expiration(RTIMER_EXT_LF_1,&expiration);
-	rtimer_ext_schedule(RTIMER_EXT_LF_2, expiration + t_zero, RTIMER_EXT_SECOND_LF, NULL);
-	rtimer_ext_stop(RTIMER_EXT_LF_1);
+	rtimer_ext_wait_for_event(RTIMER_EXT_LF_1, NULL);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero, RTIMER_EXT_SECOND_LF, NULL);
 
 	LOG_INFO("WE ARE SYNCED");
 
