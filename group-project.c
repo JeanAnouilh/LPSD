@@ -201,7 +201,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	rtimer_ext_clock_t t_zero = first_time - (first_sync * delta_t);
 
 	rtimer_ext_wait_for_event(RTIMER_EXT_LF_1, NULL);
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero, RTIMER_EXT_SECOND_LF, NULL);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
 
 	LOG_INFO("WE ARE SYNCED");
 
@@ -231,10 +231,10 @@ PROCESS_THREAD(design_project_process, ev, data)
 
 	if(node_id == sinkaddress) {
 		while(1) {
-			rtimer_ext_wait_for_event(RTIMER_EXT_LF_2, NULL);
+			/*rtimer_ext_wait_for_event(RTIMER_EXT_LF_1, reset_sync_timer());*/
 			/* reset sync timer and restart all slot timers */
-			etimer_restart(&slot_timer);
-			i = 0;
+			/*etimer_restart(&slot_timer);
+			i = 0;*/
 			while(i < 27) {
 				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer));
 				etimer_reset(&slot_timer);
@@ -255,10 +255,10 @@ PROCESS_THREAD(design_project_process, ev, data)
 		while(1) {
 			/* go through all event timers that have to be listen to */
 			/* wait for sync timer to expire */
-			rtimer_ext_wait_for_event(RTIMER_EXT_LF_2, NULL);
+			/*rtimer_ext_wait_for_event(RTIMER_EXT_LF_1, reset_sync_timer());*/
 			/* reset sync timer and restart all slot timers */
-			etimer_restart(&slot_timer);
-			i = 0;
+			/*etimer_restart(&slot_timer);
+			i = 0;*/
 			while(i < 27) {
 				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer));
 				etimer_reset(&slot_timer);
@@ -286,3 +286,8 @@ PROCESS_THREAD(design_project_process, ev, data)
 	PROCESS_END();
 }
 /*---------------------------------------------------------------------------*/
+void reset_sync_timer(void) {
+	etimer_restart(&slot_timer);
+	i = 0;
+	LED_TOGGLE(LED_STATUS);
+}
