@@ -113,6 +113,12 @@ PROCESS_THREAD(design_project_process, ev, data)
 	/* initialize the data generator */
 	data_generation_init();
 
+	void reset_sync_timer(void) {
+		etimer_restart(&slot_timer);
+		i = 0;
+		LED_TOGGLE(LED_STATUS);
+	}
+
 	/* configure GPIO as outputs */
 	//PIN_CFG_OUT(RADIO_START_PIN);
 	PIN_CFG_OUT(RADIO_RX_PIN);
@@ -286,8 +292,3 @@ PROCESS_THREAD(design_project_process, ev, data)
 	PROCESS_END();
 }
 /*---------------------------------------------------------------------------*/
-void reset_sync_timer(void) {
-	etimer_restart(&slot_timer);
-	i = 0;
-	LED_TOGGLE(LED_STATUS);
-}
