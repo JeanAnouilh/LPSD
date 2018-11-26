@@ -125,8 +125,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 	etimer_set(&wait_timer, CLOCK_SECOND / 100);				// 10 milliseconds
 	etimer_set(&sync_timer, CLOCK_SECOND);						// 1 second
 	etimer_set(&slot_timer, slot_time);							// slot time 35 ms
-	
-	rtimer_ext_schedule(RTIMER_EXT_LF_0, RTIMER_EXT_SECOND_LF, 0, NULL);
 
 	/* set my_slot */
 	i = 0;
@@ -139,7 +137,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	}
 
 	etimer_restart(&sync_timer);
-	etimer_restart(&timestamp_timer);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, RTIMER_EXT_SECOND_LF, 0, NULL);
 
 	while(sync) {
 		if(firstpacket && node_id == sinkaddress) {
@@ -206,7 +204,9 @@ PROCESS_THREAD(design_project_process, ev, data)
 	rtimer_ext_clock_t t_zero = first_time - (first_sync * delta_t);
 
 	etimer_adjust(&sync_timer, (int16_t) (((int32_t) t_zero) - etimer_start_time(&sync_timer)));
-	rtimer_ext_stop(RTIMER_EXT_LF_0);
+	rtimer_ext_stop(RTIMER_EXT_LF_1);
+
+	LOG_INFO("WE ARE SYNCED");
 
 	/* ----------------------- HERE WE ARE SYNCED ----------------------- */
 	if(sinkaddress == 22) {
