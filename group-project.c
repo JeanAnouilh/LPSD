@@ -228,35 +228,16 @@ PROCESS_THREAD(design_project_process, ev, data)
 		// - set parents
 	}
 
-	
-	while(1) {
-		/* go through all event timers that have to be listen to */
-		/* wait for sync timer to expire */
-		PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&sync_timer));
-		/* reset sync timer and restart all slot timers */
-		etimer_restart(&slot_timer);
-		etimer_reset(&sync_timer);
-		i = 0;
-		while(i < 27) {
-			PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer));
-			etimer_reset(&slot_timer);
-			if(slots[i]) {
-				if(my_slot == i && is_data_in_queue()) {
-					packet = pop_data();
-					/* Wait for send */
-					etimer_restart(&wait_timer);
-					PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&wait_timer));
-					/* --- SOURCE --- */
-					radio_send(((uint8_t*)packet),sizeof(lpsd_packet_t),1);
-					LOG_INFO("TRM Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i, node_id);
-				} else if(my_slot != i){
-					packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
-					if(packet_len) {
-						LOG_INFO("REC Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i, node_id);
-					}
-				}
-			/*sink listens now synchronized */
-			} else if(node_id == sinkaddress){
+	if(node_id == sinkaddress) {
+		while(1) {
+			PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&sync_timer));
+			/* reset sync timer and restart all slot timers */
+			etimer_restart(&slot_timer);
+			etimer_reset(&sync_timer);
+			i = 0;
+			while(i < 27) {
+				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer));
+				etimer_reset(&slot_timer);
 				if(is_data_in_queue()) {
 					/* --- SINK --- */
 					/* Write our own message to serial */
@@ -265,16 +246,46 @@ PROCESS_THREAD(design_project_process, ev, data)
 				}
 				packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
 				if(packet_len) {
-					LOG_INFO("REC Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i, node_id);
+					LOG_INFO("REC Pkt:%u,%u,%u, Slot-Nr.:%u", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i);
 				}
+				++i;
 			}
-			
-			++i;
 		}
+	} else {
+		while(1) {
+			/* go through all event timers that have to be listen to */
+			/* wait for sync timer to expire */
+			PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&sync_timer));
+			/* reset sync timer and restart all slot timers */
+			etimer_restart(&slot_timer);
+			etimer_reset(&sync_timer);
+			i = 0;
+			while(i < 27) {
+				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer));
+				etimer_reset(&slot_timer);
+				if(slots[i]) {
+					if(my_slot == i && is_data_in_queue()) {
+						packet = pop_data();
+						/* Wait for send */
+						etimer_restart(&wait_timer);
+						PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&wait_timer));
+						/* --- SOURCE --- */
+						radio_send(((uint8_t*)packet),sizeof(lpsd_packet_t),1);
+						LOG_INFO("TRM Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i, node_id);
+					} else if(my_slot != i){
+						packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
+						if(packet_len) {
+							LOG_INFO("REC Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i, node_id);
+						}
+					}
+				}
+				++i;
+			}
 
-		//TODO
-		// -reason to break the while loop
-		if(0) break;
+			//TODO
+			// -reason to break the while loop
+			if(0) break;
+		}
 	}
 	PROCESS_END();
 }
