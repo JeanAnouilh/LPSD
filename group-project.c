@@ -91,7 +91,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 
 	static uint8_t				packet_len;						/* packet length, in Bytes */
 	static uint16_t				timeout_ms = 25;				/* packet receive timeout, in ms */
-	static uint16_t				timeout_sink_ms = 47;			/* packet sink receive timeout, in ms */
 	static uint32_t				slot_time = CLOCK_SECOND / 28;
 	static uint8_t				firstpacket = 1;				/* First packet for the initiator */
 	static struct etimer		sync_timer;
@@ -102,9 +101,9 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static uint8_t				last_sync = 0;
 	static uint8_t				first_sync = 0;
 	static uint8_t				i = 0;
-	static clock_time_t			last_time = 0;
-	static clock_time_t			first_time = 0;
-	static clock_time_t			timestamp;
+	static rtimer_ext_clock_t	last_time = 0;
+	static rtimer_ext_clock_t	first_time = 0;
+	static rtimer_ext_clock_t	timestamp;
 
 	static uint8_t				my_slot;						/* used slot ID */
 	static uint8_t				slot_mapping[27] = {8,2,3,4,6,7,1,10,11,13,14,15,31,17,18,19,20,22,23,24,25,26,27,28,16,32,33};
@@ -125,7 +124,10 @@ PROCESS_THREAD(design_project_process, ev, data)
 	etimer_set(&first_wait_timer, CLOCK_SECOND / 20);			// 50 milliseconds
 	etimer_set(&wait_timer, CLOCK_SECOND / 100);				// 10 milliseconds
 	etimer_set(&sync_timer, CLOCK_SECOND);						// 1 second
-	etimer_set(&slot_timer, slot_time);							// slot time 35 ms 
+	etimer_set(&slot_timer, slot_time);							// slot time 35 ms
+	
+	rtimer_ext_schedule(RTIMER_EXT_LF_0, RTIMER_EXT_SECOND_LF, 0, NULL);
+
 	/* set my_slot */
 	i = 0;
 	while(i < 27) {
@@ -137,6 +139,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	}
 
 	etimer_restart(&sync_timer);
+	etimer_restart(&timestamp_timer);
 
 	while(sync) {
 		if(firstpacket && node_id == sinkaddress) {
@@ -152,7 +155,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 			--sync;
 
 			/* get Timestamp and send first packet */
-			timestamp = clock_time();
+			timestamp = rtimer_ext_now_lf();
 			radio_send(((uint8_t*)&sync_packet),packet_len,1);
 			LOG_INFO("sync_round: %u\n", sync_packet.sync_count);
 		} else {
@@ -192,17 +195,18 @@ PROCESS_THREAD(design_project_process, ev, data)
 			LED_OFF(LED_STATUS);
 
 			/* get Timestamp and send packet */
-			timestamp = clock_time();
+			timestamp = rtimer_ext_now_lf();
 			radio_send(((uint8_t*)&sync_packet),packet_len,1);
 			//LOG_INFO("send_packet_round: %u\n",sync_packet.sync_count);
 		}
 	}
 
 	/* calculate t zero and set the sync_timer */
-	clock_time_t delta_t = (last_time - first_time) / (last_sync - first_sync);
-	clock_time_t t_zero = first_time - (first_sync * delta_t);
+	rtimer_ext_clock_t delta_t = (last_time - first_time) / (last_sync - first_sync);
+	rtimer_ext_clock_t t_zero = first_time - (first_sync * delta_t);
 
-	etimer_adjust(&sync_timer, (int16_t) (t_zero - etimer_start_time(&sync_timer)));
+	etimer_adjust(&sync_timer, (int16_t) (((int32_t) t_zero) - etimer_start_time(&sync_timer)));
+	rtimer_ext_stop(RTIMER_EXT_LF_0);
 
 	/* ----------------------- HERE WE ARE SYNCED ----------------------- */
 	if(sinkaddress == 22) {
@@ -266,9 +270,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 				if(slots[i]) {
 					if(my_slot == i && is_data_in_queue()) {
 						packet = pop_data();
-						/* Wait for send */
-						etimer_restart(&wait_timer);
-						PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&wait_timer));
 						/* --- SOURCE --- */
 						radio_send(((uint8_t*)packet),sizeof(lpsd_packet_t),1);
 						LOG_INFO("TRM Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i, node_id);
