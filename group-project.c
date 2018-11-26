@@ -123,7 +123,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 	/* Setup periodic timers that expire after 10/50/1000 milli-seconds and the slottimer. */
 	etimer_set(&first_wait_timer, CLOCK_SECOND / 20);			// 50 milliseconds
 	etimer_set(&wait_timer, CLOCK_SECOND / 100);				// 10 milliseconds
-	etimer_set(&sync_timer, CLOCK_SECOND);						// 1 second
 	etimer_set(&slot_timer, slot_time);							// slot time 35 ms
 
 	/* set my_slot */
@@ -202,8 +201,10 @@ PROCESS_THREAD(design_project_process, ev, data)
 	/* calculate t zero and set the sync_timer */
 	rtimer_ext_clock_t delta_t = (last_time - first_time) / (last_sync - first_sync);
 	rtimer_ext_clock_t t_zero = first_time - (first_sync * delta_t);
+	rtimer_ext_clock_t expiration;
 
-	etimer_adjust(&sync_timer, (int16_t) (((int32_t) t_zero) - etimer_start_time(&sync_timer)));
+	rtimer_ext_next_expiration(RTIMER_EXT_LF_1,&expiration);
+	rtimer_ext_schedule(RTIMER_EXT_LF_2, expiration + t_zero, RTIMER_EXT_SECOND_LF, NULL);
 	rtimer_ext_stop(RTIMER_EXT_LF_1);
 
 	LOG_INFO("WE ARE SYNCED");
@@ -234,10 +235,9 @@ PROCESS_THREAD(design_project_process, ev, data)
 
 	if(node_id == sinkaddress) {
 		while(1) {
-			PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&sync_timer));
+			rtimer_ext_wait_for_event(RTIMER_EXT_LF_2, NULL);
 			/* reset sync timer and restart all slot timers */
 			etimer_restart(&slot_timer);
-			etimer_reset(&sync_timer);
 			i = 0;
 			while(i < 27) {
 				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer));
@@ -259,10 +259,9 @@ PROCESS_THREAD(design_project_process, ev, data)
 		while(1) {
 			/* go through all event timers that have to be listen to */
 			/* wait for sync timer to expire */
-			PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&sync_timer));
+			rtimer_ext_wait_for_event(RTIMER_EXT_LF_2, NULL);
 			/* reset sync timer and restart all slot timers */
 			etimer_restart(&slot_timer);
-			etimer_reset(&sync_timer);
 			i = 0;
 			while(i < 27) {
 				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer));
