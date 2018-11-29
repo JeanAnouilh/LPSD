@@ -83,6 +83,7 @@ typedef struct {
 void reset_sync_timer(void)
 {
 	i = 0;
+	LOG_INFO("hello im in the callback function)");
 }
 
 /*---------------------------------------------------------------------------*/
@@ -143,7 +144,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 		++i;
 	}
 
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, 0, RTIMER_EXT_SECOND_LF, NULL);
+	rtimer_ext_schedule(RTIMER_EXT_LF_0, 0, RTIMER_EXT_SECOND_LF, NULL);
 
 	while(sync) {
 		if(firstpacket && node_id == sinkaddress) {
@@ -209,11 +210,11 @@ PROCESS_THREAD(design_project_process, ev, data)
 	rtimer_ext_clock_t delta_t = (last_time - first_time) / (uint64_t) (last_sync - first_sync);
 	rtimer_ext_clock_t t_zero = first_time - ((uint64_t) first_sync * delta_t);
 	rtimer_ext_clock_t next_exp;
-	rtimer_ext_next_expiration(RTIMER_EXT_LF_1, &next_exp);
+	rtimer_ext_next_expiration(RTIMER_EXT_LF_0, &next_exp);
 	LOG_INFO("START: %u",(uint16_t) (t_zero + next_exp));
 
 	//rtimer_ext_wait_for_event(RTIMER_EXT_LF_1, NULL);
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero+RTIMER_EXT_SECOND_LF, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
+	rtimer_ext_schedule(RTIMER_EXT_LF_0, t_zero+RTIMER_EXT_SECOND_LF, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
 
 	LOG_INFO("WE ARE SYNCED");
 
@@ -242,6 +243,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	}
 
 	while(1) {
+		LOG_INFO("hello im in the while(1) loop)");
 		if(node_id == sinkaddress) {
 			/* reset sync timer and restart all slot timers */
 			if(i == 0) {
