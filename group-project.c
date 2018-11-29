@@ -140,7 +140,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 		++i;
 	}
 
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, RTIMER_EXT_SECOND_LF, 0, NULL);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, 0, RTIMER_EXT_SECOND_LF, NULL);
 
 	while(sync) {
 		if(firstpacket && node_id == sinkaddress) {
@@ -206,8 +206,8 @@ PROCESS_THREAD(design_project_process, ev, data)
 	rtimer_ext_clock_t delta_t = (last_time - first_time) / (last_sync - first_sync);
 	rtimer_ext_clock_t t_zero = first_time - (first_sync * delta_t);
 
-	rtimer_ext_wait_for_event(RTIMER_EXT_LF_1, NULL);
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
+	//rtimer_ext_wait_for_event(RTIMER_EXT_LF_1, NULL);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero+RTIMER_EXT_SECOND_LF, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
 
 	LOG_INFO("WE ARE SYNCED");
 
