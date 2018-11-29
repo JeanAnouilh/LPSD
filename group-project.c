@@ -39,6 +39,8 @@
 #include "basic-radio.h"
 /* data generator */
 #include "data-generator.h"
+/* data transmission */
+#include "data-transmission.h"
 /*---------------------------------------------------------------------------*/
 /* Log configuration */
 #include "sys/log.h"
@@ -108,16 +110,12 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static uint8_t				slot_mapping[27] = {8,2,3,4,6,7,1,10,11,13,14,15,31,17,18,19,20,22,23,24,25,26,27,28,16,32,33};
 	static uint8_t				slots[27] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
+	
+
 	PROCESS_BEGIN();
 
 	/* initialize the data generator */
 	data_generation_init();
-
-	void reset_sync_timer(void) {
-		etimer_restart(&slot_timer);
-		i = 0;
-		LED_TOGGLE(LED_STATUS);
-	}
 
 	/* configure GPIO as outputs */
 	//PIN_CFG_OUT(RADIO_START_PIN);
@@ -203,14 +201,14 @@ PROCESS_THREAD(design_project_process, ev, data)
 	}
 
 	/* calculate t zero and set the sync_timer */
-	rtimer_ext_clock_t delta_t = (last_time - first_time) / (last_sync - first_sync);
-	rtimer_ext_clock_t t_zero = first_time - (first_sync * delta_t);
+	rtimer_ext_clock_t delta_t = (last_time - first_time) / (uint64_t) (last_sync - first_sync);
+	rtimer_ext_clock_t t_zero = first_time - ((uint64_t) first_sync * delta_t);
 	rtimer_ext_clock_t next_exp;
 	rtimer_ext_next_expiration(RTIMER_EXT_LF_1, &next_exp);
 	LOG_INFO(t_zero + next_exp);
 
 	//rtimer_ext_wait_for_event(RTIMER_EXT_LF_1, NULL);
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero+RTIMER_EXT_SECOND_LF, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero+RTIMER_EXT_SECOND_LF, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer(&i));
 
 	LOG_INFO("WE ARE SYNCED");
 
@@ -244,20 +242,24 @@ PROCESS_THREAD(design_project_process, ev, data)
 			/* reset sync timer and restart all slot timers */
 			/*etimer_restart(&slot_timer);
 			i = 0;*/
-			while(i < 27) {
-				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer));
-				etimer_reset(&slot_timer);
-				if(is_data_in_queue()) {
-					/* --- SINK --- */
-					/* Write our own message to serial */
-					packet = pop_data();
-					LOG_INFO("Pkt:%u,%u,%u\n", packet->src_id,packet->seqn, packet->payload);
+			if(i == 0) {
+				etimer_restart(&slot_timer);
+				LED_TOGGLE(LED_STATUS);
+				while(i < 27) {
+					PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer));
+					etimer_reset(&slot_timer);
+					if(is_data_in_queue()) {
+						/* --- SINK --- */
+						/* Write our own message to serial */
+						packet = pop_data();
+						LOG_INFO("Pkt:%u,%u,%u\n", packet->src_id,packet->seqn, packet->payload);
+					}
+					packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
+					if(packet_len) {
+						LOG_INFO("REC Pkt:%u,%u,%u, Slot-Nr.:%u", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i);
+					}
+					++i;
 				}
-				packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
-				if(packet_len) {
-					LOG_INFO("REC Pkt:%u,%u,%u, Slot-Nr.:%u", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i);
-				}
-				++i;
 			}
 		} else {
 			/* go through all event timers that have to be listen to */
@@ -266,23 +268,27 @@ PROCESS_THREAD(design_project_process, ev, data)
 			/* reset sync timer and restart all slot timers */
 			/*etimer_restart(&slot_timer);
 			i = 0;*/
-			while(i < 27) {
-				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer));
-				etimer_reset(&slot_timer);
-				if(slots[i]) {
-					if(my_slot == i && is_data_in_queue()) {
-						packet = pop_data();
-						/* --- SOURCE --- */
-						radio_send(((uint8_t*)packet),sizeof(lpsd_packet_t),1);
-						LOG_INFO("TRM Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i, node_id);
-					} else if(my_slot != i){
-						packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
-						if(packet_len) {
-							LOG_INFO("REC Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i, node_id);
+			if(i == 0) {
+				etimer_restart(&slot_timer);
+				LED_TOGGLE(LED_STATUS);
+				while(i < 27) {
+					PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer));
+					etimer_reset(&slot_timer);
+					if(slots[i]) {
+						if(my_slot == i && is_data_in_queue()) {
+							packet = pop_data();
+							/* --- SOURCE --- */
+							radio_send(((uint8_t*)packet),sizeof(lpsd_packet_t),1);
+							LOG_INFO("TRM Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i, node_id);
+						} else if(my_slot != i){
+							packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
+							if(packet_len) {
+								LOG_INFO("REC Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i, node_id);
+							}
 						}
 					}
+					++i;
 				}
-				++i;
 			}
 
 			//TODO

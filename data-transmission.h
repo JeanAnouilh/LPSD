@@ -27,53 +27,12 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Author:  Romain Jacob
+ * Author:  Dario Leuchtmann
  */
 
 #include "contiki.h"
-#include "random.h"
-#include "memb.h"
-#include "queue.h"
-#include "rtimer-ext.h"
-#include "node-id.h"
 
 /**
- * @brief     Struct to store the generated packets
+ * @brief     Resets i to 0
  */
-typedef struct packet_info {
-  struct packet_info *next;
-  uint16_t        src_id;
-  uint8_t         seqn;
-  uint16_t        payload;
-} lpsd_packet_queue_t;
-
-/**
- * @brief     Generates and stores a new packet
- */
-void generate_new_data(void);
-
-/**
- * @brief     Initializes the data structures required
- *            for the data packet generation
- */
-void data_generation_init(void);
-
-/**
- * @brief     Looks at the next data packet
- *            (does not remove it from the queue)
- * @return    A pointer to the first packet in queue
- */
-void* get_data(void);
-
-/**
- * @brief     Removes the next data packet
- * @return    A pointer to the first packet in queue
- */
-void* pop_data(void);
-
-/**
- * @brief     Checks if a queue is empty
- * @return    True    if there is packets in the queue
- *            False   if the queue is empty
- */
-uint8_t is_data_in_queue(void);
+void reset_sync_timer(uint8_t *i);
