@@ -31,3 +31,8 @@
  */
 
 #include "contiki.h"
+
+/**
+ * @brief     Reset i to 0
+ */
+void reset_sync_timer(void);

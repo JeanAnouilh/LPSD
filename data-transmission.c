@@ -32,4 +32,14 @@
 
 #include "data-transmission.h"
 /*---------------------------------------------------------------------------*/
-
+/* Log configuration */
+#include "sys/log.h"
+#define LOG_MODULE    "DesignProjectApp"
+#define LOG_LEVEL LOG_LEVEL_MAIN
+/*---------------------------------------------------------------------------*/
+extern uint8_t i;
+/*---------------------------------------------------------------------------*/
+void reset_sync_timer(void)
+{
+  i = 0;
+}

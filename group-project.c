@@ -63,6 +63,8 @@ uint16_t sinkaddress = SINK_ADDRESS;
 #error No random seed specified. Example: use '-RANDOM_SEED=123' initialize the random number generator.
 #endif /* RANDOM_SEED */
 uint16_t randomseed = RANDOM_SEED;
+
+uint8_t i = 0;
 /*---------------------------------------------------------------------------*/
 
 /* Structs for the different packets */
@@ -76,13 +78,6 @@ typedef struct {
 	uint8_t						seqn;
 	uint16_t					payload;
 } lpsd_packet_t;
-
-uint8_t i = 0;
-
-void reset_sync_timer(void)
-{
-  i = 0;
-}
 
 /*---------------------------------------------------------------------------*/
 PROCESS(design_project_process, "Skeleton code - LPSD Design Project");
