@@ -117,56 +117,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 		etimer_restart(&slot_timer);
 		i = 0;
 		LED_TOGGLE(LED_STATUS);
-
-		if(node_id == sinkaddress) {
-			/*rtimer_ext_wait_for_event(RTIMER_EXT_LF_1, reset_sync_timer());*/
-			/* reset sync timer and restart all slot timers */
-			/*etimer_restart(&slot_timer);
-			i = 0;*/
-			while(i < 27) {
-				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer));
-				etimer_reset(&slot_timer);
-				if(is_data_in_queue()) {
-					/* --- SINK --- */
-					/* Write our own message to serial */
-					packet = pop_data();
-					LOG_INFO("Pkt:%u,%u,%u\n", packet->src_id,packet->seqn, packet->payload);
-				}
-				packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
-				if(packet_len) {
-					LOG_INFO("REC Pkt:%u,%u,%u, Slot-Nr.:%u", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i);
-				}
-				++i;
-			}
-		} else {
-			/* go through all event timers that have to be listen to */
-			/* wait for sync timer to expire */
-			/*rtimer_ext_wait_for_event(RTIMER_EXT_LF_1, reset_sync_timer());*/
-			/* reset sync timer and restart all slot timers */
-			/*etimer_restart(&slot_timer);
-			i = 0;*/
-			while(i < 27) {
-				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer));
-				etimer_reset(&slot_timer);
-				if(slots[i]) {
-					if(my_slot == i && is_data_in_queue()) {
-						packet = pop_data();
-						/* --- SOURCE --- */
-						radio_send(((uint8_t*)packet),sizeof(lpsd_packet_t),1);
-						LOG_INFO("TRM Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i, node_id);
-					} else if(my_slot != i){
-						packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
-						if(packet_len) {
-							LOG_INFO("REC Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i, node_id);
-						}
-					}
-				}
-				++i;
-			}
-
-			//TODO
-			// -reason to break the while loop
-		}
 	}
 
 	/* configure GPIO as outputs */
@@ -289,7 +239,55 @@ PROCESS_THREAD(design_project_process, ev, data)
 	}
 
 	while(1) {
+		if(node_id == sinkaddress) {
+			/*rtimer_ext_wait_for_event(RTIMER_EXT_LF_1, reset_sync_timer());*/
+			/* reset sync timer and restart all slot timers */
+			/*etimer_restart(&slot_timer);
+			i = 0;*/
+			while(i < 27) {
+				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer));
+				etimer_reset(&slot_timer);
+				if(is_data_in_queue()) {
+					/* --- SINK --- */
+					/* Write our own message to serial */
+					packet = pop_data();
+					LOG_INFO("Pkt:%u,%u,%u\n", packet->src_id,packet->seqn, packet->payload);
+				}
+				packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
+				if(packet_len) {
+					LOG_INFO("REC Pkt:%u,%u,%u, Slot-Nr.:%u", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i);
+				}
+				++i;
+			}
+		} else {
+			/* go through all event timers that have to be listen to */
+			/* wait for sync timer to expire */
+			/*rtimer_ext_wait_for_event(RTIMER_EXT_LF_1, reset_sync_timer());*/
+			/* reset sync timer and restart all slot timers */
+			/*etimer_restart(&slot_timer);
+			i = 0;*/
+			while(i < 27) {
+				PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer));
+				etimer_reset(&slot_timer);
+				if(slots[i]) {
+					if(my_slot == i && is_data_in_queue()) {
+						packet = pop_data();
+						/* --- SOURCE --- */
+						radio_send(((uint8_t*)packet),sizeof(lpsd_packet_t),1);
+						LOG_INFO("TRM Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i, node_id);
+					} else if(my_slot != i){
+						packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
+						if(packet_len) {
+							LOG_INFO("REC Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i, node_id);
+						}
+					}
+				}
+				++i;
+			}
 
+			//TODO
+			// -reason to break the while loop
+		}
 	}
 
 	PROCESS_END();
