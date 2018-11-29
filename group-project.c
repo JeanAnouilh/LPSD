@@ -244,7 +244,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 	while(1) {
 		if(node_id == sinkaddress) {
 			/* reset sync timer and restart all slot timers */
-			i = 0;*/
 			if(i == 0) {
 				etimer_restart(&slot_timer);
 				LED_TOGGLE(LED_STATUS);
