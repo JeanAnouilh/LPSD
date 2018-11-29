@@ -39,8 +39,6 @@
 #include "basic-radio.h"
 /* data generator */
 #include "data-generator.h"
-/* data transmission */
-#include "data-transmission.h"
 /*---------------------------------------------------------------------------*/
 /* Log configuration */
 #include "sys/log.h"
@@ -78,6 +76,14 @@ typedef struct {
 	uint8_t						seqn;
 	uint16_t					payload;
 } lpsd_packet_t;
+
+/*---------------------------------------------------------------------------*/
+
+/* Functions */
+void reset_sync_timer(void)
+{
+	i = 0;
+}
 
 /*---------------------------------------------------------------------------*/
 PROCESS(design_project_process, "Skeleton code - LPSD Design Project");
@@ -237,9 +243,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 
 	while(1) {
 		if(node_id == sinkaddress) {
-			/*rtimer_ext_wait_for_event(RTIMER_EXT_LF_1, reset_sync_timer());*/
 			/* reset sync timer and restart all slot timers */
-			/*etimer_restart(&slot_timer);
 			i = 0;*/
 			if(i == 0) {
 				etimer_restart(&slot_timer);
@@ -261,12 +265,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 				}
 			}
 		} else {
-			/* go through all event timers that have to be listen to */
-			/* wait for sync timer to expire */
-			/*rtimer_ext_wait_for_event(RTIMER_EXT_LF_1, reset_sync_timer());*/
 			/* reset sync timer and restart all slot timers */
-			/*etimer_restart(&slot_timer);
-			i = 0;*/
 			if(i == 0) {
 				etimer_restart(&slot_timer);
 				LED_TOGGLE(LED_STATUS);
