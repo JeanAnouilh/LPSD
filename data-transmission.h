@@ -31,8 +31,3 @@
  */
 
 #include "contiki.h"
-
-/**
- * @brief     Resets i to 0
- */
-void reset_sync_timer(uint8_t *i);
