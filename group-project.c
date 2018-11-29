@@ -291,6 +291,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 			//TODO
 			// -reason to break the while loop
 		}
+		LOG_INFO("i: %u",i);
 	}
 
 	PROCESS_END();
