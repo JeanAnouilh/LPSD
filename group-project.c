@@ -61,8 +61,8 @@ uint16_t sinkaddress = SINK_ADDRESS;
 #error No random seed specified. Example: use '-RANDOM_SEED=123' initialize the random number generator.
 #endif /* RANDOM_SEED */
 uint16_t randomseed = RANDOM_SEED;
-
-uint8_t i = 0;
+static uint8_t counter = 0;
+static uint8_t i = 0;
 /*---------------------------------------------------------------------------*/
 
 /* Structs for the different packets */
@@ -83,7 +83,8 @@ typedef struct {
 void reset_sync_timer(void)
 {
 	i = 0;
-	LOG_INFO("hello im in the callback function)");
+	++counter;
+	
 }
 
 /*---------------------------------------------------------------------------*/
@@ -107,7 +108,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static struct etimer		wait_timer;
 	static struct etimer		first_wait_timer;
 	static struct etimer		slot_timer;
-	static uint8_t				sync = 10;						/* in minimum 3 rounds */
+	static uint8_t				sync = 0;						/* in minimum 3 rounds */
 	static uint8_t				last_sync = 0;
 	static uint8_t				first_sync = 0;
 	static rtimer_ext_clock_t	last_time = 0;
@@ -144,7 +145,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 		++i;
 	}
 
-	rtimer_ext_schedule(RTIMER_EXT_LF_0, 0, RTIMER_EXT_SECOND_LF, NULL);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, 0, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
 
 	while(sync) {
 		if(firstpacket && node_id == sinkaddress) {
@@ -214,7 +215,8 @@ PROCESS_THREAD(design_project_process, ev, data)
 	LOG_INFO("START: %u",(uint16_t) (t_zero + next_exp));
 
 	//rtimer_ext_wait_for_event(RTIMER_EXT_LF_1, NULL);
-	rtimer_ext_schedule(RTIMER_EXT_LF_0, t_zero+RTIMER_EXT_SECOND_LF, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
+	rtimer_ext_stop(RTIMER_EXT_LF_1);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero+RTIMER_EXT_SECOND_LF, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
 
 	LOG_INFO("WE ARE SYNCED");
 
@@ -243,7 +245,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	}
 
 	while(1) {
-		LOG_INFO("hello im in the while(1) loop)");
+		LOG_INFO("callback_counter: %u",counter);
 		if(node_id == sinkaddress) {
 			/* reset sync timer and restart all slot timers */
 			if(i == 0) {
@@ -286,6 +288,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 							}
 						}
 					}
+					LOG_INFO("i: %u",i);
 					++i;
 				}
 			}
@@ -293,7 +296,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 			//TODO
 			// -reason to break the while loop
 		}
-		LOG_INFO("i: %u",i);
 	}
 
 	PROCESS_END();
