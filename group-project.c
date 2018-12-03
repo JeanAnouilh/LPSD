@@ -61,7 +61,7 @@ uint16_t sinkaddress = SINK_ADDRESS;
 #error No random seed specified. Example: use '-RANDOM_SEED=123' initialize the random number generator.
 #endif /* RANDOM_SEED */
 uint16_t randomseed = RANDOM_SEED;
-static uint8_t packcounter = 0;
+//static uint8_t packcounter = 0;
 static volatile uint8_t i = 0;
 /*---------------------------------------------------------------------------*/
 
@@ -109,7 +109,17 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static lpsd_packet_t*		sinkpacket;							/* packet pointer */
 	static lpsd_superpacket_t		packet_rcv;						/* received packet buffer */
 	//static lpsd_superpacket_t		received_packets;				
-
+	packet->size=0;
+	packet_rcv.size=0;
+	static lpsd_packet_t instancepacket;
+	packet->single_packet[0]= instancepacket;
+	packet->single_packet[1]= instancepacket;
+	packet->single_packet[2]= instancepacket;
+	packet->single_packet[3]= instancepacket;
+	packet_rcv.single_packet[0]= instancepacket;
+	packet_rcv.single_packet[1]= instancepacket;
+	packet_rcv.single_packet[2]= instancepacket;
+	packet_rcv.single_packet[3]= instancepacket;
 	static uint8_t				packet_len;						/* packet length, in Bytes */
 	static uint16_t				timeout_ms = 25;				/* packet receive timeout, in ms */
 	static uint32_t				slot_time = CLOCK_SECOND / 28;
@@ -269,7 +279,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 					packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
 					if(packet_len) {
 						while(packet_rcv.size > 0){
-									LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.single_packet[4-packet_rcv.size].src_id,packet_rcv.single_packet[4-packet_rcv.size].seqn, packet_rcv.single_packet[4-packet_rcv.size].payload);
+									LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.single_packet[(4-packet_rcv.size)].src_id,packet_rcv.single_packet[(4-packet_rcv.size)].seqn, packet_rcv.single_packet[(4-packet_rcv.size)].payload);
 									--packet_rcv.size;
 									
 
@@ -281,6 +291,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 		} else {
 			//LOG_INFO("callback:%u, i:%u\n",counter,i);
 			/* reset sync timer and restart all slot timers */
+			packet->size = 0;
 			if(i == 0) {
 				etimer_restart(&slot_timer);
 				LED_TOGGLE(LED_STATUS);
@@ -289,8 +300,8 @@ PROCESS_THREAD(design_project_process, ev, data)
 					etimer_reset(&slot_timer);
 					if(slots[i]) {
 						if(my_slot == i && is_data_in_queue()) {
-							packet->single_packet[packet->size] = pop_data();
-							++packet->size;
+							packet->single_packet[(packet->size)] = pop_data();
+							packet->size=(packet->size)+1;
 							/* --- SOURCE --- */
 							radio_send(((uint8_t*)packet),sizeof(lpsd_packet_t),1);
 							packet->size = 0;
@@ -299,10 +310,10 @@ PROCESS_THREAD(design_project_process, ev, data)
 							packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
 							if(packet_len) {
 								while(packet_rcv.size > 0){
-									LOG_INFO("REC Pkt:%u,%u,%u\n", packet_rcv.single_packet[4-packet_rcv.size].src_id,packet_rcv.single_packet[4-packet_rcv.size].seqn, packet_rcv.single_packet[4-packet_rcv.size].payload);
-									packet->single_packet[packet->size] = packet_rcv.single_packet[4-packet_rcv.size];
+									LOG_INFO("REC Pkt:%u,%u,%u\n", packet_rcv.single_packet[(4-packet_rcv.size)].src_id,packet_rcv.single_packet[(4-packet_rcv.size)].seqn, packet_rcv.single_packet[(4-packet_rcv.size)].payload);
+									packet->single_packet[(packet->size)] = packet_rcv.single_packet[4-packet_rcv.size];
 									--packet_rcv.size;
-									++packet->size;
+									packet->size=(packet->size)+1;
 								}
 
 
