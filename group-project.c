@@ -61,7 +61,7 @@ uint16_t sinkaddress = SINK_ADDRESS;
 #error No random seed specified. Example: use '-RANDOM_SEED=123' initialize the random number generator.
 #endif /* RANDOM_SEED */
 uint16_t randomseed = RANDOM_SEED;
-static uint8_t counter = 0;
+static uint8_t packcounter = 0;
 static volatile uint8_t i = 0;
 /*---------------------------------------------------------------------------*/
 
@@ -76,11 +76,13 @@ typedef struct {
 	uint8_t						seqn;
 	uint16_t					payload;
 } lpsd_packet_t;
+//static lpsd_packet_t instancepacket;
+//instancepacket.src_id = 0;
+//instancepacket.seqn = 0;
+//instancepacket.payload = 0;
 typedef struct {
-	lpsd_packet_t	packet1;
-	lpsd_packet_t 	packet2;
-	lpsd_packet_t	packet3;
-	lpsd_packet_t 	packet4;
+	lpsd_packet_t				single_packet[4];
+	uint8_t 					size;
 } lpsd_superpacket_t;
 	
 
@@ -90,7 +92,6 @@ typedef struct {
 void reset_sync_timer(void)
 {
 	i = 0;
-	++counter;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -104,8 +105,10 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static lpsd_sync_t			sync_packet;					/* packet buffer */
 	static lpsd_sync_t			sync_packet_rcv;				/* received packet buffer */
 	//Normal Packet
-	static lpsd_packet_t*		packet;							/* packet pointer */
-	static lpsd_packet_t		packet_rcv;						/* received packet buffer */
+	static lpsd_superpacket_t*		packet;							/* packet pointer */
+	static lpsd_packet_t*		sinkpacket;							/* packet pointer */
+	static lpsd_superpacket_t		packet_rcv;						/* received packet buffer */
+	//static lpsd_superpacket_t		received_packets;				
 
 	static uint8_t				packet_len;						/* packet length, in Bytes */
 	static uint16_t				timeout_ms = 25;				/* packet receive timeout, in ms */
@@ -233,7 +236,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 		} else if(node_id == 28) {
 			slots[0] = 1;				// 8
 			slots[12] = 1;				// 31
-			LOG_INFO("I am 28");
 		} else if(node_id == 31) {
 			slots[25] = 1;				// 32
 		} else if(node_id == 33) {
@@ -248,9 +250,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 		// - discover Network
 		// - set parents
 	}
-
-	LOG_INFO("i: %u\n",i);
-
 	while(1) {
 		//LOG_INFO("callback_counter: %u",counter);
 		if(node_id == sinkaddress) {
@@ -264,12 +263,17 @@ PROCESS_THREAD(design_project_process, ev, data)
 					if(is_data_in_queue()) {
 						/* --- SINK --- */
 						/* Write our own message to serial */
-						packet = pop_data();
-						LOG_INFO("Pkt:%u,%u,%u\n", packet->src_id,packet->seqn, packet->payload);
+						sinkpacket = pop_data();
+						LOG_INFO("Pkt:%u,%u,%u\n", sinkpacket->src_id,sinkpacket->seqn, sinkpacket->payload);
 					}
 					packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
 					if(packet_len) {
-						LOG_INFO("REC Pkt:%u,%u,%u, Slot-Nr.:%u", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i);
+						while(packet_rcv.size > 0){
+									LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.single_packet[4-packet_rcv.size].src_id,packet_rcv.single_packet[4-packet_rcv.size].seqn, packet_rcv.single_packet[4-packet_rcv.size].payload);
+									--packet_rcv.size;
+									
+
+								}
 					}
 					++i;
 				}
@@ -285,14 +289,23 @@ PROCESS_THREAD(design_project_process, ev, data)
 					etimer_reset(&slot_timer);
 					if(slots[i]) {
 						if(my_slot == i && is_data_in_queue()) {
-							packet = pop_data();
+							packet->single_packet[packet->size] = pop_data();
+							++packet->size;
 							/* --- SOURCE --- */
 							radio_send(((uint8_t*)packet),sizeof(lpsd_packet_t),1);
-							LOG_INFO("TRM Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet->src_id,packet->seqn, packet->payload, i, node_id);
+							packet->size = 0;
+							LOG_INFO("TRM Pkt Size :%u\n", packet->size);
 						} else if(my_slot != i){
 							packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
 							if(packet_len) {
-								LOG_INFO("REC Pkt:%u,%u,%u, Slot-Nr.:%u, Node-ID:%u\n", packet_rcv.src_id,packet_rcv.seqn, packet_rcv.payload, i, node_id);
+								while(packet_rcv.size > 0){
+									LOG_INFO("REC Pkt:%u,%u,%u\n", packet_rcv.single_packet[4-packet_rcv.size].src_id,packet_rcv.single_packet[4-packet_rcv.size].seqn, packet_rcv.single_packet[4-packet_rcv.size].payload);
+									packet->single_packet[packet->size] = packet_rcv.single_packet[4-packet_rcv.size];
+									--packet_rcv.size;
+									++packet->size;
+								}
+
+
 							}
 						}
 					}
