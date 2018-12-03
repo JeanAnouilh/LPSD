@@ -129,9 +129,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static uint16_t				timeout_ms = 25;				/* packet receive timeout, in ms */
 	static uint32_t				slot_time = CLOCK_SECOND / 28;
 	static uint8_t				firstpacket = 1;				/* First packet for the initiator */
-	static struct etimer		wait_timer;
-	static struct etimer		first_wait_timer;
-	static struct etimer		slot_timer;
 	static uint8_t				sync = 10;						/* in minimum 3 rounds */
 	static uint8_t				last_sync = 0;
 	static uint8_t				first_sync = 0;
@@ -157,11 +154,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 	PIN_CFG_OUT(RADIO_TX_PIN);
 	PIN_CFG_OUT(LED_STATUS);
 
-	/* Setup periodic timers that expire after 10/50/1000 milli-seconds and the slottimer. */
-	etimer_set(&first_wait_timer, CLOCK_SECOND / 20);			// 50 milliseconds
-	etimer_set(&wait_timer, CLOCK_SECOND / 100);				// 10 milliseconds
-	etimer_set(&slot_timer, slot_time);							// slot time 35 ms
-
 	/* set my_slot */
 	i = 0;
 	while(i < 27) {
@@ -175,9 +167,11 @@ PROCESS_THREAD(design_project_process, ev, data)
 	while(sync) {
 		if(firstpacket && node_id == sinkaddress) {
 			/* --- INITIATOR --- */
-			/* Wait 50 ms to be sure that all other nodes are ready. */
-			etimer_restart(&first_wait_timer);
-			PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&first_wait_timer));
+			uint8_t waiter = 100;
+			while(waiter) {
+				LOG_INFO("waiting\n");
+				--waiter;
+			}
 
 			/* prepare first packet */
 			firstpacket = 0;
@@ -200,7 +194,9 @@ PROCESS_THREAD(design_project_process, ev, data)
 				}
 			}
 			/* Restart the timer */
-			etimer_restart(&wait_timer);
+			LOG_INFO("waiting\n");
+			LOG_INFO("waiting\n");
+			LOG_INFO("waiting\n");
 			LED_ON(LED_STATUS);
 
 			LOG_INFO("receive_packet_round: %u\n",sync_packet_rcv.sync_count);
@@ -222,7 +218,9 @@ PROCESS_THREAD(design_project_process, ev, data)
 			--sync;
 
 			/* Wait for send */
-			PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&wait_timer));
+			LOG_INFO("waiting\n");
+			LOG_INFO("waiting\n");
+			LOG_INFO("waiting\n");
 			LED_OFF(LED_STATUS);
 
 			/* get Timestamp and send packet */
