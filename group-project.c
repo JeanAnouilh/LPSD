@@ -127,7 +127,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 	packet_rcv.single_packet[3]= instancepacket;
 	static uint8_t				packet_len;						/* packet length, in Bytes */
 	static uint16_t				timeout_ms = 25;				/* packet receive timeout, in ms */
-	static uint32_t				slot_time = CLOCK_SECOND / 28;
 	static uint8_t				firstpacket = 1;				/* First packet for the initiator */
 	static uint8_t				sync = 10;						/* in minimum 3 rounds */
 	static uint8_t				last_sync = 0;
@@ -235,6 +234,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	rtimer_ext_clock_t next_exp;
 	rtimer_ext_next_expiration(RTIMER_EXT_LF_1, &next_exp);
 	LOG_INFO("START: %u",(uint16_t) (t_zero + next_exp));
+	t_zero = 0;
 
 	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero+RTIMER_EXT_SECOND_LF, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
 
@@ -268,7 +268,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 		if(node_id == sinkaddress) {
 			/* reset sync timer and restart all slot timers */
 			if(i == 0) {
-				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
+				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/28), (rtimer_ext_callback_t) &reset_slot_timer);
 				LED_TOGGLE(LED_STATUS);
 				while(i < 27) {
 					while(1) {
@@ -298,7 +298,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 			/* reset sync timer and restart all slot timers */
 			packet->size = 0;
 			if(i == 0) {
-				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
+				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/28), (rtimer_ext_callback_t) &reset_slot_timer);
 				while(i < 27) {
 					while(1) {
 						if(j) {
