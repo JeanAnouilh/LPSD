@@ -63,6 +63,7 @@ uint16_t sinkaddress = SINK_ADDRESS;
 uint16_t randomseed = RANDOM_SEED;
 //static uint8_t packcounter = 0;
 static volatile uint8_t i = 0;
+static volatile uint8_t j = 1;
 /*---------------------------------------------------------------------------*/
 
 /* Structs for the different packets */
@@ -93,6 +94,10 @@ void reset_sync_timer(void)
 {
 	i = 0;
 }
+void reset_slot_timer(void)
+{
+	j = 1;
+}
 
 /*---------------------------------------------------------------------------*/
 PROCESS(design_project_process, "Skeleton code - LPSD Design Project");
@@ -106,7 +111,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static lpsd_sync_t			sync_packet_rcv;				/* received packet buffer */
 	//Normal Packet
 	static lpsd_superpacket_t*		packet;							/* packet pointer */
-	static lpsd_packet_t*		sinkpacket;							/* packet pointer */
+	static lpsd_packet_t*			poppacket;						/* packet pointer */
 	static lpsd_superpacket_t		packet_rcv;						/* received packet buffer */
 	//static lpsd_superpacket_t		received_packets;				
 	packet->size=0;
@@ -133,6 +138,9 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static rtimer_ext_clock_t	last_time = 0;
 	static rtimer_ext_clock_t	first_time = 0;
 	static rtimer_ext_clock_t	timestamp;
+
+	static uint8_t				send_counter = 0;
+	static uint8_t				rec_counter = 0;
 
 	static uint8_t				my_slot;						/* used slot ID */
 	static uint8_t				slot_mapping[27] = {8,2,3,4,6,7,1,10,11,13,14,15,31,17,18,19,20,22,23,24,25,26,27,28,16,32,33};
@@ -227,12 +235,9 @@ PROCESS_THREAD(design_project_process, ev, data)
 	rtimer_ext_clock_t delta_t = (last_time - first_time) / (uint64_t) (last_sync - first_sync);
 	rtimer_ext_clock_t t_zero = first_time - ((uint64_t) first_sync * delta_t);
 	rtimer_ext_clock_t next_exp;
-	rtimer_ext_next_expiration(RTIMER_EXT_LF_0, &next_exp);
+	rtimer_ext_next_expiration(RTIMER_EXT_LF_1, &next_exp);
 	LOG_INFO("START: %u",(uint16_t) (t_zero + next_exp));
 
-	//rtimer_ext_wait_for_event(RTIMER_EXT_LF_1, NULL);
-	rtimer_ext_stop(RTIMER_EXT_LF_1);
-	t_zero=0;
 	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero+RTIMER_EXT_SECOND_LF, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
 
 	LOG_INFO("WE ARE SYNCED");
@@ -265,25 +270,27 @@ PROCESS_THREAD(design_project_process, ev, data)
 		if(node_id == sinkaddress) {
 			/* reset sync timer and restart all slot timers */
 			if(i == 0) {
-				etimer_restart(&slot_timer);
+				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
 				LED_TOGGLE(LED_STATUS);
 				while(i < 27) {
-					PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer));
-					etimer_reset(&slot_timer);
-					if(is_data_in_queue()) {
-						/* --- SINK --- */
-						/* Write our own message to serial */
-						sinkpacket = pop_data();
-						LOG_INFO("Pkt:%u,%u,%u\n", sinkpacket->src_id,sinkpacket->seqn, sinkpacket->payload);
-					}
-					packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
-					if(packet_len) {
-						while(packet_rcv.size > 0){
+					while(1) {
+						if(j) {
+							if(is_data_in_queue()) {
+								/* --- SINK --- */
+								/* Write our own message to serial */
+								poppacket = pop_data();
+								LOG_INFO("Pkt:%u,%u,%u\n", poppacket->src_id,poppacket->seqn, poppacket->payload);
+							}
+							packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
+							if(packet_len) {
+								while(packet_rcv.size > 0) {
 									LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.single_packet[(4-packet_rcv.size)].src_id,packet_rcv.single_packet[(4-packet_rcv.size)].seqn, packet_rcv.single_packet[(4-packet_rcv.size)].payload);
 									--packet_rcv.size;
-									
-
 								}
+							}
+							j = 0;
+							break;
+						}
 					}
 					++i;
 				}
@@ -293,31 +300,36 @@ PROCESS_THREAD(design_project_process, ev, data)
 			/* reset sync timer and restart all slot timers */
 			packet->size = 0;
 			if(i == 0) {
-				etimer_restart(&slot_timer);
-				LED_TOGGLE(LED_STATUS);
+				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
 				while(i < 27) {
-					PROCESS_WAIT_EVENT_UNTIL(etimer_expired(&slot_timer));
-					etimer_reset(&slot_timer);
-					if(slots[i]) {
-						if(my_slot == i && is_data_in_queue()) {
-							packet->single_packet[(packet->size)] = pop_data();
-							packet->size=(packet->size)+1;
-							/* --- SOURCE --- */
-							radio_send(((uint8_t*)packet),sizeof(lpsd_packet_t),1);
-							packet->size = 0;
-							LOG_INFO("TRM Pkt Size :%u\n", packet->size);
-						} else if(my_slot != i){
-							packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
-							if(packet_len) {
-								while(packet_rcv.size > 0){
-									LOG_INFO("REC Pkt:%u,%u,%u\n", packet_rcv.single_packet[(4-packet_rcv.size)].src_id,packet_rcv.single_packet[(4-packet_rcv.size)].seqn, packet_rcv.single_packet[(4-packet_rcv.size)].payload);
-									packet->single_packet[(packet->size)] = packet_rcv.single_packet[4-packet_rcv.size];
-									--packet_rcv.size;
-									packet->size=(packet->size)+1;
+					while(1) {
+						if(j) {
+							if(slots[i]) {
+								if(my_slot == i && is_data_in_queue()) {
+									poppacket = pop_data();
+									packet->single_packet[send_counter] = *poppacket;
+									++send_counter;
+									packet->size = send_counter;
+									/* --- SOURCE --- */
+									radio_send(((uint8_t*)packet),sizeof(lpsd_superpacket_t),1);
+									send_counter = 0;
+									LOG_INFO("TRM Pkt Size :%u\n", packet->size);
+								} else if(my_slot != i){
+									packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
+									if(packet_len) {
+										rec_counter = packet_rcv.size;
+										while(rec_counter > 0){
+											LOG_INFO("REC Pkt:%u,%u,%u\n", packet_rcv.single_packet[(4-rec_counter)].src_id,packet_rcv.single_packet[(4-rec_counter)].seqn, packet_rcv.single_packet[(4-rec_counter)].payload);
+											packet->single_packet[send_counter] = packet_rcv.single_packet[(4-rec_counter)];
+											--rec_counter;
+											++send_counter;
+										}
+										packet->size = send_counter;
+									}
 								}
-
-
 							}
+							j = 0;
+							break;
 						}
 					}
 					++i;
