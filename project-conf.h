@@ -75,12 +75,12 @@
   #define CC2420_CONF_AUTOACK           0
   #define CC2420_CONF_ADDRDECODE        0
   #define CC2420_CONF_SFD_TIMESTAMPS    0
-  #define RF_CHANNEL                    12
+  #define RF_CHANNEL                    26
 
 #endif /* PLATFORM_DPP_CC430 */
 
 /* application configuration */
-#define RADIO_CONF_PAYLOAD_LEN          20
+#define RADIO_CONF_PAYLOAD_LEN          100
 #define DCSTAT_CONF_ON                  1
 
 /* general RF config */

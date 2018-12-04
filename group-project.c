@@ -39,6 +39,7 @@
 #include "basic-radio.h"
 /* data generator */
 #include "data-generator.h"
+#include "rtimer-ext.h"
 /*---------------------------------------------------------------------------*/
 /* Log configuration */
 #include "sys/log.h"
@@ -75,7 +76,88 @@ typedef struct {
 typedef struct {
 	uint16_t					src_id;
 	uint8_t						seqn;
+	uint8_t						seqn1;
+	uint8_t						seqn2;
+	uint8_t						seqn3;
+	uint8_t						seqn4;
+	uint8_t						seqn5;
+	uint8_t						seqn6;
+	uint8_t						seqn7;
+	uint8_t						seqn8;
+	uint8_t						seqn9;
 	uint16_t					payload;
+	uint16_t					payload1;
+	uint16_t					payload2;
+	uint16_t					payload3;
+	uint16_t					payload4;
+	uint16_t					payload5;
+	uint16_t					payload6;
+	uint16_t					payload7;
+	uint16_t					payload8;
+	uint16_t					payload9;
+	uint8_t						seqn210;
+	uint8_t						seqn21;
+	uint8_t						seqn22;
+	uint8_t						seqn23;
+	uint8_t						seqn24;
+	uint8_t						seqn25;
+	uint8_t						seqn26;
+	uint8_t						seqn27;
+	uint8_t						seqn28;
+	uint8_t						seqn29;
+	uint16_t					payload210;
+	uint16_t					payload21;
+	uint16_t					payload22;
+	uint16_t					payload23;
+	uint16_t					payload24;
+	uint16_t					payload25;
+	uint16_t					payload26;
+	uint16_t					payload27;
+	uint16_t					payload28;
+	uint16_t					payload29;
+	uint8_t						seqn310;
+	uint8_t						seqn31;
+	uint8_t						seqn32;
+	uint8_t						seqn33;
+	uint8_t						seqn34;
+	uint8_t						seqn35;
+	/*uint8_t						seqn36;
+	uint8_t						seqn37;
+	uint8_t						seqn38;
+	uint8_t						seqn39;*/
+	/*uint16_t					payload310;
+	uint16_t					payload31;
+	uint16_t					payload32;
+	uint16_t					payload33;
+	uint16_t					payload34;
+	uint16_t					payload35;
+	uint16_t					payload36;
+	uint16_t					payload37;
+	uint16_t					payload38;
+	uint16_t					payload39; */
+/*
+	uint8_t						seqn410;
+	uint8_t						seqn41;
+	uint8_t						seqn422;
+	uint8_t						seqn423;
+	uint8_t						seqn424;
+	uint8_t						seqn425;
+	uint8_t						seqn426;
+	uint8_t						seqn427;
+	uint8_t						seqn428;
+	uint8_t						seqn429;
+	uint16_t					payload410;
+	uint16_t					payload421;
+	uint16_t					payload422;
+	uint16_t					payload423;
+	uint16_t					payload424;
+	uint16_t					payload425;
+	uint16_t					payload426;
+	uint16_t					payload427;
+	uint16_t					payload428;
+	uint16_t					payload429;
+	*/
+	
 } lpsd_packet_t;
 //static lpsd_packet_t instancepacket;
 //instancepacket.src_id = 0;
@@ -93,6 +175,7 @@ typedef struct {
 void reset_sync_timer(void)
 {
 	i = 0;
+	
 }
 void reset_slot_timer(void)
 {
@@ -234,7 +317,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	rtimer_ext_clock_t next_exp;
 	rtimer_ext_next_expiration(RTIMER_EXT_LF_1, &next_exp);
 	LOG_INFO("START: %u",(uint16_t) (t_zero + next_exp));
-	t_zero = 0;
+	//t_zero = 0;
 
 	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero+RTIMER_EXT_SECOND_LF, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
 
@@ -263,6 +346,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 		// - discover Network
 		// - set parents
 	}
+LED_ON(LED_STATUS);
 	while(1) {
 		//LOG_INFO("callback_counter: %u",counter);
 		if(node_id == sinkaddress) {
@@ -299,6 +383,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 			packet->size = 0;
 			if(i == 0) {
 				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/28), (rtimer_ext_callback_t) &reset_slot_timer);
+				//LED_TOGGLE(LED_STATUS);
 				while(i < 27) {
 					while(1) {
 						if(j) {
@@ -309,9 +394,16 @@ PROCESS_THREAD(design_project_process, ev, data)
 									++send_counter;
 									packet->size = send_counter;
 									/* --- SOURCE --- */
-									radio_send(((uint8_t*)packet),sizeof(lpsd_superpacket_t),1);
+									//LED_TOGGLE(LED_STATUS);
+									timestamp = rtimer_ext_now_lf();
+									send_counter = 		radio_send(((uint8_t*)poppacket),sizeof(lpsd_packet_t),100);
+									firstpacket = rtimer_ext_now_lf();
+									uint16_t t= (firstpacket-timestamp);
+									
+									LOG_INFO("TRM Send successful :%u time: %u \n", send_counter,t);
 									send_counter = 0;
-									LOG_INFO("TRM Pkt Size :%u\n", packet->size);
+									LOG_INFO("Size of packet :%u\n", sizeof(lpsd_packet_t));
+									//LED_OFF(LED_STATUS);
 								} else if(my_slot != i){
 									packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
 									if(packet_len) {
