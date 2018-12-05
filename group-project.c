@@ -214,12 +214,10 @@ PROCESS_THREAD(design_project_process, ev, data)
 	rtimer_ext_clock_t t_zero = first_time - ((uint64_t) first_sync * delta_t);
 	rtimer_ext_clock_t next_exp;
 	rtimer_ext_next_expiration(RTIMER_EXT_LF_1, &next_exp);
-	LOG_INFO("START: %u",(uint16_t) (t_zero + next_exp));
-	//t_zero = 0;
-
 	rtimer_ext_stop(RTIMER_EXT_LF_1);
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero+RTIMER_EXT_SECOND_LF, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, RTIMER_EXT_SECOND_LF, t_zero + next_exp + RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
 
+	LOG_INFO("START: %u",(uint16_t) (t_zero + next_exp));
 	LOG_INFO("WE ARE SYNCED");
 
 	/* ----------------------- HERE WE ARE SYNCED ----------------------- */
