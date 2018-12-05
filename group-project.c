@@ -35,6 +35,8 @@
 #include "node-id.h"
 /* GPIO */
 #include "gpio.h"
+/* clock */
+#include "clock.h"
 /* radio */
 #include "basic-radio.h"
 /* data generator */
@@ -76,95 +78,13 @@ typedef struct {
 typedef struct {
 	uint16_t					src_id;
 	uint8_t						seqn;
-	uint8_t						seqn1;
-	uint8_t						seqn2;
-	uint8_t						seqn3;
-	uint8_t						seqn4;
-	uint8_t						seqn5;
-	uint8_t						seqn6;
-	uint8_t						seqn7;
-	uint8_t						seqn8;
-	uint8_t						seqn9;
 	uint16_t					payload;
-	uint16_t					payload1;
-	uint16_t					payload2;
-	uint16_t					payload3;
-	uint16_t					payload4;
-	uint16_t					payload5;
-	uint16_t					payload6;
-	uint16_t					payload7;
-	uint16_t					payload8;
-	uint16_t					payload9;
-	uint8_t						seqn210;
-	uint8_t						seqn21;
-	uint8_t						seqn22;
-	uint8_t						seqn23;
-	uint8_t						seqn24;
-	uint8_t						seqn25;
-	uint8_t						seqn26;
-	uint8_t						seqn27;
-	uint8_t						seqn28;
-	uint8_t						seqn29;
-	uint16_t					payload210;
-	uint16_t					payload21;
-	uint16_t					payload22;
-	uint16_t					payload23;
-	uint16_t					payload24;
-	uint16_t					payload25;
-	uint16_t					payload26;
-	uint16_t					payload27;
-	uint16_t					payload28;
-	uint16_t					payload29;
-	uint8_t						seqn310;
-	uint8_t						seqn31;
-	uint8_t						seqn32;
-	uint8_t						seqn33;
-	uint8_t						seqn34;
-	uint8_t						seqn35;
-	/*uint8_t						seqn36;
-	uint8_t						seqn37;
-	uint8_t						seqn38;
-	uint8_t						seqn39;*/
-	/*uint16_t					payload310;
-	uint16_t					payload31;
-	uint16_t					payload32;
-	uint16_t					payload33;
-	uint16_t					payload34;
-	uint16_t					payload35;
-	uint16_t					payload36;
-	uint16_t					payload37;
-	uint16_t					payload38;
-	uint16_t					payload39; */
-/*
-	uint8_t						seqn410;
-	uint8_t						seqn41;
-	uint8_t						seqn422;
-	uint8_t						seqn423;
-	uint8_t						seqn424;
-	uint8_t						seqn425;
-	uint8_t						seqn426;
-	uint8_t						seqn427;
-	uint8_t						seqn428;
-	uint8_t						seqn429;
-	uint16_t					payload410;
-	uint16_t					payload421;
-	uint16_t					payload422;
-	uint16_t					payload423;
-	uint16_t					payload424;
-	uint16_t					payload425;
-	uint16_t					payload426;
-	uint16_t					payload427;
-	uint16_t					payload428;
-	uint16_t					payload429;
-	*/
-	
 } lpsd_packet_t;
-//static lpsd_packet_t instancepacket;
-//instancepacket.src_id = 0;
-//instancepacket.seqn = 0;
-//instancepacket.payload = 0;
+// Super packet
 typedef struct {
-	lpsd_packet_t				single_packet[4];
+	uint16_t					src_id[4];
+	uint8_t						seqn[20];
+	uint16_t					payload[20];
 	uint8_t 					size;
 } lpsd_superpacket_t;
 	
@@ -193,21 +113,10 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static lpsd_sync_t			sync_packet;					/* packet buffer */
 	static lpsd_sync_t			sync_packet_rcv;				/* received packet buffer */
 	//Normal Packet
-	static lpsd_superpacket_t*		packet;							/* packet pointer */
-	static lpsd_packet_t*			poppacket;						/* packet pointer */
-	static lpsd_superpacket_t		packet_rcv;						/* received packet buffer */
-	//static lpsd_superpacket_t		received_packets;				
-	packet->size=0;
-	packet_rcv.size=0;
-	static lpsd_packet_t instancepacket;
-	packet->single_packet[0]= instancepacket;
-	packet->single_packet[1]= instancepacket;
-	packet->single_packet[2]= instancepacket;
-	packet->single_packet[3]= instancepacket;
-	packet_rcv.single_packet[0]= instancepacket;
-	packet_rcv.single_packet[1]= instancepacket;
-	packet_rcv.single_packet[2]= instancepacket;
-	packet_rcv.single_packet[3]= instancepacket;
+	static lpsd_superpacket_t*	packet;							/* packet pointer */
+	static lpsd_packet_t*		pop_packet;						/* packet pointer */
+	static lpsd_superpacket_t	packet_rcv;						/* received packet buffer */
+	packet->size = 1;
 	static uint8_t				packet_len;						/* packet length, in Bytes */
 	static uint16_t				timeout_ms = 25;				/* packet receive timeout, in ms */
 	static uint8_t				firstpacket = 1;				/* First packet for the initiator */
@@ -249,11 +158,8 @@ PROCESS_THREAD(design_project_process, ev, data)
 	while(sync) {
 		if(firstpacket && node_id == sinkaddress) {
 			/* --- INITIATOR --- */
-			uint8_t waiter = 100;
-			while(waiter) {
-				LOG_INFO("waiting\n");
-				--waiter;
-			}
+			// wait 50 ms
+			clock_delay(17668);
 
 			/* prepare first packet */
 			firstpacket = 0;
@@ -275,11 +181,9 @@ PROCESS_THREAD(design_project_process, ev, data)
 					break;
 				}
 			}
-			/* Restart the timer */
-			LOG_INFO("waiting\n");
-			LOG_INFO("waiting\n");
-			LOG_INFO("waiting\n");
-			LED_ON(LED_STATUS);
+
+			// wait 5 ms
+			clock_delay(1767);
 
 			LOG_INFO("receive_packet_round: %u\n",sync_packet_rcv.sync_count);
 
@@ -298,12 +202,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 			++sync_packet.sync_count;	
 			packet_len = sizeof(sync_packet);
 			--sync;
-
-			/* Wait for send */
-			LOG_INFO("waiting\n");
-			LOG_INFO("waiting\n");
-			LOG_INFO("waiting\n");
-			LED_OFF(LED_STATUS);
 
 			/* get Timestamp and send packet */
 			timestamp = rtimer_ext_now_lf();
@@ -348,7 +246,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 	}
 LED_ON(LED_STATUS);
 	while(1) {
-		//LOG_INFO("callback_counter: %u",counter);
 		if(node_id == sinkaddress) {
 			/* reset sync timer and restart all slot timers */
 			if(i == 0) {
@@ -360,13 +257,18 @@ LED_ON(LED_STATUS);
 							if(is_data_in_queue()) {
 								/* --- SINK --- */
 								/* Write our own message to serial */
-								poppacket = pop_data();
-								LOG_INFO("Pkt:%u,%u,%u\n", poppacket->src_id,poppacket->seqn, poppacket->payload);
+								pop_packet = pop_data();
+								LOG_INFO("Pkt:%u,%u,%u\n", pop_packet->src_id,pop_packet->seqn, pop_packet->payload);
 							}
 							packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
 							if(packet_len) {
 								while(packet_rcv.size > 0) {
-									LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.single_packet[(4-packet_rcv.size)].src_id,packet_rcv.single_packet[(4-packet_rcv.size)].seqn, packet_rcv.single_packet[(4-packet_rcv.size)].payload);
+									uint8_t counter = 0;
+									while(counter < 5) {
+										uint8_t val = ((packet_rcv.size - 1) * 5) + counter;
+										LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.src_id[counter],packet_rcv.seqn[val], packet_rcv.payload[val]);
+										++counter;
+									}
 									--packet_rcv.size;
 								}
 							}
@@ -378,43 +280,42 @@ LED_ON(LED_STATUS);
 				}
 			}
 		} else {
-			//LOG_INFO("callback:%u, i:%u\n",counter,i);
 			/* reset sync timer and restart all slot timers */
 			packet->size = 0;
 			if(i == 0) {
 				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/28), (rtimer_ext_callback_t) &reset_slot_timer);
-				//LED_TOGGLE(LED_STATUS);
+				LED_TOGGLE(LED_STATUS);
 				while(i < 27) {
 					while(1) {
 						if(j) {
 							if(slots[i]) {
 								if(my_slot == i && is_data_in_queue()) {
-									poppacket = pop_data();
-									packet->single_packet[send_counter] = *poppacket;
-									++send_counter;
-									packet->size = send_counter;
+									pop_packet = pop_data();
+
+									packet->src_id[0] = poppacket->src_id;
+									packet->seqn[0] = poppacket->seqn;
+									packet->payload[0] = poppacket->payload;
+
 									/* --- SOURCE --- */
-									//LED_TOGGLE(LED_STATUS);
-									timestamp = rtimer_ext_now_lf();
-									send_counter = 		radio_send(((uint8_t*)poppacket),sizeof(lpsd_packet_t),100);
-									firstpacket = rtimer_ext_now_lf();
-									uint16_t t= (firstpacket-timestamp);
+									uint8_t send_test = radio_send(((uint8_t*)(&(packet->src_id[0]))),sizeof(lpsd_superpacket_t),1);
 									
-									LOG_INFO("TRM Send successful :%u time: %u \n", send_counter,t);
-									send_counter = 0;
-									LOG_INFO("Size of packet :%u\n", sizeof(lpsd_packet_t));
-									//LED_OFF(LED_STATUS);
+									LOG_INFO("TRM successful: %u\n", send_test);
+									LOG_INFO("Size of packet: %u\n", sizeof(lpsd_superpacket_t));
 								} else if(my_slot != i){
 									packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
 									if(packet_len) {
-										rec_counter = packet_rcv.size;
-										while(rec_counter > 0){
-											LOG_INFO("REC Pkt:%u,%u,%u\n", packet_rcv.single_packet[(4-rec_counter)].src_id,packet_rcv.single_packet[(4-rec_counter)].seqn, packet_rcv.single_packet[(4-rec_counter)].payload);
-											packet->single_packet[send_counter] = packet_rcv.single_packet[(4-rec_counter)];
-											--rec_counter;
-											++send_counter;
+										uint8_t counter = 0;
+										while(counter < 4) {
+											uint8_t read_val = ((packet_rcv.size - 1) * 5) + counter;
+											uint8_t write_val = ((packet_rcv.size) * 5) + counter;
+											LOG_INFO("REC Pkt:%u,%u,%u\n", packet_rcv.src_id[counter],packet_rcv.seqn[read_val], packet_rcv.payload[read_val]);
+
+											packet->src_id[counter + 1] = packet_rcv.src_id[counter];
+											packet->seqn[write_val] = packet_rcv.seqn[read_val];
+											packet->payload[write_val] = packet_rcv.payload[read_val];
+											++counter;
 										}
-										packet->size = send_counter;
+										--packet_rcv.size;
 									}
 								}
 							}
