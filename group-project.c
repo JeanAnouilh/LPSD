@@ -64,7 +64,8 @@ uint16_t sinkaddress = SINK_ADDRESS;
 #error No random seed specified. Example: use '-RANDOM_SEED=123' initialize the random number generator.
 #endif /* RANDOM_SEED */
 uint16_t randomseed = RANDOM_SEED;
-//static uint8_t packcounter = 0;
+
+
 static volatile uint8_t i = 0;
 static volatile uint8_t j = 1;
 /*---------------------------------------------------------------------------*/
@@ -74,7 +75,7 @@ static volatile uint8_t j = 1;
 typedef struct {
 	uint8_t						sync_count;
 } lpsd_sync_t;
-// Normal packet
+/* Packet type for queue */
 typedef struct {
 	uint16_t					src_id;
 	uint8_t						seqn;
@@ -127,8 +128,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static rtimer_ext_clock_t	first_time = 0;
 	static rtimer_ext_clock_t	timestamp;
 
-	static uint8_t				send_counter = 0;
-	static uint8_t				rec_counter = 0;
+	static uint8_t				load_counter = 5;
 
 	static uint8_t				my_slot;						/* used slot ID */
 	static uint8_t				slot_mapping[27] = {8,2,3,4,6,7,1,10,11,13,14,15,31,17,18,19,20,22,23,24,25,26,27,28,16,32,33};
@@ -244,7 +244,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 		// - discover Network
 		// - set parents
 	}
-LED_ON(LED_STATUS);
 	while(1) {
 		if(node_id == sinkaddress) {
 			/* reset sync timer and restart all slot timers */
@@ -303,6 +302,7 @@ LED_ON(LED_STATUS);
 									LOG_INFO("Size of packet: %u\n", sizeof(lpsd_superpacket_t));
 								} else if(my_slot != i){
 									packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
+									LOG_INFO("REC Pkt with size :%u\n", packet_rcv.size);
 									if(packet_len) {
 										uint8_t counter = 0;
 										while(counter < 4) {
