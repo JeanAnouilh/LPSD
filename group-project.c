@@ -113,8 +113,12 @@ void reset_slot_timer(void)
 void reset_timer(void)
 {
 	rtimer_ext_schedule(RTIMER_EXT_LF_1, RTIMER_EXT_SECOND_LF + t_zero, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
-	LOG_INFO("T_ZERO: %u\n",t_zero);
-	sync = 0;
+	LOG_INFO("T_ZERO: %u\n",(uint16_t) t_zero);
+	if(sync) {
+		LOG_INFO("Not synced --> going to LPM4.");
+		sync = 0;
+		LPM4;
+	}
 }
 
 /*---------------------------------------------------------------------------*/
