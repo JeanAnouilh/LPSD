@@ -100,7 +100,7 @@ typedef struct {
 } lpsd_discovery_t;
 // Writing queue
 QUEUE(writing_queue);
-MEMB(writing_memb, lpsd_packet_queue_t, 2000);
+MEMB(writing_memb, lpsd_packet_queue_t, 200);
 /*---------------------------------------------------------------------------*/
 
 /* Functions */
@@ -148,6 +148,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static rtimer_ext_clock_t	first_time = 0;
 	static rtimer_ext_clock_t	timestamp;
 	static uint8_t				stop = 0;
+	static uint8_t				seqn = 0;
 
 	static uint8_t				my_slot;						/* used slot ID */
 	static uint8_t				slot_mapping[27] = {8,2,3,4,6,7,1,10,11,13,14,15,31,17,18,19,20,22,23,24,25,26,27,28,16,32,33};
@@ -273,44 +274,8 @@ PROCESS_THREAD(design_project_process, ev, data)
 								/* --- SINK --- */
 								/* Write our own message to serial */
 								pop_packet = pop_data();
-								lpsd_packet_queue_t* writing_pkt = memb_alloc(&writing_memb);
-								if(writing_pkt == 0) {
-									LOG_INFO("Writing queue overflow!\n");
-									++stop;
-									break;
-								}
-								writing_pkt->src_id   = pop_packet->src_id;
-								writing_pkt->seqn     = pop_packet->seqn;
-								writing_pkt->payload  = pop_packet->payload;
-
-								/* add packet to the queue */
-								queue_enqueue(writing_queue, writing_pkt);
-							}
-							packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
-							if(packet_len) {
-								//LOG_INFO("Max #packets received: %u", packet_rcv.size);
-								while(packet_rcv.size > 0) {
-									uint8_t counter = 0;
-									while(counter < 5) {
-										uint8_t read_val = ((packet_rcv.size - 1) * 5) + counter;
-										if(packet_rcv.seqn[read_val]) {
-											lpsd_packet_queue_t* writing_pkt = memb_alloc(&writing_memb);
-											if(writing_pkt == 0) {
-												LOG_INFO("Writing queue overflow!\n");
-												++stop;
-												break;
-											}
-											writing_pkt->src_id   = packet_rcv.src_id[(packet_rcv.size - 1)];
-											writing_pkt->seqn     = packet_rcv.seqn[read_val];
-											writing_pkt->payload  = packet_rcv.payload[read_val];
-
-											/* add packet to the queue */
-											queue_enqueue(writing_queue, writing_pkt);
-										}
-										++counter;
-									}
-									--packet_rcv.size;
-								}
+								seqn = pop_packet->seqn;
+								LOG_INFO("Pkt:%u,%u,%u\n", pop_packet->src_id,pop_packet->seqn, pop_packet->payload);
 							}
 							if(my_slot == i) {
 								uint8_t break_counter = 0;
@@ -322,8 +287,41 @@ PROCESS_THREAD(design_project_process, ev, data)
 
 						  			LOG_INFO("Pkt:%u,%u,%u\n", pkt->src_id,pkt->seqn, pkt->payload);
 						  			stop = 0;
+						  			++break_counter;
 								}
-								if(!break_counter) ++stop;
+								if(!break_counter && seqn == 200) ++stop;
+							} else {
+								packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
+								if(packet_len) {
+									//LOG_INFO("Max #packets received: %u", packet_rcv.size);
+									while(packet_rcv.size > 0) {
+										uint8_t counter = 0;
+										while(counter < 5) {
+											uint8_t read_val = ((packet_rcv.size - 1) * 5) + counter;
+											if(packet_rcv.seqn[read_val]) {
+												lpsd_packet_queue_t* writing_pkt = memb_alloc(&writing_memb);
+												if(writing_pkt == 0) {
+													LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.src_id[(packet_rcv.size - 1)],packet_rcv.seqn[read_val], packet_rcv.payload[read_val]);
+													++stop;
+												} else {
+													writing_pkt->src_id   = packet_rcv.src_id[(packet_rcv.size - 1)];
+													writing_pkt->seqn     = packet_rcv.seqn[read_val];
+													writing_pkt->payload  = packet_rcv.payload[read_val];
+
+													/* add packet to the queue */
+													queue_enqueue(writing_queue, writing_pkt);
+												}
+
+												if(stop > 5) {
+													stop = 0;
+													break;
+												}
+											}
+											++counter;
+										}
+										--packet_rcv.size;
+									}
+								}
 							}
 							j = 0;
 							break;
@@ -377,6 +375,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 												packet.payload[write_val] = packet_rcv.payload[read_val];
 												++counter;
 											}
+											if(!break_counter && seqn == 200) ++stop;
 											--packet_rcv.size;
 											++packet.size;
 										}
