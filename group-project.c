@@ -140,7 +140,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static lpsd_superpacket_t	packet_rcv;						/* received packet buffer */
 	packet.size = 1;
 	static uint8_t				packet_len;						/* packet length, in Bytes */
-	static uint16_t				timeout_ms = 25;				/* packet receive timeout, in ms */
+	static uint16_t				timeout_ms = 27;				/* packet receive timeout, in ms */
 	static uint8_t				firstpacket = 1;				/* First packet for the initiator */
 	static uint8_t				last_sync = 0;
 	static uint8_t				first_sync = 0;
@@ -266,7 +266,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 		if(node_id == sinkaddress) {
 			/* reset sync timer and restart all slot timers */
 			if(i == 0) {
-				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/28), (rtimer_ext_callback_t) &reset_slot_timer);
+				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
 				while(i < 27) {
 					while(1) {
 						if(j) {
@@ -286,14 +286,12 @@ PROCESS_THREAD(design_project_process, ev, data)
 						  			memb_free(&writing_memb, pkt);
 
 						  			LOG_INFO("Pkt:%u,%u,%u\n", pkt->src_id,pkt->seqn, pkt->payload);
-						  			stop = 0;
 						  			++break_counter;
 								}
-								if(!break_counter && seqn == 200) ++stop;
+								if(seqn == 200) ++stop;
 							} else {
 								packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
 								if(packet_len) {
-									//LOG_INFO("Max #packets received: %u", packet_rcv.size);
 									while(packet_rcv.size > 0) {
 										uint8_t counter = 0;
 										while(counter < 5) {
@@ -333,7 +331,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 		} else {
 			/* reset sync timer and restart all slot timers */
 			if(i == 0) {
-				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/28), (rtimer_ext_callback_t) &reset_slot_timer);
+				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
 				while(i < 27) {
 					while(1) {
 						if(j) {
@@ -346,10 +344,10 @@ PROCESS_THREAD(design_project_process, ev, data)
 										packet.src_id[0] = pop_packet->src_id;
 										packet.seqn[counter] = pop_packet->seqn;
 										packet.payload[counter] = pop_packet->payload;
+										seqn = pop_packet->seqn;
 
 										++counter;
 									}
-									if(!counter) ++stop;
 									while(counter < 5) {
 										packet.seqn[counter] = 0;
 										packet.payload[counter] = 0;
@@ -368,14 +366,13 @@ PROCESS_THREAD(design_project_process, ev, data)
 											while(counter < 5) {
 												uint8_t read_val = ((packet_rcv.size - 1) * 5) + counter;
 												uint8_t write_val = (packet.size * 5) + counter;
-												//LOG_INFO("REC Pkt:%u,%u,%u\n", packet_rcv.src_id[(packet_rcv.size - 1)],packet_rcv.seqn[read_val], packet_rcv.payload[read_val]);
 												
 												packet.src_id[packet.size] = packet_rcv.src_id[(packet_rcv.size - 1)];
 												packet.seqn[write_val] = packet_rcv.seqn[read_val];
 												packet.payload[write_val] = packet_rcv.payload[read_val];
 												++counter;
 											}
-											if(!break_counter && seqn == 200) ++stop;
+											if(seqn == 200) ++stop;
 											--packet_rcv.size;
 											++packet.size;
 										}
