@@ -68,6 +68,7 @@ uint16_t randomseed = RANDOM_SEED;
 
 static volatile uint8_t i = 0;
 static volatile uint8_t j = 1;
+static volatile rtimer_ext_clock_t t_zero = 0;
 /*---------------------------------------------------------------------------*/
 
 /* Structs for the different packets */
@@ -107,6 +108,10 @@ void reset_sync_timer(void)
 void reset_slot_timer(void)
 {
 	j = 1;
+}
+void reset_timer(void)
+{
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -215,11 +220,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	}
 	/* calculate t zero and set the sync_timer */
 	rtimer_ext_clock_t delta_t = (last_time - first_time) / (uint64_t) (last_sync - first_sync);
-	rtimer_ext_clock_t t_zero = first_time - ((uint64_t) first_sync * delta_t);
-	rtimer_ext_clock_t next_exp;
-	rtimer_ext_next_expiration(RTIMER_EXT_LF_1, &next_exp);
-	rtimer_ext_stop(RTIMER_EXT_LF_1);
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero + next_exp, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
+	t_zero = first_time - ((uint64_t) first_sync * delta_t);
 
 	LOG_INFO("First Time: %u, First Sync: %u",(uint16_t) first_time,(uint16_t) first_sync);
 	LOG_INFO("Last Time: %u, Last Sync: %u",(uint16_t) last_time,(uint16_t) last_sync);
