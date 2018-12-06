@@ -100,7 +100,7 @@ typedef struct {
 } lpsd_discovery_t;
 // Writing queue
 QUEUE(writing_queue);
-MEMB(writing_memb, lpsd_packet_queue_t, 200);
+MEMB(writing_memb, lpsd_packet_queue_t, 2000);
 /*---------------------------------------------------------------------------*/
 
 /* Functions */
@@ -115,7 +115,7 @@ void reset_slot_timer(void)
 }
 void reset_timer(void)
 {
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, RTIMER_EXT_SECOND_LF + t_zero, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, (RTIMER_EXT_SECOND_LF - t_zero), RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
 	LOG_INFO("T_ZERO: %u\n",(uint16_t) t_zero);
 	if(sync) {
 		LOG_INFO("Not synced --> going to LPM4.");
@@ -125,7 +125,7 @@ void reset_timer(void)
 }
 
 /*---------------------------------------------------------------------------*/
-PROCESS(design_project_process, "Skeleton code - LPSD Design Project");
+PROCESS(design_project_process, "Flocklab Multi-Hop by Alex and Dario");
 AUTOSTART_PROCESSES(&design_project_process);
 /*---------------------------------------------------------------------------*/
 PROCESS_THREAD(design_project_process, ev, data)
@@ -138,7 +138,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static lpsd_superpacket_t	packet;							/* packet pointer */
 	static lpsd_packet_t*		pop_packet;						/* packet pointer */
 	static lpsd_superpacket_t	packet_rcv;						/* received packet buffer */
-	static lpsd_packet_t*		writing_pop_pkt;				
 	packet.size = 1;
 	static uint8_t				packet_len;						/* packet length, in Bytes */
 	static uint16_t				timeout_ms = 25;				/* packet receive timeout, in ms */
@@ -274,7 +273,18 @@ PROCESS_THREAD(design_project_process, ev, data)
 								/* --- SINK --- */
 								/* Write our own message to serial */
 								pop_packet = pop_data();
-								//LOG_INFO("Pkt:%u,%u,%u\n", pop_packet->src_id,pop_packet->seqn, pop_packet->payload);
+								lpsd_packet_queue_t* writing_pkt = memb_alloc(&writing_memb);
+								if(writing_pkt == 0) {
+									LOG_INFO("Writing queue overflow!\n");
+									++stop;
+									break;
+								}
+								writing_pkt->src_id   = pop_packet->src_id;
+								writing_pkt->seqn     = pop_packet->seqn;
+								writing_pkt->payload  = pop_packet->payload;
+
+								/* add packet to the queue */
+								queue_enqueue(writing_queue, writing_pkt);
 							}
 							packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
 							if(packet_len) {
@@ -284,10 +294,10 @@ PROCESS_THREAD(design_project_process, ev, data)
 									while(counter < 5) {
 										uint8_t read_val = ((packet_rcv.size - 1) * 5) + counter;
 										if(packet_rcv.seqn[read_val]) {
-											lpsd_packet_queue_t* writing_pkt = memb_alloc(&packet_memb);
+											lpsd_packet_queue_t* writing_pkt = memb_alloc(&writing_memb);
 											if(writing_pkt == 0) {
 												LOG_INFO("Writing queue overflow!\n");
-												stop = 5;
+												++stop;
 												break;
 											}
 											writing_pkt->src_id   = packet_rcv.src_id[(packet_rcv.size - 1)];
@@ -301,6 +311,19 @@ PROCESS_THREAD(design_project_process, ev, data)
 									}
 									--packet_rcv.size;
 								}
+							}
+							if(my_slot == i) {
+								uint8_t break_counter = 0;
+								while(*writing_queue != NULL && break_counter < 50) {
+									/* dequeue the first packet */
+						  			lpsd_packet_queue_t* pkt = queue_dequeue(writing_queue);
+						  			/* free the memory block */
+						  			memb_free(&writing_memb, pkt);
+
+						  			LOG_INFO("Pkt:%u,%u,%u\n", pkt->src_id,pkt->seqn, pkt->payload);
+						  			stop = 0;
+								}
+								if(!break_counter) ++stop;
 							}
 							j = 0;
 							break;
@@ -371,7 +394,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 			//TODO
 			// -reason to break the while loop
 		}
-		if(stop == 5) break;
+		if(stop >= 5) break;
 	}
 
 	if(node_id == sinkaddress) {
@@ -381,8 +404,7 @@ PROCESS_THREAD(design_project_process, ev, data)
   			/* free the memory block */
   			memb_free(&writing_memb, pkt);
 
-  			writing_pop_pkt = &(pkt->src_id);
-  			LOG_INFO("Pkt:%u,%u,%u\n", writing_pop_pkt->src_id,writing_pop_pkt->seqn, writing_pop_pkt->payload);
+  			LOG_INFO("Pkt:%u,%u,%u\n", pkt->src_id,pkt->seqn, pkt->payload);
 		}
 	} else {
 		LOG_INFO("no new packets --> going to LPM4.");
