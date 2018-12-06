@@ -88,6 +88,12 @@ typedef struct {
 	uint16_t					payload[20];
 	uint8_t 					size;
 } lpsd_superpacket_t;
+// Network discovery packet
+typedef struct {
+	uint16_t					src_id;					// sender of this message
+	uint16_t					dst_id;					// target of this sender
+	uint8_t 					size;					// tell the number of packets
+} lpsd_discovery_t;
 	
 
 /*---------------------------------------------------------------------------*/
@@ -215,7 +221,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	rtimer_ext_clock_t next_exp;
 	rtimer_ext_next_expiration(RTIMER_EXT_LF_1, &next_exp);
 	rtimer_ext_stop(RTIMER_EXT_LF_1);
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, RTIMER_EXT_SECOND_LF, t_zero + next_exp + RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero + next_exp + RTIMER_EXT_SECOND_LF, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
 
 	LOG_INFO("START: %u",(uint16_t) (t_zero + next_exp));
 	LOG_INFO("WE ARE SYNCED");
@@ -253,7 +259,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 				while(i < 27) {
 					while(1) {
 						if(j) {
-							if(is_data_in_queue()) {
+							while(is_data_in_queue()) {
 								/* --- SINK --- */
 								/* Write our own message to serial */
 								pop_packet = pop_data();
@@ -265,8 +271,8 @@ PROCESS_THREAD(design_project_process, ev, data)
 								while(packet_rcv.size > 0) {
 									uint8_t counter = 0;
 									while(counter < 5) {
-										uint8_t read_val = ((packet_rcv.size - 1) * 4) + counter;
-										LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.src_id[counter],packet_rcv.seqn[read_val], packet_rcv.payload[read_val]);
+										uint8_t read_val = ((packet_rcv.size - 1) * 5) + counter;
+										LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.src_id[(packet_rcv.size - 1)],packet_rcv.seqn[read_val], packet_rcv.payload[read_val]);
 										++counter;
 									}
 									--packet_rcv.size;
@@ -307,18 +313,21 @@ PROCESS_THREAD(design_project_process, ev, data)
 								} else if(my_slot != i){
 									packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
 									if(packet_len) {
-										uint8_t counter = 0;
-										while(counter < 5) {
-											uint8_t read_val = (counter * 4) + counter;
-											uint8_t write_val = (packet.size * 4) + counter;
-											LOG_INFO("REC Pkt:%u,%u,%u\n", packet_rcv.src_id[counter],packet_rcv.seqn[read_val], packet_rcv.payload[read_val]);
-
-											packet.src_id[packet.size] = packet_rcv.src_id[counter];
-											packet.seqn[write_val] = packet_rcv.seqn[read_val];
-											packet.payload[write_val] = packet_rcv.payload[read_val];
-											++counter;
+										while(packet_rcv.size > 0) {
+											uint8_t counter = 0;
+											while(counter < 5) {
+												uint8_t read_val = ((packet_rcv.size - 1) * 5) + counter;
+												uint8_t write_val = (packet.size * 5) + counter;
+												LOG_INFO("REC Pkt:%u,%u,%u\n", packet_rcv.src_id[(packet_rcv.size - 1)],packet_rcv.seqn[read_val], packet_rcv.payload[read_val]);
+												
+												packet.src_id[packet.size] = packet_rcv.src_id[(packet_rcv.size - 1)];
+												packet.seqn[write_val] = packet_rcv.seqn[read_val];
+												packet.payload[write_val] = packet_rcv.payload[read_val];
+												++counter;
+											}
+											--packet_rcv.size;
+											++packet.size;
 										}
-										++packet.size;
 									}
 								}
 							}
