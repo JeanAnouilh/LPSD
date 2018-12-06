@@ -33,6 +33,8 @@
 /* general */
 #include "contiki.h"
 #include "node-id.h"
+#include "memb.h"
+#include "queue.h"
 /* GPIO */
 #include "gpio.h"
 /* clock */
@@ -96,8 +98,9 @@ typedef struct {
 	uint16_t					dst_id;					// target of this sender
 	uint8_t 					size;					// tell the number of packets
 } lpsd_discovery_t;
-	
-
+// Writing queue
+QUEUE(writing_queue);
+MEMB(writing_memb, lpsd_packet_queue_t, 200);
 /*---------------------------------------------------------------------------*/
 
 /* Functions */
@@ -135,6 +138,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static lpsd_superpacket_t	packet;							/* packet pointer */
 	static lpsd_packet_t*		pop_packet;						/* packet pointer */
 	static lpsd_superpacket_t	packet_rcv;						/* received packet buffer */
+	static lpsd_packet_t*		writing_pop_pkt;				
 	packet.size = 1;
 	static uint8_t				packet_len;						/* packet length, in Bytes */
 	static uint16_t				timeout_ms = 25;				/* packet receive timeout, in ms */
@@ -144,6 +148,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static rtimer_ext_clock_t	last_time = 0;
 	static rtimer_ext_clock_t	first_time = 0;
 	static rtimer_ext_clock_t	timestamp;
+	static uint8_t				stop = 0;
 
 	static uint8_t				my_slot;						/* used slot ID */
 	static uint8_t				slot_mapping[27] = {8,2,3,4,6,7,1,10,11,13,14,15,31,17,18,19,20,22,23,24,25,26,27,28,16,32,33};
@@ -153,6 +158,10 @@ PROCESS_THREAD(design_project_process, ev, data)
 
 	/* initialize the data generator */
 	data_generation_init();
+
+	/* initialize the writing queue */
+  	memb_init(&writing_memb);
+  	queue_init(writing_queue);
 
 	/* configure GPIO as outputs */
 	//PIN_CFG_OUT(RADIO_START_PIN);
@@ -275,10 +284,19 @@ PROCESS_THREAD(design_project_process, ev, data)
 									while(counter < 5) {
 										uint8_t read_val = ((packet_rcv.size - 1) * 5) + counter;
 										if(packet_rcv.seqn[read_val]) {
-											//queue.add(packet_rcv.src_id[(packet_rcv.size - 1)],packet_rcv.seqn[read_val],packet_rcv.payload[read_val]);
-											read_val = 0;
+											lpsd_packet_queue_t* writing_pkt = memb_alloc(&packet_memb);
+											if(writing_pkt == 0) {
+												LOG_INFO("Writing queue overflow!\n");
+												stop = 5;
+												break;
+											}
+											writing_pkt->src_id   = packet_rcv.src_id[(packet_rcv.size - 1)];
+											writing_pkt->seqn     = packet_rcv.seqn[read_val];
+											writing_pkt->payload  = packet_rcv.payload[read_val];
+
+											/* add packet to the queue */
+											queue_enqueue(writing_queue, writing_pkt);
 										}
-										//LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.src_id[(packet_rcv.size - 1)],packet_rcv.seqn[read_val], packet_rcv.payload[read_val]);
 										++counter;
 									}
 									--packet_rcv.size;
@@ -307,6 +325,13 @@ PROCESS_THREAD(design_project_process, ev, data)
 										packet.src_id[0] = pop_packet->src_id;
 										packet.seqn[counter] = pop_packet->seqn;
 										packet.payload[counter] = pop_packet->payload;
+
+										++counter;
+									}
+									if(!counter) ++stop;
+									while(counter < 5) {
+										packet.seqn[counter] = 0;
+										packet.payload[counter] = 0;
 
 										++counter;
 									}
@@ -346,6 +371,22 @@ PROCESS_THREAD(design_project_process, ev, data)
 			//TODO
 			// -reason to break the while loop
 		}
+		if(stop == 5) break;
+	}
+
+	if(node_id == sinkaddress) {
+		while(*writing_queue != NULL) {
+			/* dequeue the first packet */
+  			lpsd_packet_queue_t* pkt = queue_dequeue(writing_queue);
+  			/* free the memory block */
+  			memb_free(&writing_memb, pkt);
+
+  			writing_pop_pkt = &(pkt->src_id);
+  			LOG_INFO("Pkt:%u,%u,%u\n", writing_pop_pkt->src_id,writing_pop_pkt->seqn, writing_pop_pkt->payload);
+		}
+	} else {
+		LOG_INFO("no new packets --> going to LPM4.");
+		LPM4;
 	}
 
 	PROCESS_END();
