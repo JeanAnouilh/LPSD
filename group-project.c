@@ -69,6 +69,7 @@ uint16_t randomseed = RANDOM_SEED;
 static volatile uint8_t i = 0;
 static volatile uint8_t j = 1;
 static volatile rtimer_ext_clock_t t_zero = 0;
+static volatile uint8_t sync = 10;						/* in minimum 3 rounds */
 /*---------------------------------------------------------------------------*/
 
 /* Structs for the different packets */
@@ -111,8 +112,9 @@ void reset_slot_timer(void)
 }
 void reset_timer(void)
 {
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
-	LOG_INFO("T_ZERO: %u",t_zero);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, RTIMER_EXT_SECOND_LF + t_zero, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
+	LOG_INFO("T_ZERO: %u\n",t_zero);
+	sync = 0;
 }
 
 /*---------------------------------------------------------------------------*/
@@ -133,7 +135,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static uint8_t				packet_len;						/* packet length, in Bytes */
 	static uint16_t				timeout_ms = 25;				/* packet receive timeout, in ms */
 	static uint8_t				firstpacket = 1;				/* First packet for the initiator */
-	static uint8_t				sync = 10;						/* in minimum 3 rounds */
 	static uint8_t				last_sync = 0;
 	static uint8_t				first_sync = 0;
 	static rtimer_ext_clock_t	last_time = 0;
@@ -221,9 +222,9 @@ PROCESS_THREAD(design_project_process, ev, data)
 	rtimer_ext_clock_t delta_t = (last_time - first_time) / (uint64_t) (last_sync - first_sync);
 	t_zero = first_time - ((uint64_t) first_sync * delta_t);
 
-	LOG_INFO("First Time: %u, First Sync: %u",(uint16_t) first_time,(uint16_t) first_sync);
-	LOG_INFO("Last Time: %u, Last Sync: %u",(uint16_t) last_time,(uint16_t) last_sync);
-	LOG_INFO("delta_t: %u",(uint16_t) delta_t);
+	//LOG_INFO("First Time: %u, First Sync: %u",(uint16_t) first_time,(uint16_t) first_sync);
+	//LOG_INFO("Last Time: %u, Last Sync: %u",(uint16_t) last_time,(uint16_t) last_sync);
+	//LOG_INFO("delta_t: %u",(uint16_t) delta_t);
 
 	/* ----------------------- HERE WE ARE SYNCED ----------------------- */
 	if(sinkaddress == 22) {
@@ -252,9 +253,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 		if(node_id == sinkaddress) {
 			/* reset sync timer and restart all slot timers */
 			if(i == 0) {
-				rtimer_ext_stop(RTIMER_EXT_LF_2);
 				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/28), (rtimer_ext_callback_t) &reset_slot_timer);
-				LED_TOGGLE(LED_STATUS);
 				while(i < 27) {
 					while(1) {
 						if(j) {
@@ -272,7 +271,8 @@ PROCESS_THREAD(design_project_process, ev, data)
 									while(counter < 5) {
 										uint8_t read_val = ((packet_rcv.size - 1) * 5) + counter;
 										if(packet_rcv.seqn[read_val]) {
-											queue.add(packet_rcv.src_id[(packet_rcv.size - 1)],packet_rcv.seqn[read_val],packet_rcv.payload[read_val]);
+											//queue.add(packet_rcv.src_id[(packet_rcv.size - 1)],packet_rcv.seqn[read_val],packet_rcv.payload[read_val]);
+											read_val = 0;
 										}
 										//LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.src_id[(packet_rcv.size - 1)],packet_rcv.seqn[read_val], packet_rcv.payload[read_val]);
 										++counter;
@@ -290,9 +290,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 		} else {
 			/* reset sync timer and restart all slot timers */
 			if(i == 0) {
-				rtimer_ext_stop(RTIMER_EXT_LF_2);
 				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/28), (rtimer_ext_callback_t) &reset_slot_timer);
-				LED_TOGGLE(LED_STATUS);
 				while(i < 27) {
 					while(1) {
 						if(j) {
