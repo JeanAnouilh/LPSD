@@ -174,7 +174,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 			--sync;
 
 			/* get Timestamp and send first packet */
-			timestamp = rtimer_ext_now_lf();
+			//timestamp = rtimer_ext_now_lf();
 			radio_send(((uint8_t*)&sync_packet),packet_len,1);
 			LOG_INFO("sync_round: %u\n", sync_packet.sync_count);
 		} else {
@@ -190,8 +190,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 
 			// wait 5 ms
 			clock_delay(1767);
-
-			LOG_INFO("receive_packet_round: %u\n",sync_packet_rcv.sync_count);
 
 			if(timestamp) {
 				if(!first_sync) {
@@ -221,10 +219,11 @@ PROCESS_THREAD(design_project_process, ev, data)
 	rtimer_ext_clock_t next_exp;
 	rtimer_ext_next_expiration(RTIMER_EXT_LF_1, &next_exp);
 	rtimer_ext_stop(RTIMER_EXT_LF_1);
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero + next_exp + RTIMER_EXT_SECOND_LF, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero + next_exp, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
 
-	LOG_INFO("START: %u",(uint16_t) (t_zero + next_exp));
-	LOG_INFO("WE ARE SYNCED");
+	LOG_INFO("First Time: %u, First Sync: %u",(uint16_t) first_time,(uint16_t) first_sync);
+	LOG_INFO("Last Time: %u, Last Sync: %u",(uint16_t) last_time,(uint16_t) last_sync);
+	LOG_INFO("delta_t: %u",(uint16_t) delta_t);
 
 	/* ----------------------- HERE WE ARE SYNCED ----------------------- */
 	if(sinkaddress == 22) {
