@@ -159,9 +159,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 
 	PROCESS_BEGIN();
 
-	/* initialize the data generator */
-	data_generation_init();
-
 	/* initialize the writing queue */
   	memb_init(&writing_memb);
   	queue_init(writing_queue);
@@ -171,6 +168,8 @@ PROCESS_THREAD(design_project_process, ev, data)
 	PIN_CFG_OUT(RADIO_RX_PIN);
 	PIN_CFG_OUT(RADIO_TX_PIN);
 	PIN_CFG_OUT(LED_STATUS);
+
+	rtimer_ext_schedule(RTIMER_EXT_LF_0, 0, RTIMER_EXT_SECOND_LF, NULL);
 
 	/* set my_slot */
 	i = 0;
@@ -238,7 +237,11 @@ PROCESS_THREAD(design_project_process, ev, data)
 	t_zero = first_time - ((uint64_t) first_sync * delta_t);
 	rtimer_ext_clock_t* exp_time;
 	rtimer_ext_next_expiration(RTIMER_EXT_LF_0, exp_time);
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero + *exp_time + RTIMER_EXT_SECOND_LF, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero + *exp_time, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
+
+	/* initialize the data generator */
+	rtimer_ext_stop(RTIMER_EXT_LF_0);
+	data_generation_init();
 
 
 	//LOG_INFO("First Time: %u, First Sync: %u",(uint16_t) first_time,(uint16_t) first_sync);
