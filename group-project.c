@@ -113,7 +113,7 @@ void reset_slot_timer(void)
 {
 	j = 1;
 }
-void schedule_sync_timer(void)
+/*void schedule_sync_timer(void)
 {
 	//clock_delay((uint16_t) 11.0424028 * t_zero);
 	rtimer_ext_stop(RTIMER_EXT_LF_1);
@@ -125,7 +125,7 @@ void schedule_sync_timer(void)
 		sync = 0;
 		LPM4;
 	}
-}
+}*/
 
 /*---------------------------------------------------------------------------*/
 PROCESS(design_project_process, "Flocklab Multi-Hop by Alex and Dario");
@@ -181,7 +181,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 		}
 		++i;
 	}
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, 0, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &schedule_sync_timer);
 	while(sync) {
 		if(firstpacket && node_id == sinkaddress) {
 			/* --- INITIATOR --- */
@@ -237,6 +236,10 @@ PROCESS_THREAD(design_project_process, ev, data)
 	/* calculate t zero and set the sync_timer */
 	rtimer_ext_clock_t delta_t = (last_time - first_time) / (uint64_t) (last_sync - first_sync);
 	t_zero = first_time - ((uint64_t) first_sync * delta_t);
+	rtimer_ext_clock_t* exp_time;
+	rtimer_ext_next_expiration(RTIMER_EXT_LF_0, exp_time);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero + *exp_time + RTIMER_EXT_SECOND_LF, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
+
 
 	//LOG_INFO("First Time: %u, First Sync: %u",(uint16_t) first_time,(uint16_t) first_sync);
 	//LOG_INFO("Last Time: %u, Last Sync: %u",(uint16_t) last_time,(uint16_t) last_sync);
