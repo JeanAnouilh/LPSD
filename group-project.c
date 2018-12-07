@@ -115,7 +115,9 @@ void reset_slot_timer(void)
 }
 void schedule_sync_timer(void)
 {
-	rtimer_ext_schedule(RTIMER_EXT_LF_2, (RTIMER_EXT_SECOND_LF + t_zero), RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
+	clock_delay((uint16_t) 11.0424028 * t_zero);
+	rtimer_ext_schedule(RTIMER_EXT_LF_2, RTIMER_EXT_SECOND_LF, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
+
 	LOG_INFO("T_ZERO: %u\n",(uint16_t) t_zero);
 	if(sync) {
 		LOG_INFO("Not synced --> going to LPM4.");
