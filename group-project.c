@@ -115,8 +115,9 @@ void reset_slot_timer(void)
 }
 void schedule_sync_timer(void)
 {
-	clock_delay((uint16_t) 11.0424028 * t_zero);
-	rtimer_ext_schedule(RTIMER_EXT_LF_2, RTIMER_EXT_SECOND_LF, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
+	//clock_delay((uint16_t) 11.0424028 * t_zero);
+	rtimer_ext_stop(RTIMER_EXT_LF_1);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, RTIMER_EXT_SECOND_LF + t_zero, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
 
 	LOG_INFO("T_ZERO: %u\n",(uint16_t) t_zero);
 	if(sync) {
@@ -268,7 +269,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 		if(node_id == sinkaddress) {
 			/* reset sync timer and restart all slot timers */
 			if(i == 0) {
-				rtimer_ext_schedule(RTIMER_EXT_LF_1, 0, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
+				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
 				while(i < 27) {
 					while(1) {
 						if(j) {
