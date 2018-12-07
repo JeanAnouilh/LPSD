@@ -113,9 +113,9 @@ void reset_slot_timer(void)
 {
 	j = 1;
 }
-void reset_timer(void)
+void schedule_sync_timer(void)
 {
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, (RTIMER_EXT_SECOND_LF + t_zero), RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
+	rtimer_ext_schedule(RTIMER_EXT_LF_2, (RTIMER_EXT_SECOND_LF + t_zero), RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
 	LOG_INFO("T_ZERO: %u\n",(uint16_t) t_zero);
 	if(sync) {
 		LOG_INFO("Not synced --> going to LPM4.");
@@ -178,7 +178,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 		}
 		++i;
 	}
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, 0, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_timer);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, 0, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &schedule_sync_timer);
 	while(sync) {
 		if(firstpacket && node_id == sinkaddress) {
 			/* --- INITIATOR --- */
@@ -266,7 +266,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 		if(node_id == sinkaddress) {
 			/* reset sync timer and restart all slot timers */
 			if(i == 0) {
-				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
+				rtimer_ext_schedule(RTIMER_EXT_LF_1, 0, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
 				while(i < 27) {
 					while(1) {
 						if(j) {
@@ -340,6 +340,8 @@ PROCESS_THREAD(design_project_process, ev, data)
 									uint8_t counter = 0;
 									while(is_data_in_queue() && counter < 5) {
 										pop_packet = pop_data();
+
+										LOG_INFO("POP Pkt:%u,%u,%u\n", pop_packet->src_id,pop_packet->seqn, pop_packet->payload);
 
 										packet.src_id[0] = pop_packet->src_id;
 										packet.seqn[counter] = pop_packet->seqn;
