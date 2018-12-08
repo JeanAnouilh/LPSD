@@ -109,21 +109,20 @@ static lpsd_sync_t			sync_packet_rcv;				/* received packet buffer */
 static lpsd_superpacket_t	packet;							/* packet pointer */
 static lpsd_packet_t*		pop_packet;						/* packet pointer */
 static lpsd_superpacket_t	packet_rcv;						/* received packet buffer */
-packet.size = 1;
 static uint8_t				packet_len;						/* packet length, in Bytes */
-static uint16_t				timeout_ms = 25;				/* packet receive timeout, in ms */
-static uint8_t				firstpacket = 1;				/* First packet for the initiator */
-static uint8_t				last_sync = 0;
-static uint8_t				first_sync = 0;
-static rtimer_ext_clock_t	last_time = 0;
-static rtimer_ext_clock_t	first_time = 0;
+static uint16_t				timeout_ms;						/* packet receive timeout, in ms */
+static uint8_t				firstpacket;					/* First packet for the initiator */
+static uint8_t				last_sync;
+static uint8_t				first_sync;
+static rtimer_ext_clock_t	last_time;
+static rtimer_ext_clock_t	first_time;
 static rtimer_ext_clock_t	timestamp;
-static uint8_t				stop = 0;
-static uint8_t				seqn = 0;
+static uint8_t				stop;
+static uint8_t				seqn;
 
 static uint8_t				my_slot;						/* used slot ID */
-static uint8_t				slot_mapping[27] = {8,2,3,4,6,7,1,10,11,13,14,15,31,17,18,19,20,22,23,24,25,26,27,28,16,32,33};
-static uint8_t				slots[27] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+static uint8_t				slot_mapping[27];
+static uint8_t				slots[27];
 
 
 /* Functions */
@@ -268,6 +267,19 @@ AUTOSTART_PROCESSES(&design_project_process);
 PROCESS_THREAD(design_project_process, ev, data)
 {
 	PROCESS_BEGIN();
+
+	packet.size = 1;
+	timeout_ms = 25;
+	firstpacket = 1;
+	last_sync = 0;
+	first_sync = 0;
+	last_time = 0;
+	first_time = 0;
+	stop = 0;
+	seqn = 0;
+
+	slot_mapping[27] = {8,2,3,4,6,7,1,10,11,13,14,15,31,17,18,19,20,22,23,24,25,26,27,28,16,32,33};
+	slots[27] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 	/* initialize the writing queue */
   	memb_init(&writing_memb);
