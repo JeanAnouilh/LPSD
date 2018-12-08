@@ -126,11 +126,11 @@ static uint8_t				slots[27];
 
 
 /* Functions */
-void reset_sync_timer(void)
+/*void reset_sync_timer(void)
 {
 	//radio_rcv(((uint8_t*)&i), 2);
 	i = 0;
-}
+}*/
 void reset_slot_timer(void)
 {
 	if(node_id == sinkaddress) {
@@ -237,6 +237,7 @@ void reset_slot_timer(void)
 		// -reason to break the while loop
 	}
 	++i;
+	if(i == 27) i = 0;
 }
 void schedule_sync_timer(void)
 {
@@ -244,7 +245,7 @@ void schedule_sync_timer(void)
 	if(!t_zero) t_zero = 1130;
 	rtimer_ext_stop(RTIMER_EXT_LF_0);
 	rtimer_ext_reset();
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
+	//rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
 	rtimer_ext_schedule(RTIMER_EXT_LF_2, t_zero, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
 	rtimer_ext_clock_t exp_time;
 	rtimer_ext_next_expiration(RTIMER_EXT_LF_1, &exp_time);
