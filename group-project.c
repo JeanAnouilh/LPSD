@@ -69,7 +69,7 @@ uint16_t randomseed = RANDOM_SEED;
 
 static volatile uint8_t i = 0;	
 static volatile rtimer_ext_clock_t t_zero = 0;
-static volatile uint8_t sync = 10;						/* in minimum 3 rounds */
+static volatile uint8_t sync = 0;						/* in minimum 3 rounds */
 /*---------------------------------------------------------------------------*/
 
 /* Structs for the different packets */
@@ -116,12 +116,13 @@ static uint8_t				first_sync;
 static rtimer_ext_clock_t	last_time;
 static rtimer_ext_clock_t	first_time;
 static rtimer_ext_clock_t	timestamp;
-static uint8_t				stop;
-static uint8_t				seqn;
+static volatile uint8_t				stop;
+static volatile uint8_t				seqn;
 
-static uint8_t				my_slot;						/* used slot ID */
-static uint8_t				slot_mapping[28];
-static uint8_t				slots[28];
+static volatile uint8_t				my_slot;						/* used slot ID */
+static volatile uint8_t				slot_mapping[28];
+static volatile uint8_t				slots[28];
+static volatile uint8_t				send;
 
 
 /* Functions */
@@ -208,10 +209,8 @@ void reset_slot_timer(void)
 				}
 				if(seqn == 200) ++stop;
 				// --- SOURCE ---
-				radio_send(((uint8_t*)(&(packet.src_id[0]))),sizeof(lpsd_superpacket_t),1);
-				LOG_INFO("Still alive A\n");
+				send = 1;
 				packet.size = 1;
-				LOG_INFO("Still alive B\n");
 			} else if(my_slot != i) {
 				packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
 				if(packet_len) {
@@ -233,32 +232,26 @@ void reset_slot_timer(void)
 				}
 			}
 		}
-		LOG_INFO("Still alive C\n");
 		//TODO
 		// -reason to break the while loop
 	}
-	LOG_INFO("i: %u\n", i);
 	++i;
 }
 void schedule_sync_timer(void)
 {
 	//clock_delay((uint16_t) 11.0424028 * t_zero);
 	if(t_zero == 0) t_zero = 1130;
+	LOG_INFO("T_ZERO: %u\n",(uint16_t) t_zero);
 	rtimer_ext_reset();
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
-	rtimer_ext_schedule(RTIMER_EXT_LF_2, t_zero, (RTIMER_EXT_SECOND_LF/28), (rtimer_ext_callback_t) &reset_slot_timer);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero + RTIMER_EXT_SECOND_LF, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
+	rtimer_ext_schedule(RTIMER_EXT_LF_2, t_zero + RTIMER_EXT_SECOND_LF, (RTIMER_EXT_SECOND_LF/28), (rtimer_ext_callback_t) &reset_slot_timer);
 	rtimer_ext_clock_t exp_time;
 	rtimer_ext_next_expiration(RTIMER_EXT_LF_2, &exp_time);
 
-	LOG_INFO("T_ZERO: %u\n",(uint16_t) t_zero);
-
 	if(sync) {
 		LOG_INFO("Not synced --> try with average t_zero %u.", (uint16_t) t_zero);
-		sync = 0;
+		sync = -1;
 	}
-
-	/* initialize the data generator */
-	data_generation_init();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -269,7 +262,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 {
 	PROCESS_BEGIN();
 
-	packet.size = 1;
+	
 	timeout_ms = 25;
 	firstpacket = 1;
 	last_sync = 0;
@@ -278,6 +271,8 @@ PROCESS_THREAD(design_project_process, ev, data)
 	first_time = 0;
 	stop = 0;
 	seqn = 0;
+	packet.size = 1;
+	send = 0;
 
 	slot_mapping[1] = 8;
 	slot_mapping[2] = 2;
@@ -348,6 +343,9 @@ PROCESS_THREAD(design_project_process, ev, data)
 
 	rtimer_ext_schedule(RTIMER_EXT_LF_1, RTIMER_EXT_SECOND_LF, 0, (rtimer_ext_callback_t) &schedule_sync_timer);
 
+	/* initialize the data generator */
+	data_generation_init();
+
 	/* set my_slot */
 	i = 0;
 	while(i < 28) {
@@ -408,10 +406,14 @@ PROCESS_THREAD(design_project_process, ev, data)
 			radio_send(((uint8_t*)&sync_packet),packet_len,1);
 			//LOG_INFO("send_packet_round: %u\n",sync_packet.sync_count);
 		}
+		if(sync == -1) break;
 	}
-	/* calculate t zero and set the sync_timer */
-	rtimer_ext_clock_t delta_t = (last_time - first_time) / (uint64_t) (last_sync - first_sync);
-	t_zero = first_time - ((uint64_t) first_sync * delta_t);
+
+	if(sync != -1) {
+		/* calculate t zero and set the sync_timer */
+		rtimer_ext_clock_t delta_t = (last_time - first_time) / (uint64_t) (last_sync - first_sync);
+		t_zero = first_time - ((uint64_t) first_sync * delta_t);
+	}
 
 	/* ----------------------- HERE WE ARE SYNCED ----------------------- */
 	if(sinkaddress == 22) {
@@ -437,8 +439,11 @@ PROCESS_THREAD(design_project_process, ev, data)
 		// - set parents
 	}
 
-	while(1) {
-		if(stop >= 5) break;
+	while(stop < 5) {
+		if(send) {
+			radio_send(((uint8_t*)(&(packet.src_id[0]))),sizeof(lpsd_superpacket_t),1);
+			send = 0;
+		}
 	}
 
 	if(node_id == sinkaddress) {
