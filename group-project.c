@@ -235,6 +235,9 @@ void reset_slot_timer(void)
 		// -reason to break the while loop
 	}
 	++i;
+	if(i == 27) {
+		i = 0;
+	}
 }
 void schedule_sync_timer(void)
 {
@@ -303,6 +306,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	slot_mapping[25] = 32;
 	slot_mapping[26] = 33;
 
+	slots[0] = 0;
 	slots[1] = 0;
 	slots[2] = 0;
 	slots[3] = 0;
