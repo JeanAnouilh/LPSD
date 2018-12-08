@@ -123,6 +123,61 @@ static volatile uint8_t				my_slot;						/* used slot ID */
 static volatile uint8_t				slot_mapping[27];
 static volatile uint8_t				slots[27];
 
+slot_mapping[0] = 8;
+slot_mapping[1] = 2;
+slot_mapping[2] = 3;
+slot_mapping[3] = 4;
+slot_mapping[4] = 6;
+slot_mapping[5] = 7;
+slot_mapping[6] = 1;
+slot_mapping[7] = 10;
+slot_mapping[8] = 11;
+slot_mapping[9] = 13;
+slot_mapping[10] = 14;
+slot_mapping[11] = 15;
+slot_mapping[12] = 31;
+slot_mapping[13] = 17;
+slot_mapping[14] = 18;
+slot_mapping[15] = 19;
+slot_mapping[16] = 20;
+slot_mapping[17] = 22;
+slot_mapping[18] = 23;
+slot_mapping[19] = 24;
+slot_mapping[20] = 25;
+slot_mapping[21] = 26;
+slot_mapping[22] = 27;
+slot_mapping[23] = 28;
+slot_mapping[24] = 16;
+slot_mapping[25] = 32;
+slot_mapping[26] = 33;
+
+slots[1] = 0;
+slots[2] = 0;
+slots[3] = 0;
+slots[4] = 0;
+slots[5] = 0;
+slots[6] = 0;
+slots[7] = 0;
+slots[8] = 0;
+slots[9] = 0;
+slots[10] = 0;
+slots[11] = 0;
+slots[12] = 0;
+slots[13] = 0;
+slots[14] = 0;
+slots[15] = 0;
+slots[16] = 0;
+slots[17] = 0;
+slots[18] = 0;
+slots[19] = 0;
+slots[20] = 0;
+slots[21] = 0;
+slots[22] = 0;
+slots[23] = 0;
+slots[24] = 0;
+slots[25] = 0;
+slots[26] = 0;
+
 /* Functions */
 /*void reset_sync_timer(void)
 {
@@ -265,61 +320,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 {
 	PROCESS_BEGIN();
 	packet.size = 1;
-
-	slot_mapping[0] = 8;
-	slot_mapping[1] = 2;
-	slot_mapping[2] = 3;
-	slot_mapping[3] = 4;
-	slot_mapping[4] = 6;
-	slot_mapping[5] = 7;
-	slot_mapping[6] = 1;
-	slot_mapping[7] = 10;
-	slot_mapping[8] = 11;
-	slot_mapping[9] = 13;
-	slot_mapping[10] = 14;
-	slot_mapping[11] = 15;
-	slot_mapping[12] = 31;
-	slot_mapping[13] = 17;
-	slot_mapping[14] = 18;
-	slot_mapping[15] = 19;
-	slot_mapping[16] = 20;
-	slot_mapping[17] = 22;
-	slot_mapping[18] = 23;
-	slot_mapping[19] = 24;
-	slot_mapping[20] = 25;
-	slot_mapping[21] = 26;
-	slot_mapping[22] = 27;
-	slot_mapping[23] = 28;
-	slot_mapping[24] = 16;
-	slot_mapping[25] = 32;
-	slot_mapping[26] = 33;
-
-	slots[1] = 0;
-	slots[2] = 0;
-	slots[3] = 0;
-	slots[4] = 0;
-	slots[5] = 0;
-	slots[6] = 0;
-	slots[7] = 0;
-	slots[8] = 0;
-	slots[9] = 0;
-	slots[10] = 0;
-	slots[11] = 0;
-	slots[12] = 0;
-	slots[13] = 0;
-	slots[14] = 0;
-	slots[15] = 0;
-	slots[16] = 0;
-	slots[17] = 0;
-	slots[18] = 0;
-	slots[19] = 0;
-	slots[20] = 0;
-	slots[21] = 0;
-	slots[22] = 0;
-	slots[23] = 0;
-	slots[24] = 0;
-	slots[25] = 0;
-	slots[26] = 0;
 
 	/* initialize the writing queue */
   	memb_init(&writing_memb);
