@@ -67,6 +67,7 @@ uint16_t sinkaddress = SINK_ADDRESS;
 #endif /* RANDOM_SEED */
 uint16_t randomseed = RANDOM_SEED;
 
+static volatile uint8_t i = 0;	
 static volatile rtimer_ext_clock_t t_zero = 0;
 static volatile uint8_t sync = 10;						/* in minimum 3 rounds */
 /*---------------------------------------------------------------------------*/
