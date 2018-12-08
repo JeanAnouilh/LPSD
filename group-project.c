@@ -113,11 +113,12 @@ void reset_slot_timer(void)
 {
 	j = 1;
 }
-/*void schedule_sync_timer(void)
+void schedule_sync_timer(void)
 {
 	//clock_delay((uint16_t) 11.0424028 * t_zero);
-	rtimer_ext_stop(RTIMER_EXT_LF_1);
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, RTIMER_EXT_SECOND_LF + t_zero, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
+	rtimer_ext_stop(RTIMER_EXT_LF_0);
+	rtimer_ext_reset();
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
 
 	LOG_INFO("T_ZERO: %u\n",(uint16_t) t_zero);
 	if(sync) {
@@ -125,7 +126,9 @@ void reset_slot_timer(void)
 		sync = 0;
 		LPM4;
 	}
-}*/
+
+	data_generation_init();
+}
 
 /*---------------------------------------------------------------------------*/
 PROCESS(design_project_process, "Flocklab Multi-Hop by Alex and Dario");
@@ -169,7 +172,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	PIN_CFG_OUT(RADIO_TX_PIN);
 	PIN_CFG_OUT(LED_STATUS);
 
-	rtimer_ext_schedule(RTIMER_EXT_LF_0, 0, RTIMER_EXT_SECOND_LF, NULL);
+	rtimer_ext_schedule(RTIMER_EXT_LF_0, 0, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &schedule_sync_timer);
 
 	/* set my_slot */
 	i = 0;
@@ -235,18 +238,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	/* calculate t zero and set the sync_timer */
 	rtimer_ext_clock_t delta_t = (last_time - first_time) / (uint64_t) (last_sync - first_sync);
 	t_zero = first_time - ((uint64_t) first_sync * delta_t);
-	rtimer_ext_clock_t* exp_time;
-	rtimer_ext_next_expiration(RTIMER_EXT_LF_0, exp_time);
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero + *exp_time, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
-
-	/* initialize the data generator */
-	rtimer_ext_stop(RTIMER_EXT_LF_0);
-	data_generation_init();
-
-
-	//LOG_INFO("First Time: %u, First Sync: %u",(uint16_t) first_time,(uint16_t) first_sync);
-	//LOG_INFO("Last Time: %u, Last Sync: %u",(uint16_t) last_time,(uint16_t) last_sync);
-	//LOG_INFO("delta_t: %u",(uint16_t) delta_t);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero + exp_time, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
 
 	/* ----------------------- HERE WE ARE SYNCED ----------------------- */
 	if(sinkaddress == 22) {
