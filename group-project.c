@@ -122,7 +122,6 @@ static uint8_t				seqn;
 static uint8_t				my_slot;						/* used slot ID */
 static uint8_t				slot_mapping[27];
 static uint8_t				slots[27];
-static uint8_t				my_round;
 
 
 /* Functions */
@@ -133,11 +132,7 @@ static uint8_t				my_round;
 }*/
 void reset_slot_timer(void)
 {
-	if(i < 27) {
-		radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
-		LOG_INFO("i:%u, my_round:%u\n", i, my_round);
-	}
-	/*if(node_id == sinkaddress) {
+	if(node_id == sinkaddress) {
 		while(is_data_in_queue()) {
 			// --- SINK ---
 			// Write our own message to serial
@@ -238,11 +233,10 @@ void reset_slot_timer(void)
 		}
 		//TODO
 		// -reason to break the while loop
-	}*/
+	}
 	++i;
 	if(i == 27) {
 		i = 0;
-		++my_round;
 	}
 }
 void schedule_sync_timer(void)
