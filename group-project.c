@@ -271,9 +271,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 		if(node_id == sinkaddress) {
 			// reset sync timer and restart all slot timers
 			if(i == 0) {
-				//rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
-				radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
-				i = 27;
+				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
 				while(i < 27) {
 					while(1) {
 						if(j) {
@@ -338,9 +336,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 		} else {
 			// reset sync timer and restart all slot timers
 			if(i == 0) {
-				//rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
-				radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
-				i = 27;
+				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
 				while(i < 27) {
 					while(1) {
 						if(j) {
