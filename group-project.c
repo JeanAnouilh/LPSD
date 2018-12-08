@@ -107,8 +107,7 @@ MEMB(writing_memb, lpsd_packet_queue_t, 200);
 void reset_sync_timer(void)
 {
 	i = 0;
-	rtimer_ext_clock_t exp_time;
-	radio_rcv(((uint8_t*)&exp_time), 20);
+	radio_rcv(((uint8_t*)&i), 2);
 }
 void reset_slot_timer(void)
 {
@@ -117,7 +116,7 @@ void reset_slot_timer(void)
 void schedule_sync_timer(void)
 {
 	//clock_delay((uint16_t) 11.0424028 * t_zero);
-	if(!t_zero && sync) t_zero = 1130;
+	if(!t_zero) t_zero = 1130;
 	rtimer_ext_stop(RTIMER_EXT_LF_0);
 	rtimer_ext_reset();
 	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
@@ -127,7 +126,7 @@ void schedule_sync_timer(void)
 	LOG_INFO("T_ZERO: %u\n",(uint16_t) t_zero);
 
 	if(sync) {
-		LOG_INFO("Not synced --> try with average t_zero 1130.");
+		LOG_INFO("Not synced --> try with average t_zero %u.", t_zero);
 		sync = 0;
 	}
 
@@ -162,8 +161,8 @@ PROCESS_THREAD(design_project_process, ev, data)
 	static uint8_t				seqn = 0;
 
 	static uint8_t				my_slot;						/* used slot ID */
-	static uint8_t				slot_mapping[27] = {8,2,3,4,6,7,1,10,11,13,14,15,31,17,18,19,20,22,23,24,25,26,27,28,16,32,33};
-	static uint8_t				slots[27] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	static uint8_t				slot_mapping[28] = {0,8,2,3,4,6,7,1,10,11,13,14,15,31,17,18,19,20,22,23,24,25,26,27,28,16,32,33};
+	static uint8_t				slots[28] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 	PROCESS_BEGIN();
 
@@ -248,17 +247,17 @@ PROCESS_THREAD(design_project_process, ev, data)
 	if(sinkaddress == 22) {
 		/* --- Scenario 1 --- */
 		if(node_id == 3) {
-			slots[7] = 1;				// 10
-			slots[11] = 1;				// 15
+			slots[8] = 1;				// 10
+			slots[12] = 1;				// 15
 		} else if(node_id == 28) {
-			slots[0] = 1;				// 8
-			slots[12] = 1;				// 31
+			slots[1] = 1;				// 8
+			slots[13] = 1;				// 31
 		} else if(node_id == 31) {
-			slots[25] = 1;				// 32
+			slots[26] = 1;				// 32
 		} else if(node_id == 33) {
-			slots[6] = 1;				// 1
-			slots[1] = 1;				// 2
-			slots[3] = 1;				// 4
+			slots[7] = 1;				// 1
+			slots[2] = 1;				// 2
+			slots[4] = 1;				// 4
 		}
 	} else {
 		/* --- Scenario 2 --- */
@@ -271,8 +270,9 @@ PROCESS_THREAD(design_project_process, ev, data)
 		if(node_id == sinkaddress) {
 			// reset sync timer and restart all slot timers
 			if(i == 0) {
-				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
-				while(i < 27) {
+				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/28), (rtimer_ext_callback_t) &reset_slot_timer);
+				while(i < 28) {
+					if(i = 0) j = 0;
 					while(1) {
 						if(j) {
 							while(is_data_in_queue()) {
@@ -336,8 +336,9 @@ PROCESS_THREAD(design_project_process, ev, data)
 		} else {
 			// reset sync timer and restart all slot timers
 			if(i == 0) {
-				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
-				while(i < 27) {
+				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/28), (rtimer_ext_callback_t) &reset_slot_timer);
+				while(i < 28) {
+					if(i = 0) j = 0;
 					while(1) {
 						if(j) {
 							if(slots[i]) {
