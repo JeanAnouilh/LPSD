@@ -120,14 +120,14 @@ static uint8_t				stop;
 static uint8_t				seqn;
 
 static uint8_t				my_slot;						/* used slot ID */
-static uint8_t				slot_mapping[27];
-static uint8_t				slots[27];
+static uint8_t				slot_mapping[28];
+static uint8_t				slots[28];
 
 
 /* Functions */
 void reset_sync_timer(void)
 {
-	LOG_INFO("Next round\n");
+	radio_rcv(((uint8_t*)&packet_rcv), 2);
 	i = 0;
 }
 void reset_slot_timer(void)
@@ -235,9 +235,6 @@ void reset_slot_timer(void)
 		// -reason to break the while loop
 	}
 	++i;
-	if(i == 27) {
-		i = 0;
-	}
 }
 void schedule_sync_timer(void)
 {
@@ -245,7 +242,7 @@ void schedule_sync_timer(void)
 	if(t_zero == 0) t_zero = 1130;
 	rtimer_ext_reset();
 	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
-	rtimer_ext_schedule(RTIMER_EXT_LF_2, t_zero, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
+	rtimer_ext_schedule(RTIMER_EXT_LF_2, t_zero, (RTIMER_EXT_SECOND_LF/28), (rtimer_ext_callback_t) &reset_slot_timer);
 	rtimer_ext_clock_t exp_time;
 	rtimer_ext_next_expiration(RTIMER_EXT_LF_2, &exp_time);
 
@@ -278,33 +275,33 @@ PROCESS_THREAD(design_project_process, ev, data)
 	stop = 0;
 	seqn = 0;
 
-	slot_mapping[0] = 8;
-	slot_mapping[1] = 2;
-	slot_mapping[2] = 3;
-	slot_mapping[3] = 4;
-	slot_mapping[4] = 6;
-	slot_mapping[5] = 7;
-	slot_mapping[6] = 1;
-	slot_mapping[7] = 10;
-	slot_mapping[8] = 11;
-	slot_mapping[9] = 13;
-	slot_mapping[10] = 14;
-	slot_mapping[11] = 15;
-	slot_mapping[12] = 31;
-	slot_mapping[13] = 17;
-	slot_mapping[14] = 18;
-	slot_mapping[15] = 19;
-	slot_mapping[16] = 20;
-	slot_mapping[17] = 22;
-	slot_mapping[18] = 23;
-	slot_mapping[19] = 24;
-	slot_mapping[20] = 25;
-	slot_mapping[21] = 26;
-	slot_mapping[22] = 27;
-	slot_mapping[23] = 28;
-	slot_mapping[24] = 16;
-	slot_mapping[25] = 32;
-	slot_mapping[26] = 33;
+	slot_mapping[1] = 8;
+	slot_mapping[2] = 2;
+	slot_mapping[3] = 3;
+	slot_mapping[4] = 4;
+	slot_mapping[5] = 6;
+	slot_mapping[6] = 7;
+	slot_mapping[7] = 1;
+	slot_mapping[8] = 10;
+	slot_mapping[9] = 11;
+	slot_mapping[10] = 13;
+	slot_mapping[11] = 14;
+	slot_mapping[12] = 15;
+	slot_mapping[13] = 31;
+	slot_mapping[14] = 17;
+	slot_mapping[15] = 18;
+	slot_mapping[16] = 19;
+	slot_mapping[17] = 20;
+	slot_mapping[18] = 22;
+	slot_mapping[19] = 23;
+	slot_mapping[20] = 24;
+	slot_mapping[21] = 25;
+	slot_mapping[22] = 26;
+	slot_mapping[23] = 27;
+	slot_mapping[24] = 28;
+	slot_mapping[25] = 16;
+	slot_mapping[26] = 32;
+	slot_mapping[27] = 33;
 
 	slots[0] = 0;
 	slots[1] = 0;
@@ -333,6 +330,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	slots[24] = 0;
 	slots[25] = 0;
 	slots[26] = 0;
+	slots[27] = 0;
 
 	/* initialize the writing queue */
   	memb_init(&writing_memb);
@@ -348,7 +346,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 
 	/* set my_slot */
 	i = 0;
-	while(i < 27) {
+	while(i < 28) {
 		if(node_id == slot_mapping[i]) {
 			my_slot = i;
 			slots[i] = 1;
@@ -415,17 +413,17 @@ PROCESS_THREAD(design_project_process, ev, data)
 	if(sinkaddress == 22) {
 		/* --- Scenario 1 --- */
 		if(node_id == 3) {
-			slots[7] = 1;				// 10
-			slots[11] = 1;				// 15
+			slots[8] = 1;				// 10
+			slots[12] = 1;				// 15
 		} else if(node_id == 28) {
-			slots[0] = 1;				// 8
-			slots[12] = 1;				// 31
+			slots[1] = 1;				// 8
+			slots[13] = 1;				// 31
 		} else if(node_id == 31) {
-			slots[25] = 1;				// 32
+			slots[26] = 1;				// 32
 		} else if(node_id == 33) {
-			slots[6] = 1;				// 1
-			slots[1] = 1;				// 2
-			slots[3] = 1;				// 4
+			slots[7] = 1;				// 1
+			slots[2] = 1;				// 2
+			slots[4] = 1;				// 4
 		}
 	} else {
 		/* --- Scenario 2 --- */
