@@ -185,7 +185,7 @@ void reset_slot_timer(void)
 			}
 		}
 	} else {
-		if(slots[i]) {
+		if(i < 28 && slots[i]) {
 			if(my_slot == i) {
 				uint8_t counter = 0;
 				while(is_data_in_queue() && counter < 5) {
@@ -209,8 +209,10 @@ void reset_slot_timer(void)
 				if(seqn == 200) ++stop;
 				// --- SOURCE ---
 				radio_send(((uint8_t*)(&(packet.src_id[0]))),sizeof(lpsd_superpacket_t),1);
+				LOG_INFO("Still alive A\n");
 				packet.size = 1;
-			} else if(my_slot != i){
+				LOG_INFO("Still alive B\n");
+			} else if(my_slot != i) {
 				packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
 				if(packet_len) {
 					while(packet_rcv.size > 0) {
@@ -231,9 +233,11 @@ void reset_slot_timer(void)
 				}
 			}
 		}
+		LOG_INFO("Still alive C\n");
 		//TODO
 		// -reason to break the while loop
 	}
+	LOG_INFO("i: %u\n", i);
 	++i;
 }
 void schedule_sync_timer(void)
