@@ -119,14 +119,21 @@ void schedule_sync_timer(void)
 	rtimer_ext_stop(RTIMER_EXT_LF_0);
 	rtimer_ext_reset();
 	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
+	rtimer_ext_clock_t exp_time;
+	rtimer_ext_next_expiration(RTIMER_EXT_LF_1, &exp_time);
 
 	LOG_INFO("T_ZERO: %u\n",(uint16_t) t_zero);
+	LOG_INFO("EXP_TIME: %u\n",(uint16_t) exp_time);
+
+	radio_rcv(((uint8_t*)&exp_time), 30);
+
 	if(sync) {
 		LOG_INFO("Not synced --> going to LPM4.");
 		sync = 0;
 		LPM4;
 	}
 
+	LPM4;
 	data_generation_init();
 }
 
@@ -238,7 +245,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 	/* calculate t zero and set the sync_timer */
 	rtimer_ext_clock_t delta_t = (last_time - first_time) / (uint64_t) (last_sync - first_sync);
 	t_zero = first_time - ((uint64_t) first_sync * delta_t);
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero + exp_time, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
 
 	/* ----------------------- HERE WE ARE SYNCED ----------------------- */
 	if(sinkaddress == 22) {
