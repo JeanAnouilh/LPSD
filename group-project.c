@@ -107,7 +107,11 @@ MEMB(writing_memb, lpsd_packet_queue_t, 200);
 void reset_sync_timer(void)
 {
 	i = 0;
-	
+	rtimer_ext_clock_t exp_time;
+	rtimer_ext_next_expiration(RTIMER_EXT_LF_1, &exp_time);
+	LOG_INFO("EXP_TIME_2: %u\n",(uint16_t) exp_time);
+	radio_rcv(((uint8_t*)&exp_time), 30);
+	LPM4;
 }
 void reset_slot_timer(void)
 {
@@ -133,8 +137,7 @@ void schedule_sync_timer(void)
 		LPM4;
 	}
 
-	LPM4;
-	data_generation_init();
+	//data_generation_init();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -270,7 +273,8 @@ PROCESS_THREAD(design_project_process, ev, data)
 		// - set parents
 	}
 	while(1) {
-		if(node_id == sinkaddress) {
+		if(1) slots[0] = 1;
+		else if(node_id == sinkaddress) {
 			/* reset sync timer and restart all slot timers */
 			if(i == 0) {
 				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
