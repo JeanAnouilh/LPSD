@@ -107,6 +107,8 @@ MEMB(writing_memb, lpsd_packet_queue_t, 200);
 void reset_sync_timer(void)
 {
 	i = 0;
+	rtimer_ext_clock_t exp_time;
+	radio_rcv(((uint8_t*)&exp_time), 20);
 }
 void reset_slot_timer(void)
 {
