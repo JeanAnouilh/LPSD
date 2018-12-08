@@ -185,7 +185,6 @@ void reset_slot_timer(void)
 			}
 		}
 	} else {
-		// reset sync timer and restart all slot timers
 		if(slots[i]) {
 			if(my_slot == i) {
 				uint8_t counter = 0;
@@ -241,13 +240,12 @@ void reset_slot_timer(void)
 void schedule_sync_timer(void)
 {
 	//clock_delay((uint16_t) 11.0424028 * t_zero);
-	if(!t_zero) t_zero = 1130;
-	rtimer_ext_stop(RTIMER_EXT_LF_0);
+	if(t_zero == 0) t_zero = 1130;
 	rtimer_ext_reset();
 	//rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
 	rtimer_ext_schedule(RTIMER_EXT_LF_2, t_zero, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
 	rtimer_ext_clock_t exp_time;
-	rtimer_ext_next_expiration(RTIMER_EXT_LF_1, &exp_time);
+	rtimer_ext_next_expiration(RTIMER_EXT_LF_2, &exp_time);
 
 	LOG_INFO("T_ZERO: %u\n",(uint16_t) t_zero);
 
@@ -343,7 +341,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	PIN_CFG_OUT(RADIO_TX_PIN);
 	PIN_CFG_OUT(LED_STATUS);
 
-	rtimer_ext_schedule(RTIMER_EXT_LF_0, 0, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &schedule_sync_timer);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, RTIMER_EXT_SECOND_LF, 0, (rtimer_ext_callback_t) &schedule_sync_timer);
 
 	/* set my_slot */
 	i = 0;
