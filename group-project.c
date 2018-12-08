@@ -107,11 +107,6 @@ MEMB(writing_memb, lpsd_packet_queue_t, 200);
 void reset_sync_timer(void)
 {
 	i = 0;
-	rtimer_ext_clock_t exp_time;
-	rtimer_ext_next_expiration(RTIMER_EXT_LF_1, &exp_time);
-	LOG_INFO("EXP_TIME_2: %u\n",(uint16_t) exp_time);
-	radio_rcv(((uint8_t*)&exp_time), 30);
-	LPM4;
 }
 void reset_slot_timer(void)
 {
@@ -120,6 +115,7 @@ void reset_slot_timer(void)
 void schedule_sync_timer(void)
 {
 	//clock_delay((uint16_t) 11.0424028 * t_zero);
+	if(!t_zero && sync) t_zero = 1130;
 	rtimer_ext_stop(RTIMER_EXT_LF_0);
 	rtimer_ext_reset();
 	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
@@ -127,17 +123,14 @@ void schedule_sync_timer(void)
 	rtimer_ext_next_expiration(RTIMER_EXT_LF_1, &exp_time);
 
 	LOG_INFO("T_ZERO: %u\n",(uint16_t) t_zero);
-	LOG_INFO("EXP_TIME: %u\n",(uint16_t) exp_time);
-
-	radio_rcv(((uint8_t*)&exp_time), 30);
 
 	if(sync) {
-		LOG_INFO("Not synced --> going to LPM4.");
+		LOG_INFO("Not synced --> try with average t_zero 1130.");
 		sync = 0;
-		LPM4;
 	}
 
-	//data_generation_init();
+	/* initialize the data generator */
+	data_generation_init();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -275,15 +268,15 @@ PROCESS_THREAD(design_project_process, ev, data)
 	while(1) {
 		if(1) slots[0] = 1;
 		else if(node_id == sinkaddress) {
-			/* reset sync timer and restart all slot timers */
+			// reset sync timer and restart all slot timers
 			if(i == 0) {
 				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
 				while(i < 27) {
 					while(1) {
 						if(j) {
 							while(is_data_in_queue()) {
-								/* --- SINK --- */
-								/* Write our own message to serial */
+								// --- SINK ---
+								// Write our own message to serial
 								pop_packet = pop_data();
 								seqn = pop_packet->seqn;
 								LOG_INFO("Pkt:%u,%u,%u\n", pop_packet->src_id,pop_packet->seqn, pop_packet->payload);
@@ -291,9 +284,9 @@ PROCESS_THREAD(design_project_process, ev, data)
 							if(my_slot == i) {
 								uint8_t break_counter = 0;
 								while(*writing_queue != NULL && break_counter < 50) {
-									/* dequeue the first packet */
+									// dequeue the first packet
 						  			lpsd_packet_queue_t* pkt = queue_dequeue(writing_queue);
-						  			/* free the memory block */
+						  			// free the memory block
 						  			memb_free(&writing_memb, pkt);
 
 						  			LOG_INFO("Pkt:%u,%u,%u\n", pkt->src_id,pkt->seqn, pkt->payload);
@@ -317,7 +310,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 													writing_pkt->seqn     = packet_rcv.seqn[read_val];
 													writing_pkt->payload  = packet_rcv.payload[read_val];
 
-													/* add packet to the queue */
+													// add packet to the queue
 													queue_enqueue(writing_queue, writing_pkt);
 												}
 
@@ -340,7 +333,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 				}
 			}
 		} else {
-			/* reset sync timer and restart all slot timers */
+			// reset sync timer and restart all slot timers
 			if(i == 0) {
 				rtimer_ext_schedule(RTIMER_EXT_LF_2, 0, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
 				while(i < 27) {
@@ -368,7 +361,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 										++counter;
 									}
 
-									/* --- SOURCE --- */
+									// --- SOURCE ---
 									radio_send(((uint8_t*)(&(packet.src_id[0]))),sizeof(lpsd_superpacket_t),1);
 									packet.size = 1;
 								} else if(my_slot != i){
