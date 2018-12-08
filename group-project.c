@@ -102,81 +102,28 @@ MEMB(writing_memb, lpsd_packet_queue_t, 200);
 /*---------------------------------------------------------------------------*/
 /* --- Packets --- */
 //Syncronization Packet
-static volatile lpsd_sync_t			sync_packet;					/* packet buffer */
-static volatile lpsd_sync_t			sync_packet_rcv;				/* received packet buffer */
+static lpsd_sync_t			sync_packet;					/* packet buffer */
+static lpsd_sync_t			sync_packet_rcv;				/* received packet buffer */
 //Normal Packet
-static volatile lpsd_superpacket_t	packet;							/* packet pointer */
-static volatile lpsd_packet_t*		pop_packet;						/* packet pointer */
-static volatile lpsd_superpacket_t	packet_rcv;						/* received packet buffer */
-static volatile uint8_t				packet_len;						/* packet length, in Bytes */
-static volatile uint16_t			timeout_ms = 25;				/* packet receive timeout, in ms */
-static volatile uint8_t				firstpacket = 1;				/* First packet for the initiator */
-static volatile uint8_t				last_sync = 0;
-static volatile uint8_t				first_sync = 0;
-static volatile rtimer_ext_clock_t	last_time = 0;
-static volatile rtimer_ext_clock_t	first_time = 0;
-static volatile rtimer_ext_clock_t	timestamp;
-static volatile uint8_t				stop = 0;
-static volatile uint8_t				seqn = 0;
+static lpsd_superpacket_t	packet;							/* packet pointer */
+static lpsd_packet_t*		pop_packet;						/* packet pointer */
+static lpsd_superpacket_t	packet_rcv;						/* received packet buffer */
+static uint8_t				packet_len;						/* packet length, in Bytes */
+static uint16_t				timeout_ms;						/* packet receive timeout, in ms */
+static uint8_t				firstpacket;					/* First packet for the initiator */
+static uint8_t				last_sync;
+static uint8_t				first_sync;
+static rtimer_ext_clock_t	last_time;
+static rtimer_ext_clock_t	first_time;
+static rtimer_ext_clock_t	timestamp;
+static uint8_t				stop;
+static uint8_t				seqn;
 
-static volatile uint8_t				my_slot;						/* used slot ID */
-static volatile uint8_t				slot_mapping[27];
-static volatile uint8_t				slots[27];
+static uint8_t				my_slot;						/* used slot ID */
+static uint8_t				slot_mapping[27];
+static uint8_t				slots[27];
+static uint8_t				my_round;
 
-slot_mapping[0] = 8;
-slot_mapping[1] = 2;
-slot_mapping[2] = 3;
-slot_mapping[3] = 4;
-slot_mapping[4] = 6;
-slot_mapping[5] = 7;
-slot_mapping[6] = 1;
-slot_mapping[7] = 10;
-slot_mapping[8] = 11;
-slot_mapping[9] = 13;
-slot_mapping[10] = 14;
-slot_mapping[11] = 15;
-slot_mapping[12] = 31;
-slot_mapping[13] = 17;
-slot_mapping[14] = 18;
-slot_mapping[15] = 19;
-slot_mapping[16] = 20;
-slot_mapping[17] = 22;
-slot_mapping[18] = 23;
-slot_mapping[19] = 24;
-slot_mapping[20] = 25;
-slot_mapping[21] = 26;
-slot_mapping[22] = 27;
-slot_mapping[23] = 28;
-slot_mapping[24] = 16;
-slot_mapping[25] = 32;
-slot_mapping[26] = 33;
-
-slots[1] = 0;
-slots[2] = 0;
-slots[3] = 0;
-slots[4] = 0;
-slots[5] = 0;
-slots[6] = 0;
-slots[7] = 0;
-slots[8] = 0;
-slots[9] = 0;
-slots[10] = 0;
-slots[11] = 0;
-slots[12] = 0;
-slots[13] = 0;
-slots[14] = 0;
-slots[15] = 0;
-slots[16] = 0;
-slots[17] = 0;
-slots[18] = 0;
-slots[19] = 0;
-slots[20] = 0;
-slots[21] = 0;
-slots[22] = 0;
-slots[23] = 0;
-slots[24] = 0;
-slots[25] = 0;
-slots[26] = 0;
 
 /* Functions */
 /*void reset_sync_timer(void)
@@ -186,7 +133,11 @@ slots[26] = 0;
 }*/
 void reset_slot_timer(void)
 {
-	if(node_id == sinkaddress) {
+	if(i < 27) {
+		radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
+		LOG_INFO("i:%u, my_round:%u\n", i, my_round);
+	}
+	/*if(node_id == sinkaddress) {
 		while(is_data_in_queue()) {
 			// --- SINK ---
 			// Write our own message to serial
@@ -287,14 +238,18 @@ void reset_slot_timer(void)
 		}
 		//TODO
 		// -reason to break the while loop
-	}
+	}*/
 	++i;
-	if(i == 27) i = 0;
+	if(i == 27) {
+		i = 0;
+		++my_round;
+	}
 }
 void schedule_sync_timer(void)
 {
 	//clock_delay((uint16_t) 11.0424028 * t_zero);
 	if(t_zero == 0) t_zero = 1130;
+	my_round = 0;
 	rtimer_ext_reset();
 	//rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
 	rtimer_ext_schedule(RTIMER_EXT_LF_2, t_zero, (RTIMER_EXT_SECOND_LF/27), (rtimer_ext_callback_t) &reset_slot_timer);
@@ -319,7 +274,71 @@ AUTOSTART_PROCESSES(&design_project_process);
 PROCESS_THREAD(design_project_process, ev, data)
 {
 	PROCESS_BEGIN();
+
 	packet.size = 1;
+	timeout_ms = 25;
+	firstpacket = 1;
+	last_sync = 0;
+	first_sync = 0;
+	last_time = 0;
+	first_time = 0;
+	stop = 0;
+	seqn = 0;
+
+	slot_mapping[0] = 8;
+	slot_mapping[1] = 2;
+	slot_mapping[2] = 3;
+	slot_mapping[3] = 4;
+	slot_mapping[4] = 6;
+	slot_mapping[5] = 7;
+	slot_mapping[6] = 1;
+	slot_mapping[7] = 10;
+	slot_mapping[8] = 11;
+	slot_mapping[9] = 13;
+	slot_mapping[10] = 14;
+	slot_mapping[11] = 15;
+	slot_mapping[12] = 31;
+	slot_mapping[13] = 17;
+	slot_mapping[14] = 18;
+	slot_mapping[15] = 19;
+	slot_mapping[16] = 20;
+	slot_mapping[17] = 22;
+	slot_mapping[18] = 23;
+	slot_mapping[19] = 24;
+	slot_mapping[20] = 25;
+	slot_mapping[21] = 26;
+	slot_mapping[22] = 27;
+	slot_mapping[23] = 28;
+	slot_mapping[24] = 16;
+	slot_mapping[25] = 32;
+	slot_mapping[26] = 33;
+
+	slots[1] = 0;
+	slots[2] = 0;
+	slots[3] = 0;
+	slots[4] = 0;
+	slots[5] = 0;
+	slots[6] = 0;
+	slots[7] = 0;
+	slots[8] = 0;
+	slots[9] = 0;
+	slots[10] = 0;
+	slots[11] = 0;
+	slots[12] = 0;
+	slots[13] = 0;
+	slots[14] = 0;
+	slots[15] = 0;
+	slots[16] = 0;
+	slots[17] = 0;
+	slots[18] = 0;
+	slots[19] = 0;
+	slots[20] = 0;
+	slots[21] = 0;
+	slots[22] = 0;
+	slots[23] = 0;
+	slots[24] = 0;
+	slots[25] = 0;
+	slots[26] = 0;
 
 	/* initialize the writing queue */
   	memb_init(&writing_memb);
