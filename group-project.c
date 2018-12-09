@@ -69,7 +69,7 @@ uint16_t randomseed = RANDOM_SEED;
 
 static volatile uint8_t i = 0;	
 static volatile rtimer_ext_clock_t t_zero = 0;
-static volatile uint8_t sync = 0;						/* in minimum 3 rounds */
+static volatile uint8_t sync = 10;						/* in minimum 3 rounds */
 /*---------------------------------------------------------------------------*/
 
 /* Structs for the different packets */
@@ -105,9 +105,9 @@ MEMB(writing_memb, lpsd_packet_queue_t, 200);
 static lpsd_sync_t			sync_packet;					/* packet buffer */
 static lpsd_sync_t			sync_packet_rcv;				/* received packet buffer */
 //Normal Packet
-static lpsd_superpacket_t	packet;							/* packet pointer */
-static lpsd_packet_t*		pop_packet;						/* packet pointer */
-static lpsd_superpacket_t	packet_rcv;						/* received packet buffer */
+static volatile lpsd_superpacket_t	packet;							/* packet pointer */
+static volatile lpsd_packet_t*		pop_packet;						/* packet pointer */
+static volatile lpsd_superpacket_t	packet_rcv;						/* received packet buffer */
 static uint8_t				packet_len;						/* packet length, in Bytes */
 static uint16_t				timeout_ms;						/* packet receive timeout, in ms */
 static uint8_t				firstpacket;					/* First packet for the initiator */
@@ -123,12 +123,14 @@ static volatile uint8_t				my_slot;						/* used slot ID */
 static volatile uint8_t				slot_mapping[28];
 static volatile uint8_t				slots[28];
 static volatile uint8_t				send;
+static volatile uint8_t				receive;
+static volatile uint8_t				receive_sink;
 
 
 /* Functions */
 void reset_sync_timer(void)
 {
-	radio_rcv(((uint8_t*)&packet_rcv), 2);
+	radio_rcv(((uint8_t*)&packet_rcv), 1);
 	i = 0;
 }
 void reset_slot_timer(void)
@@ -154,36 +156,7 @@ void reset_slot_timer(void)
 			}
 			if(seqn == 200) ++stop;
 		} else {
-			packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
-			if(packet_len) {
-				while(packet_rcv.size > 0) {
-					uint8_t counter = 0;
-					while(counter < 5) {
-						uint8_t read_val = ((packet_rcv.size - 1) * 5) + counter;
-						if(packet_rcv.seqn[read_val]) {
-							lpsd_packet_queue_t* writing_pkt = memb_alloc(&writing_memb);
-							if(writing_pkt == 0) {
-								LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.src_id[(packet_rcv.size - 1)],packet_rcv.seqn[read_val], packet_rcv.payload[read_val]);
-								++stop;
-							} else {
-								writing_pkt->src_id   = packet_rcv.src_id[(packet_rcv.size - 1)];
-								writing_pkt->seqn     = packet_rcv.seqn[read_val];
-								writing_pkt->payload  = packet_rcv.payload[read_val];
-
-								// add packet to the queue
-								queue_enqueue(writing_queue, writing_pkt);
-							}
-
-							if(stop > 5) {
-								stop = 0;
-								break;
-							}
-						}
-						++counter;
-					}
-					--packet_rcv.size;
-				}
-			}
+			receive_sink = 1;
 		}
 	} else {
 		if(i < 28 && slots[i]) {
@@ -192,7 +165,7 @@ void reset_slot_timer(void)
 				while(is_data_in_queue() && counter < 5) {
 					pop_packet = pop_data();
 
-					LOG_INFO("POP Pkt:%u,%u,%u\n", pop_packet->src_id,pop_packet->seqn, pop_packet->payload);
+					//LOG_INFO("POP Pkt:%u,%u,%u\n", pop_packet->src_id,pop_packet->seqn, pop_packet->payload);
 
 					packet.src_id[0] = pop_packet->src_id;
 					packet.seqn[counter] = pop_packet->seqn;
@@ -210,26 +183,8 @@ void reset_slot_timer(void)
 				if(seqn == 200) ++stop;
 				// --- SOURCE ---
 				send = 1;
-				packet.size = 1;
 			} else if(my_slot != i) {
-				packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
-				if(packet_len) {
-					while(packet_rcv.size > 0) {
-						uint8_t counter = 0;
-						while(counter < 5) {
-							uint8_t read_val = ((packet_rcv.size - 1) * 5) + counter;
-							uint8_t write_val = (packet.size * 5) + counter;
-							
-							packet.src_id[packet.size] = packet_rcv.src_id[(packet_rcv.size - 1)];
-							packet.seqn[write_val] = packet_rcv.seqn[read_val];
-							packet.payload[write_val] = packet_rcv.payload[read_val];
-							++counter;
-						}
-						if(seqn == 200) ++stop;
-						--packet_rcv.size;
-						++packet.size;
-					}
-				}
+				receive = 1;
 			}
 		}
 		//TODO
@@ -240,7 +195,6 @@ void reset_slot_timer(void)
 void schedule_sync_timer(void)
 {
 	//clock_delay((uint16_t) 11.0424028 * t_zero);
-	if(t_zero == 0) t_zero = 1130;
 	LOG_INFO("T_ZERO: %u\n",(uint16_t) t_zero);
 	rtimer_ext_reset();
 	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero + RTIMER_EXT_SECOND_LF, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
@@ -249,7 +203,8 @@ void schedule_sync_timer(void)
 	rtimer_ext_next_expiration(RTIMER_EXT_LF_2, &exp_time);
 
 	if(sync) {
-		LOG_INFO("Not synced --> try with average t_zero %u.", (uint16_t) t_zero);
+		LOG_INFO("Not synced --> going to LPM4.");
+		LPM4;
 		sync = -1;
 	}
 }
@@ -273,6 +228,8 @@ PROCESS_THREAD(design_project_process, ev, data)
 	seqn = 0;
 	packet.size = 1;
 	send = 0;
+	receive = 0;
+	receive_sink = 0;
 
 	slot_mapping[1] = 8;
 	slot_mapping[2] = 2;
@@ -443,6 +400,63 @@ PROCESS_THREAD(design_project_process, ev, data)
 		if(send) {
 			radio_send(((uint8_t*)(&(packet.src_id[0]))),sizeof(lpsd_superpacket_t),1);
 			send = 0;
+			packet.size = 1;
+		} else if(receive) {
+			packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
+			if(packet_len) {
+				uint8_t rec_size = packet_rcv.size;
+				while(rec_size > 0) {
+					uint8_t counter = 0;
+					while(counter < 5) {
+						uint8_t read_val = ((rec_size - 1) * 5) + counter;
+						uint8_t write_val = (packet.size * 5) + counter;
+						
+						packet.src_id[packet.size] = packet_rcv.src_id[(rec_size - 1)];
+						packet.seqn[write_val] = packet_rcv.seqn[read_val];
+						packet.payload[write_val] = packet_rcv.payload[read_val];
+						++counter;
+					}
+					if(seqn == 200) ++stop;
+					--rec_size;
+					++packet.size;
+				}
+			}
+			receive = 0;
+		}
+		
+		if(receive_sink) {
+			packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
+			if(packet_len) {
+				uint8_t rec_size = packet_rcv.size;
+				while(rec_size > 0) {
+					uint8_t counter = 0;
+					while(counter < 5) {
+						uint8_t read_val = ((rec_size - 1) * 5) + counter;
+						if(packet_rcv.seqn[read_val]) {
+							lpsd_packet_queue_t* writing_pkt = memb_alloc(&writing_memb);
+							if(writing_pkt == 0) {
+								LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.src_id[(rec_size - 1)],packet_rcv.seqn[read_val], packet_rcv.payload[read_val]);
+								++stop;
+							} else {
+								writing_pkt->src_id   = packet_rcv.src_id[(rec_size - 1)];
+								writing_pkt->seqn     = packet_rcv.seqn[read_val];
+								writing_pkt->payload  = packet_rcv.payload[read_val];
+
+								// add packet to the queue
+								queue_enqueue(writing_queue, writing_pkt);
+							}
+
+							if(stop > 5) {
+								stop = 0;
+								break;
+							}
+						}
+						++counter;
+					}
+					--rec_size;
+				}
+			}
+			receive_sink = 0;
 		}
 	}
 
