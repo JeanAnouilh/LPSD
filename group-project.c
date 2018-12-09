@@ -375,19 +375,25 @@ PROCESS_THREAD(design_project_process, ev, data)
 	/* ----------------------- HERE WE ARE SYNCED ----------------------- */
 	if(sinkaddress == 22) {
 		/* --- Scenario 1 --- */
+
 		if(node_id == 3) {
+			slots[2] = 1;				// 2
 			slots[8] = 1;				// 10
 			slots[12] = 1;				// 15
+		}else if(node_id == 8) {
+			slots[7] = 1;				// 1
 		} else if(node_id == 28) {
 			slots[1] = 1;				// 8
 			slots[13] = 1;				// 31
 		} else if(node_id == 31) {
 			slots[26] = 1;				// 32
-		} else if(node_id == 33) {
-			slots[7] = 1;				// 1
-			slots[2] = 1;				// 2
+		} else if(node_id == 16) {
+			slots[27] = 1;				//33
+		}
+		else if(node_id == 6) {
 			slots[4] = 1;				// 4
 		}
+
 	} else {
 		/* --- Scenario 2 --- */
 
