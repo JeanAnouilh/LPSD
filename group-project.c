@@ -145,7 +145,7 @@ void reset_slot_timer(void)
 		}
 		if(my_slot == i) {
 			uint8_t break_counter = 0;
-			while(*writing_queue != NULL && break_counter < 50) {
+			while(*writing_queue != NULL && break_counter < 5) {
 				// dequeue the first packet
 	  			lpsd_packet_queue_t* pkt = queue_dequeue(writing_queue);
 	  			// free the memory block
@@ -165,7 +165,7 @@ void reset_slot_timer(void)
 				while(is_data_in_queue() && counter < 5) {
 					pop_packet = pop_data();
 
-					//LOG_INFO("POP Pkt:%u,%u,%u\n", pop_packet->src_id,pop_packet->seqn, pop_packet->payload);
+					LOG_INFO("POP Pkt:%u,%u,%u\n", pop_packet->src_id,pop_packet->seqn, pop_packet->payload);
 
 					packet.src_id[0] = pop_packet->src_id;
 					packet.seqn[counter] = pop_packet->seqn;
@@ -406,7 +406,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 			if(packet_len) {
 				uint8_t rec_size = packet_rcv.size;
 				while(rec_size > 0) {
-					uint8_t counter = 0;
+					/*uint8_t counter = 0;
 					while(counter < 5) {
 						uint8_t read_val = ((rec_size - 1) * 5) + counter;
 						uint8_t write_val = (packet.size * 5) + counter;
@@ -415,7 +415,12 @@ PROCESS_THREAD(design_project_process, ev, data)
 						packet.seqn[write_val] = packet_rcv.seqn[read_val];
 						packet.payload[write_val] = packet_rcv.payload[read_val];
 						++counter;
-					}
+					}*/
+					uint8_t read_val = ((rec_size - 1) * 5);
+					uint8_t write_val = (packet.size * 5);
+					packet.src_id[packet.size] = packet_rcv.src_id[(rec_size - 1)];
+					packet.seqn[write_val] = packet_rcv.seqn[read_val];
+					packet.payload[write_val] = packet_rcv.payload[read_val];
 					if(seqn == 200) ++stop;
 					--rec_size;
 					++packet.size;
@@ -429,7 +434,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 			if(packet_len) {
 				uint8_t rec_size = packet_rcv.size;
 				while(rec_size > 0) {
-					uint8_t counter = 0;
+					/*uint8_t counter = 0;
 					while(counter < 5) {
 						uint8_t read_val = ((rec_size - 1) * 5) + counter;
 						if(packet_rcv.seqn[read_val]) {
@@ -452,7 +457,9 @@ PROCESS_THREAD(design_project_process, ev, data)
 							}
 						}
 						++counter;
-					}
+					}*/
+					uint8_t read_val = ((rec_size - 1) * 5);
+					LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.src_id[(rec_size - 1)],packet_rcv.seqn[read_val], packet_rcv.payload[read_val]);
 					--rec_size;
 				}
 			}
