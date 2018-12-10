@@ -85,7 +85,7 @@
 
 /* general RF config */
 #define RF_CONF_MAX_PKT_LEN             (RADIO_CONF_PAYLOAD_LEN + 10)
-#define RF_CONF_TX_POWER                RF1A_TX_POWER_MINUS_6_dBm
+#define RF_CONF_TX_POWER                RF1A_TX_POWER_0_dBm
 #define RF_CONF_TX_CH                   RF_CHANNEL
 
 #endif /* PROJECT_CONF_H_ */

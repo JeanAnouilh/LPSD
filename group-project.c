@@ -100,7 +100,7 @@ typedef struct {
 } lpsd_discovery_t;
 // Writing queue
 QUEUE(writing_queue);
-MEMB(writing_memb, lpsd_packet_queue_t, 200);
+MEMB(writing_memb, lpsd_packet_queue_t, 250);
 /*---------------------------------------------------------------------------*/
 /* --- Packets --- */
 //Syncronization Packet
@@ -141,7 +141,7 @@ static volatile uint8_t 			peer_counter = 0;
 /* Functions */
 void reset_sync_timer(void)
 {
-	radio_rcv(((uint8_t*)&packet_rcv), 1);
+	radio_rcv(((uint8_t*)&sync_packet_rcv), 1);
 	i = 0;
 }
 void reset_slot_timer(void)
@@ -164,7 +164,7 @@ void reset_slot_timer(void)
 		}
 
 	}else if(node_id == sinkaddress) {
-		while(is_data_in_queue()) {
+		if(is_data_in_queue()) {
 			// --- SINK ---
 			// Write our own message to serial
 			pop_packet = pop_data();
@@ -173,7 +173,7 @@ void reset_slot_timer(void)
 		}
 		if(my_slot == i) {
 			uint8_t break_counter = 0;
-			while(*writing_queue != NULL && break_counter < 8) {
+			while(*writing_queue != NULL && break_counter < 4) {
 				// dequeue the first packet
 	  			lpsd_packet_queue_t* pkt = queue_dequeue(writing_queue);
 	  			// free the memory block
@@ -256,7 +256,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 		slot_time = RTIMER_EXT_SECOND_LF/56;
 	}
 	
-	timeout_ms = 8;
+	timeout_ms = 6;
 	firstpacket = 1;
 	last_sync = 0;
 	first_sync = 0;
@@ -393,14 +393,14 @@ PROCESS_THREAD(design_project_process, ev, data)
 
 			//LOG_INFO("Listening...");
 			while(1) {
-				packet_len = radio_rcv(((uint8_t*)&sync_packet_rcv), 2000);
+				packet_len = radio_rcv(((uint8_t*)&sync_packet_rcv), 100);
 				if(packet_len){
 					break;
 				}
 			}
 
-			// wait 5 ms
-			clock_delay(10*1767);
+			// wait 25 ms
+			clock_delay(5*1767);
 
 			if(timestamp) {
 				if(!first_sync) {
@@ -432,7 +432,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	}
 
 	/* ----------------------- HERE WE ARE SYNCED ----------------------- */
-	if(sinkaddress != 22) {
+	if(sinkaddress == 22) {
 		/* --- Scenario 1 --- */
 
 		if(node_id == 3) {
@@ -461,7 +461,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 		// - set parents
 		while(first_round){
 			if(receive){
-				packet_len = radio_rcv(((uint8_t*)&disc_packet_rcv),timeout_ms );
+				packet_len = radio_rcv(((uint8_t*)&disc_packet_rcv),timeout_ms);
 				if(packet_len)
 				{
 					if(disc_packet_rcv.src_id == sinkaddress){
@@ -525,7 +525,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 			packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
 			if(packet_len) {
 				uint8_t rec_size = packet_rcv.size;
-				while(rec_size > 0) {
+				while(rec_size > 0 && packet.size < 4) {
 					uint8_t counter = 0;
 					while(counter < 5) {
 						uint8_t read_val = ((rec_size - 1) * 5) + counter;
@@ -561,7 +561,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 					uint8_t counter = 0;
 					while(counter < 5) {
 						uint8_t read_val = ((rec_size - 1) * 5) + counter;
-						if(packet_rcv.seqn[read_val]) {
+						if(packet_rcv.seqn[read_val] && packet_rcv.src_id[(rec_size - 1)] <= 33) {
 							if(counter == 0) {
 								LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.src_id[(rec_size - 1)],packet_rcv.seqn[read_val], packet_rcv.payload[read_val]);
 							} else {
@@ -581,13 +581,14 @@ PROCESS_THREAD(design_project_process, ev, data)
 				}
 			} else {
 				uint8_t counter = 0;
-				while(*writing_queue != NULL && counter < 5) {
+				while(*writing_queue != NULL && counter < 3) {
 					/* dequeue the first packet */
 	  				lpsd_packet_queue_t* pkt = queue_dequeue(writing_queue);
 	  				/* free the memory block */
 	  				memb_free(&writing_memb, pkt);
-
-	  				LOG_INFO("Pkt:%u,%u,%u\n", pkt->src_id,pkt->seqn, pkt->payload);
+					if(pkt->src_id <= 33) {
+	  					LOG_INFO("Pkt:%u,%u,%u\n", pkt->src_id,pkt->seqn, pkt->payload);
+					}
 					
 					++counter;
 				}
@@ -602,8 +603,9 @@ PROCESS_THREAD(design_project_process, ev, data)
   			lpsd_packet_queue_t* pkt = queue_dequeue(writing_queue);
   			/* free the memory block */
   			memb_free(&writing_memb, pkt);
-
-  			LOG_INFO("Pkt:%u,%u,%u\n", pkt->src_id,pkt->seqn, pkt->payload);
+			if(pkt->src_id <= 33) {
+  				LOG_INFO("Pkt:%u,%u,%u\n", pkt->src_id,pkt->seqn, pkt->payload);
+			}
 		}
 	} else {
 		LOG_INFO("no new packets --> going to LPM4.");
