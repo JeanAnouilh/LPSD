@@ -1,6 +1,7 @@
 obj_dpp-cc430/stack-check.o: ../../os/sys/stack-check.c \
  ../../os/contiki.h ../../arch/platform/dpp-cc430/./contiki-conf.h \
- project-conf.h ../../arch/platform/dpp-cc430/dpp2/dpp-def.h \
+ project-conf.h ../../tools/flocklab/flocklab.h \
+ ../../arch/platform/dpp-cc430/dpp1/dpp-def.h \
  ../../arch/platform/dpp-cc430/./../dpp-cc430/rf1a-SmartRF-settings/868MHz-2GFSK-250kbps.h \
  ../../arch/cpu/cc430/./pmm.h ../../arch/cpu/cc430/./uart.h \
  ../../arch/cpu/cc430/./gpio.h ../../arch/cpu/cc430/./rtimer-ext.h \
@@ -14,7 +15,8 @@ obj_dpp-cc430/stack-check.o: ../../os/sys/stack-check.c \
  ../../os/sys/log.h ../../os/net/linkaddr.h ../../os/sys/log-conf.h
 ../../os/sys/stack-check.c :
  ../../os/contiki.h ../../arch/platform/dpp-cc430/./contiki-conf.h :
- project-conf.h ../../arch/platform/dpp-cc430/dpp2/dpp-def.h :
+ project-conf.h ../../tools/flocklab/flocklab.h :
+ ../../arch/platform/dpp-cc430/dpp1/dpp-def.h :
  ../../arch/platform/dpp-cc430/./../dpp-cc430/rf1a-SmartRF-settings/868MHz-2GFSK-250kbps.h :
  ../../arch/cpu/cc430/./pmm.h ../../arch/cpu/cc430/./uart.h :
  ../../arch/cpu/cc430/./gpio.h ../../arch/cpu/cc430/./rtimer-ext.h :
