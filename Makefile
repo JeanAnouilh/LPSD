@@ -10,7 +10,7 @@ endif
 CFLAGS += -DPLATFORM_$(shell echo $(TARGET) | tr a-z\- A-Z_)
 
 # select the data rate
-CFLAGS += -DDATARATE=10
+CFLAGS += -DDATARATE=1
 # select the sink address
 CFLAGS += -DSINK_ADDRESS=22
 # select the sink address

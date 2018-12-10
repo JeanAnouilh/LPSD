@@ -53,7 +53,7 @@ void data_generation_init(void)
   random_init(randomseed);
 
   /* initialize the timer for data generation */
-  rtimer_ext_clock_t start_time = (1000 + (node_id * 111)%500)
+  rtimer_ext_clock_t start_time = (10000 + (node_id * 111)%500)
                                    * RTIMER_EXT_SECOND_LF
                                    / 1000;
   rtimer_ext_clock_t period     = RTIMER_EXT_SECOND_LF / datarate;

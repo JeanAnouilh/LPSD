@@ -54,7 +54,7 @@
     #define LED_STATUS                  COM_GPIO3
   #endif /* FLOCKLAB */
 
-  #define RF_CHANNEL                    5 /* approx. 869 MHz */
+  #define RF_CHANNEL                    10 /* approx. 869 MHz */
 
 #elif defined PLATFORM_SKY
   #ifdef FLOCKLAB
@@ -85,7 +85,7 @@
 
 /* general RF config */
 #define RF_CONF_MAX_PKT_LEN             (RADIO_CONF_PAYLOAD_LEN + 10)
-#define RF_CONF_TX_POWER                RF1A_TX_POWER_MAX
+#define RF_CONF_TX_POWER                RF1A_TX_POWER_MINUS_6_dBm
 #define RF_CONF_TX_CH                   RF_CHANNEL
 
 #endif /* PROJECT_CONF_H_ */

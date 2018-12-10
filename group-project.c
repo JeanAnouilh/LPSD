@@ -94,8 +94,7 @@ typedef struct {
 typedef struct {
 	uint16_t					src_id;					// sender of this message
 	uint16_t					dst_id;					// target of this sender
-	uint8_t 					size;					// tell the number of packets
-	uint8_t 					my_childs[5];			// selection of childs
+	uint8_t 					my_childs[5];				// selection of childs
 	
 } lpsd_discovery_t;
 // Writing queue
@@ -132,10 +131,8 @@ static volatile uint8_t				slots[28];
 static volatile uint8_t				send;
 static volatile uint8_t				receive;
 static volatile uint8_t				receive_sink;
-static volatile uint8_t 			do_discovery;
+static volatile uint8_t 			do_discovery = 0;
 static volatile uint8_t				first_round = 1;
-static volatile uint8_t 			child_counter = 0;
-static volatile uint8_t 			parent_counter = 0;
 static volatile uint8_t 			sink_connection = 0;
 static volatile uint8_t 			peers[5];
 static volatile uint8_t 			peer_counter;
@@ -233,7 +230,7 @@ void schedule_sync_timer(void)
 
 	if(sync) {
 		LOG_INFO("Not synced --> calculated t_zero with less cycles.");
-		//LPM4;
+		LPM4;
 		sync = 0;
 	}
 }
@@ -324,6 +321,28 @@ PROCESS_THREAD(design_project_process, ev, data)
 	slots[26] = 0;
 	slots[27] = 0;
 
+	peers[0] = 0;
+	peers[1] = 0;
+	peers[2] = 0;
+	peers[3] = 0;
+	peers[4] = 0;
+
+	disc_packet.src_id = node_id;
+	disc_packet.dst_id = 0;
+	disc_packet.my_childs[0] = 0;
+	disc_packet.my_childs[1] = 0;
+	disc_packet.my_childs[2] = 0;
+	disc_packet.my_childs[3] = 0;
+	disc_packet.my_childs[4] = 0;
+
+	disc_packet_rcv.src_id = 0;
+	disc_packet_rcv.dst_id = 0;
+	disc_packet_rcv.my_childs[0] = 0;
+	disc_packet_rcv.my_childs[1] = 0;
+	disc_packet_rcv.my_childs[2] = 0;
+	disc_packet_rcv.my_childs[3] = 0;
+	disc_packet_rcv.my_childs[4] = 0;
+
 	/* initialize the writing queue */
   	memb_init(&writing_memb);
   	queue_init(writing_queue);
@@ -334,7 +353,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	PIN_CFG_OUT(RADIO_TX_PIN);
 	PIN_CFG_OUT(LED_STATUS);
 
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, RTIMER_EXT_SECOND_LF, 0, (rtimer_ext_callback_t) &schedule_sync_timer);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, 2*RTIMER_EXT_SECOND_LF, 0, (rtimer_ext_callback_t) &schedule_sync_timer);
 
 	/* initialize the data generator */
 	data_generation_init();
@@ -369,14 +388,14 @@ PROCESS_THREAD(design_project_process, ev, data)
 
 			//LOG_INFO("Listening...");
 			while(1) {
-				packet_len = radio_rcv(((uint8_t*)&sync_packet_rcv), 3*timeout_ms);
+				packet_len = radio_rcv(((uint8_t*)&sync_packet_rcv), 2000);
 				if(packet_len){
 					break;
 				}
 			}
 
 			// wait 5 ms
-			clock_delay(1767);
+			clock_delay(10*1767);
 
 			if(timestamp) {
 				if(!first_sync) {
@@ -399,7 +418,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 			radio_send(((uint8_t*)&sync_packet),packet_len,1);
 			//LOG_INFO("send_packet_round: %u\n",sync_packet.sync_count);
 		}
-		if(sync == -1) break;
 	}
 
 	if(sync != -1) {
@@ -409,7 +427,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 	}
 
 	/* ----------------------- HERE WE ARE SYNCED ----------------------- */
-	if(sinkaddress == 22) {
+	if(sinkaddress != 22) {
 		/* --- Scenario 1 --- */
 
 		if(node_id == 3) {
@@ -441,29 +459,35 @@ PROCESS_THREAD(design_project_process, ev, data)
 					if(disc_packet_rcv.src_id == sinkaddress){
 						sink_connection = 1;
 						disc_packet.dst_id = sinkaddress;
+						LOG_INFO("Direct connection to sink\n");
 					}else if(peer_counter < 5){
 						slots[i] = 1;
 						peers[peer_counter] = disc_packet_rcv.src_id;
 						++peer_counter;
 					}
 				}
+			} else if(send) {
+				radio_send(((uint8_t*)&disc_packet),sizeof(disc_packet),1);
+				send=0;
 			}
 			if(i == 27){
 				first_round = 0;
+				LOG_INFO("First round completed\n");
 			}
 			receive = 0;
 		}
 	}
 	while(do_discovery){
 		if(receive && !sink_connection){
-			packet_len = radio_rcv(((uint8_t*)&disc_packet_rcv), 15);
+			packet_len = radio_rcv(((uint8_t*)&disc_packet_rcv), timeout_ms);
 			if(packet_len){
 				if(disc_packet_rcv.dst_id){
 					uint8_t k = 0;
-					while( k < 5){
+					while(k < 5){
 						if(disc_packet_rcv.my_childs[k] == node_id){
 							disc_packet.dst_id = disc_packet_rcv.src_id;
 							sink_connection = 1;
+							LOG_INFO("My Parent: %u\n", disc_packet.dst_id);
 						}
 					}
 				}
@@ -471,15 +495,17 @@ PROCESS_THREAD(design_project_process, ev, data)
 			}
 			receive = 0;
 		} else if(send){
-			disc_packet.src_id = node_id;
-			//disc_packet.size = 0;
-			uint8_t 	k = 0;
+			uint8_t k = 0;
 			while(k < 5){
 				disc_packet.my_childs[k] = peers[k];
 			}
 			radio_send(((uint8_t*)&disc_packet),sizeof(disc_packet),1);
 			send=0;
-			do_discovery = 0;
+			LOG_INFO("My Child 1: %u, 2: %u, 3: %u, 4: %u, 5: %u\n", peers[0], peers[1], peers[2], peers[3], peers[4]);
+			if(disc_packet.dst_id) {
+				do_discovery = 0;
+				LOG_INFO("Discovery completed\n");
+			}
 		}
 	}
 	while(stop < 5) {
