@@ -67,7 +67,8 @@ uint16_t sinkaddress = SINK_ADDRESS;
 #endif /* RANDOM_SEED */
 uint16_t randomseed = RANDOM_SEED;
 
-static volatile uint8_t i = 0;	
+static volatile uint8_t i = 0;
+static volatile uint8_t	j = 0;
 static volatile rtimer_ext_clock_t t_zero = 0;
 static volatile uint8_t sync = 10;						/* in minimum 3 rounds */
 /*---------------------------------------------------------------------------*/
@@ -135,7 +136,7 @@ static volatile uint8_t 			do_discovery = 0;
 static volatile uint8_t				first_round = 1;
 static volatile uint8_t 			sink_connection = 0;
 static volatile uint8_t 			peers[5];
-static volatile uint8_t 			peer_counter;
+static volatile uint8_t 			peer_counter = 0;
 
 /* Functions */
 void reset_sync_timer(void)
@@ -146,19 +147,23 @@ void reset_sync_timer(void)
 void reset_slot_timer(void)
 {	
 	if(do_discovery){
+		j = i;
 		if(my_slot == i){
 			send = 1;
+			receive = 0;
+			//LOG_INFO("My slot j:%u\n",j);
 		}
 		else if(first_round){
 			receive =1 ;
+			//LOG_INFO("First round j:%u\n",j);
 
 			
 		}else if(slots[i]){
-			receive= 1;
+			receive = 1;
+			//LOG_INFO("Slots j:%u\n",j);
 		}
 
-	}
-	if(node_id == sinkaddress) {
+	}else if(node_id == sinkaddress) {
 		while(is_data_in_queue()) {
 			// --- SINK ---
 			// Write our own message to serial
@@ -223,7 +228,7 @@ void schedule_sync_timer(void)
 	}
 	LOG_INFO("T_ZERO: %u\n",(uint16_t) t_zero);
 	rtimer_ext_reset();
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero + RTIMER_EXT_SECOND_LF, sync_time, (rtimer_ext_callback_t) &reset_sync_timer);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero, sync_time, (rtimer_ext_callback_t) &reset_sync_timer);
 	rtimer_ext_schedule(RTIMER_EXT_LF_2, t_zero + RTIMER_EXT_SECOND_LF, slot_time, (rtimer_ext_callback_t) &reset_slot_timer);
 	rtimer_ext_clock_t exp_time;
 	rtimer_ext_next_expiration(RTIMER_EXT_LF_2, &exp_time);
@@ -449,11 +454,14 @@ PROCESS_THREAD(design_project_process, ev, data)
 	} else {
 		/* --- Scenario 2 --- */
 		do_discovery = 1;
+		if(node_id == sinkaddress){
+			disc_packet.dst_id = sinkaddress;
+		}
 		// - discover Network
 		// - set parents
 		while(first_round){
 			if(receive){
-				packet_len = radio_rcv(((uint8_t*)&disc_packet_rcv), 15);
+				packet_len = radio_rcv(((uint8_t*)&disc_packet_rcv),timeout_ms );
 				if(packet_len)
 				{
 					if(disc_packet_rcv.src_id == sinkaddress){
@@ -461,20 +469,22 @@ PROCESS_THREAD(design_project_process, ev, data)
 						disc_packet.dst_id = sinkaddress;
 						LOG_INFO("Direct connection to sink\n");
 					}else if(peer_counter < 5){
-						slots[i] = 1;
+						slots[j] = 1;
 						peers[peer_counter] = disc_packet_rcv.src_id;
 						++peer_counter;
 					}
 				}
+				//LOG_INFO("Got packet: %u, j:%u\n", disc_packet_rcv.src_id,j);
+				receive = 0;
 			} else if(send) {
 				radio_send(((uint8_t*)&disc_packet),sizeof(disc_packet),1);
 				send=0;
+				//LOG_INFO("Send my packet, j:%u\n",j);
 			}
-			if(i == 27){
+			if(j >= 27){
 				first_round = 0;
 				LOG_INFO("First round completed\n");
 			}
-			receive = 0;
 		}
 	}
 	while(do_discovery){
@@ -489,6 +499,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 							sink_connection = 1;
 							LOG_INFO("My Parent: %u\n", disc_packet.dst_id);
 						}
+						++k;
 					}
 				}
 					
@@ -498,6 +509,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 			uint8_t k = 0;
 			while(k < 5){
 				disc_packet.my_childs[k] = peers[k];
+				++k;
 			}
 			radio_send(((uint8_t*)&disc_packet),sizeof(disc_packet),1);
 			send=0;
