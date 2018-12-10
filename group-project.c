@@ -95,6 +95,8 @@ typedef struct {
 	uint16_t					src_id;					// sender of this message
 	uint16_t					dst_id;					// target of this sender
 	uint8_t 					size;					// tell the number of packets
+	uint8_t 					my_childs[5];			// selection of childs
+	
 } lpsd_discovery_t;
 // Writing queue
 QUEUE(writing_queue);
@@ -104,6 +106,9 @@ MEMB(writing_memb, lpsd_packet_queue_t, 200);
 //Syncronization Packet
 static lpsd_sync_t			sync_packet;					/* packet buffer */
 static lpsd_sync_t			sync_packet_rcv;				/* received packet buffer */
+//Discovery packet
+static lpsd_discovery_t		disc_packet;
+static lpsd_discovery_t		disc_packet_rcv;
 //Normal Packet
 static volatile lpsd_superpacket_t	packet;							/* packet pointer */
 static volatile lpsd_packet_t*		pop_packet;						/* packet pointer */
@@ -125,7 +130,13 @@ static volatile uint8_t				slots[28];
 static volatile uint8_t				send;
 static volatile uint8_t				receive;
 static volatile uint8_t				receive_sink;
-
+static volatile uint8_t 			do_discovery;
+static volatile uint8_t				first_round = 1;
+static volatile uint8_t 			child_counter = 0;
+static volatile uint8_t 			parent_counter = 0;
+static volatile uint8_t 			sink_connection = 0;
+static volatile uint8_t 			peers[5];
+static volatile uint8_t 			peer_counter;
 
 /* Functions */
 void reset_sync_timer(void)
@@ -134,7 +145,20 @@ void reset_sync_timer(void)
 	i = 0;
 }
 void reset_slot_timer(void)
-{
+{	
+	if(do_discovery){
+		if(my_slot == i){
+			send = 1;
+		}
+		else if(first_round){
+			receive =1 ;
+
+			
+		}else if(slots[i]){
+			receive= 1;
+		}
+
+	}
 	if(node_id == sinkaddress) {
 		while(is_data_in_queue()) {
 			// --- SINK ---
@@ -396,12 +420,58 @@ PROCESS_THREAD(design_project_process, ev, data)
 
 	} else {
 		/* --- Scenario 2 --- */
-
-		//TODO
+		do_discovery = 1;
 		// - discover Network
 		// - set parents
+		while(first_round){
+			if(receive){
+				packet_len = radio_rcv(((uint8_t*)&disc_packet_rcv), 15);
+				if(packet_len)
+				{
+					if(disc_packet_rcv.src_id == sinkaddress){
+						sink_connection = 1;
+						disc_packet.dst_id = sinkaddress;
+					}else if(peer_counter < 5){
+						slots[i] = 1;
+						peers[peer_counter] = disc_packet_rcv.src_id;
+						++peer_counter;
+					}
+				}
+			}
+			if(i == 27){
+				first_round = 0;
+			}
+			receive = 0;
+		}
 	}
-
+	while(do_discovery){
+		if(receive && !sink_connection){
+			packet_len = radio_rcv(((uint8_t*)&disc_packet_rcv), 15);
+			if(packet_len){
+				if(disc_packet_rcv.dst_id){
+					uint8_t k = 0;
+					while( k < 5){
+						if(disc_packet_rcv.my_childs[k] == node_id){
+							disc_packet.dst_id = disc_packet_rcv.src_id;
+							sink_connection = 1;
+						}
+					}
+				}
+					
+			}
+			receive = 0;
+		} else if(send){
+			disc_packet.src_id = node_id;
+			//disc_packet.size = 0;
+			uint8_t 	k = 0;
+			while(k < 5){
+				disc_packet.my_childs[k] = peers[k];
+			}
+			radio_send(((uint8_t*)&disc_packet),sizeof(disc_packet),1);
+			send=0;
+			do_discovery = 0;
+		}
+	}
 	while(stop < 5) {
 		if(send) {
 			radio_send(((uint8_t*)(&(packet.src_id[0]))),sizeof(lpsd_superpacket_t),1);
