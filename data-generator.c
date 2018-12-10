@@ -75,7 +75,7 @@ void generate_new_data(void)
 
   lpsd_packet_queue_t* pkt = memb_alloc(&packet_memb);
   if(pkt == 0) {
-    LOG_INFO("Data queue overflow!\n");
+    //LOG_INFO("Data queue overflow!\n");
     return;
   }
   pkt->src_id   = node_id;

@@ -34,7 +34,7 @@
 #define PROJECT_CONF_H_
 
 /* Max size of the generated packet buffer */
-#define PACKET_QUEUE_SIZE   10
+#define PACKET_QUEUE_SIZE   100
 
 /* --- PLATFORM dependent definitions --- */
 
@@ -85,7 +85,7 @@
 
 /* general RF config */
 #define RF_CONF_MAX_PKT_LEN             (RADIO_CONF_PAYLOAD_LEN + 10)
-#define RF_CONF_TX_POWER                RF1A_TX_POWER_0_dBm
+#define RF_CONF_TX_POWER                RF1A_TX_POWER_MAX
 #define RF_CONF_TX_CH                   RF_CHANNEL
 
 #endif /* PROJECT_CONF_H_ */

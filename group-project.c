@@ -116,6 +116,8 @@ static uint8_t				first_sync;
 static rtimer_ext_clock_t	last_time;
 static rtimer_ext_clock_t	first_time;
 static rtimer_ext_clock_t	timestamp;
+static rtimer_ext_clock_t	sync_time;
+static rtimer_ext_clock_t	slot_time;
 static volatile uint8_t				stop;
 static volatile uint8_t				seqn;
 
@@ -145,7 +147,7 @@ void reset_slot_timer(void)
 		}
 		if(my_slot == i) {
 			uint8_t break_counter = 0;
-			while(*writing_queue != NULL && break_counter < 5) {
+			while(*writing_queue != NULL && break_counter < 8) {
 				// dequeue the first packet
 	  			lpsd_packet_queue_t* pkt = queue_dequeue(writing_queue);
 	  			// free the memory block
@@ -162,12 +164,12 @@ void reset_slot_timer(void)
 		if(i < 28 && slots[i]) {
 			if(my_slot == i) {
 				uint8_t counter = 0;
+				packet.src_id[0] = pop_packet->src_id;
 				while(is_data_in_queue() && counter < 5) {
 					pop_packet = pop_data();
 
-					LOG_INFO("POP Pkt:%u,%u,%u\n", pop_packet->src_id,pop_packet->seqn, pop_packet->payload);
+					//LOG_INFO("POP Pkt:%u,%u,%u\n", pop_packet->src_id,pop_packet->seqn, pop_packet->payload);
 
-					packet.src_id[0] = pop_packet->src_id;
 					packet.seqn[counter] = pop_packet->seqn;
 					packet.payload[counter] = pop_packet->payload;
 					seqn = pop_packet->seqn;
@@ -194,18 +196,21 @@ void reset_slot_timer(void)
 }
 void schedule_sync_timer(void)
 {
-	//clock_delay((uint16_t) 11.0424028 * t_zero);
+	if(t_zero == 0) {
+		rtimer_ext_clock_t delta_t = (last_time - first_time) / (uint64_t) (last_sync - first_sync);
+		t_zero = first_time - ((uint64_t) first_sync * delta_t);
+	}
 	LOG_INFO("T_ZERO: %u\n",(uint16_t) t_zero);
 	rtimer_ext_reset();
-	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero + RTIMER_EXT_SECOND_LF, RTIMER_EXT_SECOND_LF, (rtimer_ext_callback_t) &reset_sync_timer);
-	rtimer_ext_schedule(RTIMER_EXT_LF_2, t_zero + RTIMER_EXT_SECOND_LF, (RTIMER_EXT_SECOND_LF/28), (rtimer_ext_callback_t) &reset_slot_timer);
+	rtimer_ext_schedule(RTIMER_EXT_LF_1, t_zero + RTIMER_EXT_SECOND_LF, sync_time, (rtimer_ext_callback_t) &reset_sync_timer);
+	rtimer_ext_schedule(RTIMER_EXT_LF_2, t_zero + RTIMER_EXT_SECOND_LF, slot_time, (rtimer_ext_callback_t) &reset_slot_timer);
 	rtimer_ext_clock_t exp_time;
 	rtimer_ext_next_expiration(RTIMER_EXT_LF_2, &exp_time);
 
 	if(sync) {
-		LOG_INFO("Not synced --> going to LPM4.");
-		LPM4;
-		sync = -1;
+		LOG_INFO("Not synced --> calculated t_zero with less cycles.");
+		//LPM4;
+		sync = 0;
 	}
 }
 
@@ -217,8 +222,15 @@ PROCESS_THREAD(design_project_process, ev, data)
 {
 	PROCESS_BEGIN();
 
+	if(datarate == 1) {
+		sync_time = RTIMER_EXT_SECOND_LF;
+		slot_time = RTIMER_EXT_SECOND_LF/28;
+	} else {
+		sync_time = RTIMER_EXT_SECOND_LF/2;
+		slot_time = RTIMER_EXT_SECOND_LF/56;
+	}
 	
-	timeout_ms = 25;
+	timeout_ms = 8;
 	firstpacket = 1;
 	last_sync = 0;
 	first_sync = 0;
@@ -333,7 +345,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 
 			//LOG_INFO("Listening...");
 			while(1) {
-				packet_len = radio_rcv(((uint8_t*)&sync_packet_rcv), timeout_ms);
+				packet_len = radio_rcv(((uint8_t*)&sync_packet_rcv), 3*timeout_ms);
 				if(packet_len){
 					break;
 				}
@@ -376,8 +388,11 @@ PROCESS_THREAD(design_project_process, ev, data)
 	if(sinkaddress == 22) {
 		/* --- Scenario 1 --- */
 		if(node_id == 3) {
+			slots[2] = 1;				// 2
 			slots[8] = 1;				// 10
 			slots[12] = 1;				// 15
+		} else if(node_id == 16) {
+			slots[27] = 1;				// 33
 		} else if(node_id == 28) {
 			slots[1] = 1;				// 8
 			slots[13] = 1;				// 31
@@ -385,7 +400,6 @@ PROCESS_THREAD(design_project_process, ev, data)
 			slots[26] = 1;				// 32
 		} else if(node_id == 33) {
 			slots[7] = 1;				// 1
-			slots[2] = 1;				// 2
 			slots[4] = 1;				// 4
 		}
 	} else {
@@ -397,16 +411,12 @@ PROCESS_THREAD(design_project_process, ev, data)
 	}
 
 	while(stop < 5) {
-		if(send) {
-			radio_send(((uint8_t*)(&(packet.src_id[0]))),sizeof(lpsd_superpacket_t),1);
-			send = 0;
-			packet.size = 1;
-		} else if(receive) {
+		if(receive) {
 			packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
 			if(packet_len) {
 				uint8_t rec_size = packet_rcv.size;
 				while(rec_size > 0) {
-					/*uint8_t counter = 0;
+					uint8_t counter = 0;
 					while(counter < 5) {
 						uint8_t read_val = ((rec_size - 1) * 5) + counter;
 						uint8_t write_val = (packet.size * 5) + counter;
@@ -415,7 +425,7 @@ PROCESS_THREAD(design_project_process, ev, data)
 						packet.seqn[write_val] = packet_rcv.seqn[read_val];
 						packet.payload[write_val] = packet_rcv.payload[read_val];
 						++counter;
-					}*/
+					}
 					uint8_t read_val = ((rec_size - 1) * 5);
 					uint8_t write_val = (packet.size * 5);
 					packet.src_id[packet.size] = packet_rcv.src_id[(rec_size - 1)];
@@ -427,22 +437,26 @@ PROCESS_THREAD(design_project_process, ev, data)
 				}
 			}
 			receive = 0;
+		} else if(send) {
+			radio_send(((uint8_t*)(&(packet.src_id[0]))),sizeof(lpsd_superpacket_t),1);
+			send = 0;
+			packet.size = 1;
 		}
-		
 		if(receive_sink) {
 			packet_len = radio_rcv(((uint8_t*)&packet_rcv), timeout_ms);
 			if(packet_len) {
 				uint8_t rec_size = packet_rcv.size;
+				lpsd_packet_queue_t* writing_pkt;
 				while(rec_size > 0) {
-					/*uint8_t counter = 0;
+					uint8_t counter = 0;
 					while(counter < 5) {
 						uint8_t read_val = ((rec_size - 1) * 5) + counter;
 						if(packet_rcv.seqn[read_val]) {
-							lpsd_packet_queue_t* writing_pkt = memb_alloc(&writing_memb);
-							if(writing_pkt == 0) {
+							if(counter == 0) {
 								LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.src_id[(rec_size - 1)],packet_rcv.seqn[read_val], packet_rcv.payload[read_val]);
-								++stop;
 							} else {
+								writing_pkt = memb_alloc(&writing_memb);
+								
 								writing_pkt->src_id   = packet_rcv.src_id[(rec_size - 1)];
 								writing_pkt->seqn     = packet_rcv.seqn[read_val];
 								writing_pkt->payload  = packet_rcv.payload[read_val];
@@ -450,17 +464,22 @@ PROCESS_THREAD(design_project_process, ev, data)
 								// add packet to the queue
 								queue_enqueue(writing_queue, writing_pkt);
 							}
-
-							if(stop > 5) {
-								stop = 0;
-								break;
-							}
 						}
 						++counter;
-					}*/
-					uint8_t read_val = ((rec_size - 1) * 5);
-					LOG_INFO("Pkt:%u,%u,%u\n", packet_rcv.src_id[(rec_size - 1)],packet_rcv.seqn[read_val], packet_rcv.payload[read_val]);
+					}
 					--rec_size;
+				}
+			} else {
+				uint8_t counter = 0;
+				while(*writing_queue != NULL && counter < 5) {
+					/* dequeue the first packet */
+	  				lpsd_packet_queue_t* pkt = queue_dequeue(writing_queue);
+	  				/* free the memory block */
+	  				memb_free(&writing_memb, pkt);
+
+	  				LOG_INFO("Pkt:%u,%u,%u\n", pkt->src_id,pkt->seqn, pkt->payload);
+					
+					++counter;
 				}
 			}
 			receive_sink = 0;

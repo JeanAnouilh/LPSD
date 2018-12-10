@@ -73,7 +73,7 @@ contiki-ng-dpp-cc430.a(packetbuf.o)
 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(vuprintf.o)
                               /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(printf.o) (vuprintf)
 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(puts.o)
-                              obj_dpp-cc430/data-generator.o (puts)
+                              obj_dpp-cc430/contiki-main.o (puts)
 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(rand.o)
                               contiki-ng-dpp-cc430.a(random.o) (rand)
 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_mulsi3.o)
@@ -1228,7 +1228,7 @@ LOAD /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a
 .rela.plt
  *(.rela.plt)
 
-.text           0x0000000000008000     0x3d4e
+.text           0x0000000000008000     0x3ef6
                 0x0000000000008000                . = ALIGN (0x2)
  *(.init .init.*)
  *(.init0)
@@ -1309,483 +1309,479 @@ LOAD /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a
                 0x0000000000008158       0x10 group-project.o
                 0x0000000000008158                reset_sync_timer
  .text.process_thread_design_project_process
-                0x0000000000008168      0x5ee group-project.o
+                0x0000000000008168      0x712 group-project.o
  .text.schedule_sync_timer
-                0x0000000000008756       0xe6 group-project.o
-                0x0000000000008756                schedule_sync_timer
+                0x000000000000887a      0x19a group-project.o
+                0x000000000000887a                schedule_sync_timer
  .text.reset_slot_timer
-                0x000000000000883c      0x1d2 group-project.o
-                0x000000000000883c                reset_slot_timer
+                0x0000000000008a14      0x194 group-project.o
+                0x0000000000008a14                reset_slot_timer
  .text.radio_stop
-                0x0000000000008a0e       0x2a obj_dpp-cc430/basic-radio.o
-                0x0000000000008a0e                radio_stop
+                0x0000000000008ba8       0x2a obj_dpp-cc430/basic-radio.o
+                0x0000000000008ba8                radio_stop
  .text.radio_send
-                0x0000000000008a38       0x98 obj_dpp-cc430/basic-radio.o
-                0x0000000000008a38                radio_send
+                0x0000000000008bd2       0x98 obj_dpp-cc430/basic-radio.o
+                0x0000000000008bd2                radio_send
  .text.radio_rcv
-                0x0000000000008ad0       0xd2 obj_dpp-cc430/basic-radio.o
-                0x0000000000008ad0                radio_rcv
+                0x0000000000008c6a       0xd2 obj_dpp-cc430/basic-radio.o
+                0x0000000000008c6a                radio_rcv
  .text.rf1a_cb_rx_started
-                0x0000000000008ba2        0xa obj_dpp-cc430/basic-radio.o
-                0x0000000000008ba2                rf1a_cb_rx_started
+                0x0000000000008d3c        0xc obj_dpp-cc430/basic-radio.o
+                0x0000000000008d3c                rf1a_cb_rx_started
  .text.rf1a_cb_tx_started
-                0x0000000000008bac        0x6 obj_dpp-cc430/basic-radio.o
-                0x0000000000008bac                rf1a_cb_tx_started
+                0x0000000000008d48        0x8 obj_dpp-cc430/basic-radio.o
+                0x0000000000008d48                rf1a_cb_tx_started
  .text.rf1a_cb_rx_ended
-                0x0000000000008bb2       0x26 obj_dpp-cc430/basic-radio.o
-                0x0000000000008bb2                rf1a_cb_rx_ended
+                0x0000000000008d50       0x26 obj_dpp-cc430/basic-radio.o
+                0x0000000000008d50                rf1a_cb_rx_ended
  .text.rf1a_cb_tx_ended
-                0x0000000000008bd8        0xc obj_dpp-cc430/basic-radio.o
-                0x0000000000008bd8                rf1a_cb_tx_ended
+                0x0000000000008d76        0xc obj_dpp-cc430/basic-radio.o
+                0x0000000000008d76                rf1a_cb_tx_ended
  .text.rf1a_cb_rx_failed
-                0x0000000000008be4        0xc obj_dpp-cc430/basic-radio.o
-                0x0000000000008be4                rf1a_cb_rx_failed
+                0x0000000000008d82        0xc obj_dpp-cc430/basic-radio.o
+                0x0000000000008d82                rf1a_cb_rx_failed
  .text.rf1a_cb_header_received
-                0x0000000000008bf0       0x26 obj_dpp-cc430/basic-radio.o
-                0x0000000000008bf0                rf1a_cb_header_received
+                0x0000000000008d8e       0x26 obj_dpp-cc430/basic-radio.o
+                0x0000000000008d8e                rf1a_cb_header_received
  .text.rf1a_cb_rx_tx_error
-                0x0000000000008c16       0x12 obj_dpp-cc430/basic-radio.o
-                0x0000000000008c16                rf1a_cb_rx_tx_error
+                0x0000000000008db4       0x12 obj_dpp-cc430/basic-radio.o
+                0x0000000000008db4                rf1a_cb_rx_tx_error
  .text.generate_new_data
-                0x0000000000008c28       0x68 obj_dpp-cc430/data-generator.o
-                0x0000000000008c28                generate_new_data
+                0x0000000000008dc6       0x42 obj_dpp-cc430/data-generator.o
+                0x0000000000008dc6                generate_new_data
  .text.data_generation_init
-                0x0000000000008c90       0xb8 obj_dpp-cc430/data-generator.o
-                0x0000000000008c90                data_generation_init
+                0x0000000000008e08       0xb8 obj_dpp-cc430/data-generator.o
+                0x0000000000008e08                data_generation_init
  .text.pop_data
-                0x0000000000008d48       0x1e obj_dpp-cc430/data-generator.o
-                0x0000000000008d48                pop_data
+                0x0000000000008ec0       0x1e obj_dpp-cc430/data-generator.o
+                0x0000000000008ec0                pop_data
  .text.is_data_in_queue
-                0x0000000000008d66        0xc obj_dpp-cc430/data-generator.o
-                0x0000000000008d66                is_data_in_queue
+                0x0000000000008ede        0xc obj_dpp-cc430/data-generator.o
+                0x0000000000008ede                is_data_in_queue
  .text.platform_init_stage_one
-                0x0000000000008d72       0xe0 contiki-ng-dpp-cc430.a(platform.o)
-                0x0000000000008d72                platform_init_stage_one
+                0x0000000000008eea      0x10e contiki-ng-dpp-cc430.a(platform.o)
+                0x0000000000008eea                platform_init_stage_one
  .text.platform_init_stage_two
-                0x0000000000008e52       0x14 contiki-ng-dpp-cc430.a(platform.o)
-                0x0000000000008e52                platform_init_stage_two
+                0x0000000000008ff8       0x14 contiki-ng-dpp-cc430.a(platform.o)
+                0x0000000000008ff8                platform_init_stage_two
  .text.platform_init_stage_three
-                0x0000000000008e66       0x32 contiki-ng-dpp-cc430.a(platform.o)
-                0x0000000000008e66                platform_init_stage_three
+                0x000000000000900c       0x32 contiki-ng-dpp-cc430.a(platform.o)
+                0x000000000000900c                platform_init_stage_three
  .text.platform_idle
-                0x0000000000008e98       0x74 contiki-ng-dpp-cc430.a(platform.o)
-                0x0000000000008e98                platform_idle
- .text.putchar  0x0000000000008f0c        0xe contiki-ng-dpp-cc430.a(uart.o)
-                0x0000000000008f0c                putchar
+                0x000000000000903e       0x74 contiki-ng-dpp-cc430.a(platform.o)
+                0x000000000000903e                platform_idle
+ .text.putchar  0x00000000000090b2        0xe contiki-ng-dpp-cc430.a(uart.o)
+                0x00000000000090b2                putchar
  .text.uart_init
-                0x0000000000008f1a       0x58 contiki-ng-dpp-cc430.a(uart.o)
-                0x0000000000008f1a                uart_init
+                0x00000000000090c0       0x58 contiki-ng-dpp-cc430.a(uart.o)
+                0x00000000000090c0                uart_init
  .text.uart_enable
-                0x0000000000008f72       0x22 contiki-ng-dpp-cc430.a(uart.o)
-                0x0000000000008f72                uart_enable
+                0x0000000000009118       0x22 contiki-ng-dpp-cc430.a(uart.o)
+                0x0000000000009118                uart_enable
  .text.watchdog_init
-                0x0000000000008f94        0x8 contiki-ng-dpp-cc430.a(watchdog.o)
-                0x0000000000008f94                watchdog_init
+                0x000000000000913a        0x8 contiki-ng-dpp-cc430.a(watchdog.o)
+                0x000000000000913a                watchdog_init
  .text.watchdog_stop
-                0x0000000000008f9c        0x8 contiki-ng-dpp-cc430.a(watchdog.o)
-                0x0000000000008f9c                watchdog_stop
+                0x0000000000009142        0x8 contiki-ng-dpp-cc430.a(watchdog.o)
+                0x0000000000009142                watchdog_stop
  .text.watchdog_start
-                0x0000000000008fa4       0x12 contiki-ng-dpp-cc430.a(watchdog.o)
-                0x0000000000008fa4                watchdog_start
+                0x000000000000914a       0x12 contiki-ng-dpp-cc430.a(watchdog.o)
+                0x000000000000914a                watchdog_start
  .text.watchdog_periodic
-                0x0000000000008fb6       0x12 contiki-ng-dpp-cc430.a(watchdog.o)
-                0x0000000000008fb6                watchdog_periodic
+                0x000000000000915c       0x12 contiki-ng-dpp-cc430.a(watchdog.o)
+                0x000000000000915c                watchdog_periodic
  .text.soc_init
-                0x0000000000008fc8       0xa8 contiki-ng-dpp-cc430.a(soc.o)
-                0x0000000000008fc8                soc_init
+                0x000000000000916e       0xa8 contiki-ng-dpp-cc430.a(soc.o)
+                0x000000000000916e                soc_init
  .text.unmi_interrupt
-                0x0000000000009070       0x9a contiki-ng-dpp-cc430.a(soc.o)
-                0x0000000000009070                unmi_interrupt
-                0x0000000000009070                __isr_61
+                0x0000000000009216       0x9a contiki-ng-dpp-cc430.a(soc.o)
+                0x0000000000009216                unmi_interrupt
+                0x0000000000009216                __isr_61
  .text.write_byte_to_register
-                0x000000000000910a       0x34 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x00000000000092b0       0x34 contiki-ng-dpp-cc430.a(rf1a.o)
  .text.read_byte_from_register
-                0x000000000000913e       0x7c contiki-ng-dpp-cc430.a(rf1a.o)
+                0x00000000000092e4       0x7c contiki-ng-dpp-cc430.a(rf1a.o)
  .text.set_register_field
-                0x00000000000091ba       0x58 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000009360       0x58 contiki-ng-dpp-cc430.a(rf1a.o)
  .text.write_data_to_register
-                0x0000000000009212       0x84 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x00000000000093b8       0x84 contiki-ng-dpp-cc430.a(rf1a.o)
  .text.energest_off_mode
-                0x0000000000009296      0x13c contiki-ng-dpp-cc430.a(rf1a.o)
- .text.strobe   0x00000000000093d2       0xec contiki-ng-dpp-cc430.a(rf1a.o)
+                0x000000000000943c      0x13c contiki-ng-dpp-cc430.a(rf1a.o)
+ .text.strobe   0x0000000000009578       0xec contiki-ng-dpp-cc430.a(rf1a.o)
  .text.read_bytes_from_rx_fifo
-                0x00000000000094be      0x110 contiki-ng-dpp-cc430.a(rf1a.o)
-                0x00000000000094be                read_bytes_from_rx_fifo
+                0x0000000000009664      0x110 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000009664                read_bytes_from_rx_fifo
  .text.rf1a_reset
-                0x00000000000095ce       0xb0 contiki-ng-dpp-cc430.a(rf1a.o)
-                0x00000000000095ce                rf1a_reset
+                0x0000000000009774       0xb0 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000009774                rf1a_reset
  .text.rf1a_set_tx_power
-                0x000000000000967e       0x32 contiki-ng-dpp-cc430.a(rf1a.o)
-                0x000000000000967e                rf1a_set_tx_power
+                0x0000000000009824       0x32 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000009824                rf1a_set_tx_power
  .text.rf1a_configure_gdo_signal
-                0x00000000000096b0       0x1e contiki-ng-dpp-cc430.a(rf1a.o)
-                0x00000000000096b0                rf1a_configure_gdo_signal
+                0x0000000000009856       0x1e contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000009856                rf1a_configure_gdo_signal
  .text.rf1a_get_status_byte
-                0x00000000000096ce        0xc contiki-ng-dpp-cc430.a(rf1a.o)
-                0x00000000000096ce                rf1a_get_status_byte
+                0x0000000000009874        0xc contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000009874                rf1a_get_status_byte
  .text.rf1a_go_to_sleep
-                0x00000000000096da       0x9e contiki-ng-dpp-cc430.a(rf1a.o)
-                0x00000000000096da                rf1a_go_to_sleep
+                0x0000000000009880       0x9e contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000009880                rf1a_go_to_sleep
  .text.rf1a_go_to_idle
-                0x0000000000009778       0xac contiki-ng-dpp-cc430.a(rf1a.o)
-                0x0000000000009778                rf1a_go_to_idle
+                0x000000000000991e       0xac contiki-ng-dpp-cc430.a(rf1a.o)
+                0x000000000000991e                rf1a_go_to_idle
  .text.rf1a_manual_calibration
-                0x0000000000009824       0xc2 contiki-ng-dpp-cc430.a(rf1a.o)
-                0x0000000000009824                rf1a_manual_calibration
+                0x00000000000099ca       0xc2 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x00000000000099ca                rf1a_manual_calibration
  .text.rf1a_reconfig_after_sleep
-                0x00000000000098e6       0x16 contiki-ng-dpp-cc430.a(rf1a.o)
-                0x00000000000098e6                rf1a_reconfig_after_sleep
+                0x0000000000009a8c       0x16 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000009a8c                rf1a_reconfig_after_sleep
  .text.rf1a_flush_rx_fifo
-                0x00000000000098fc       0xb6 contiki-ng-dpp-cc430.a(rf1a.o)
-                0x00000000000098fc                rf1a_flush_rx_fifo
+                0x0000000000009aa2       0xb6 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000009aa2                rf1a_flush_rx_fifo
  .text.rf1a_flush_tx_fifo
-                0x00000000000099b2       0xb6 contiki-ng-dpp-cc430.a(rf1a.o)
-                0x00000000000099b2                rf1a_flush_tx_fifo
+                0x0000000000009b58       0xb6 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000009b58                rf1a_flush_tx_fifo
  .text.rf1a_start_rx
-                0x0000000000009a68       0x5a contiki-ng-dpp-cc430.a(rf1a.o)
-                0x0000000000009a68                rf1a_start_rx
+                0x0000000000009c0e       0x5a contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000009c0e                rf1a_start_rx
  .text.rf1a_start_tx
-                0x0000000000009ac2       0x5e contiki-ng-dpp-cc430.a(rf1a.o)
-                0x0000000000009ac2                rf1a_start_tx
+                0x0000000000009c68       0x5e contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000009c68                rf1a_start_tx
  .text.rf1a_write_to_tx_fifo
-                0x0000000000009b20       0x96 contiki-ng-dpp-cc430.a(rf1a.o)
-                0x0000000000009b20                rf1a_write_to_tx_fifo
+                0x0000000000009cc6       0x96 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000009cc6                rf1a_write_to_tx_fifo
  .text.rf1a_set_rxoff_mode
-                0x0000000000009bb6       0x1a contiki-ng-dpp-cc430.a(rf1a.o)
-                0x0000000000009bb6                rf1a_set_rxoff_mode
+                0x0000000000009d5c       0x1a contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000009d5c                rf1a_set_rxoff_mode
  .text.rf1a_set_txoff_mode
-                0x0000000000009bd0       0x1a contiki-ng-dpp-cc430.a(rf1a.o)
-                0x0000000000009bd0                rf1a_set_txoff_mode
+                0x0000000000009d76       0x1a contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000009d76                rf1a_set_txoff_mode
  .text.rf1a_set_maximum_packet_length
-                0x0000000000009bea       0x32 contiki-ng-dpp-cc430.a(rf1a.o)
-                0x0000000000009bea                rf1a_set_maximum_packet_length
+                0x0000000000009d90       0x32 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000009d90                rf1a_set_maximum_packet_length
  .text.rf1a_set_channel
-                0x0000000000009c1c        0xc contiki-ng-dpp-cc430.a(rf1a.o)
-                0x0000000000009c1c                rf1a_set_channel
+                0x0000000000009dc2        0xc contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000009dc2                rf1a_set_channel
  .text.rf1a_init
-                0x0000000000009c28      0x1d8 contiki-ng-dpp-cc430.a(rf1a.o)
-                0x0000000000009c28                rf1a_init
+                0x0000000000009dce      0x1da contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000009dce                rf1a_init
  .text.rf1a_set_header_len_rx
-                0x0000000000009e00        0x6 contiki-ng-dpp-cc430.a(rf1a.o)
-                0x0000000000009e00                rf1a_set_header_len_rx
+                0x0000000000009fa8        0x6 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000009fa8                rf1a_set_header_len_rx
  .text.rf1a_set_calibration_mode
-                0x0000000000009e06       0x10 contiki-ng-dpp-cc430.a(rf1a.o)
-                0x0000000000009e06                rf1a_set_calibration_mode
+                0x0000000000009fae       0x10 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000009fae                rf1a_set_calibration_mode
  .text.rf1a_clear_pending_interrupts
-                0x0000000000009e16       0x24 contiki-ng-dpp-cc430.a(rf1a.o)
-                0x0000000000009e16                rf1a_clear_pending_interrupts
+                0x0000000000009fbe       0x24 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000009fbe                rf1a_clear_pending_interrupts
  .text.radio_interrupt
-                0x0000000000009e3a      0x202 contiki-ng-dpp-cc430.a(rf1a.o)
-                0x0000000000009e3a                radio_interrupt
-                0x0000000000009e3a                __isr_53
+                0x0000000000009fe2      0x202 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000009fe2                radio_interrupt
+                0x0000000000009fe2                __isr_53
  .text.update_rtimer_ext_state
-                0x000000000000a03c       0x88 contiki-ng-dpp-cc430.a(rtimer-ext.o)
+                0x000000000000a1e4       0x88 contiki-ng-dpp-cc430.a(rtimer-ext.o)
  .text.clock_init
-                0x000000000000a0c4        0xa contiki-ng-dpp-cc430.a(rtimer-ext.o)
-                0x000000000000a0c4                clock_init
+                0x000000000000a26c        0xa contiki-ng-dpp-cc430.a(rtimer-ext.o)
+                0x000000000000a26c                clock_init
  .text.clock_time
-                0x000000000000a0ce        0xa contiki-ng-dpp-cc430.a(rtimer-ext.o)
-                0x000000000000a0ce                clock_time
+                0x000000000000a276        0xa contiki-ng-dpp-cc430.a(rtimer-ext.o)
+                0x000000000000a276                clock_time
  .text.clock_delay
-                0x000000000000a0d8        0xc contiki-ng-dpp-cc430.a(rtimer-ext.o)
-                0x000000000000a0d8                clock_delay
+                0x000000000000a280        0xc contiki-ng-dpp-cc430.a(rtimer-ext.o)
+                0x000000000000a280                clock_delay
  .text.rtimer_ext_init
-                0x000000000000a0e4       0x36 contiki-ng-dpp-cc430.a(rtimer-ext.o)
-                0x000000000000a0e4                rtimer_ext_init
+                0x000000000000a28c       0x36 contiki-ng-dpp-cc430.a(rtimer-ext.o)
+                0x000000000000a28c                rtimer_ext_init
  .text.rtimer_arch_init
-                0x000000000000a11a        0x6 contiki-ng-dpp-cc430.a(rtimer-ext.o)
-                0x000000000000a11a                rtimer_arch_init
+                0x000000000000a2c2        0x6 contiki-ng-dpp-cc430.a(rtimer-ext.o)
+                0x000000000000a2c2                rtimer_arch_init
  .text.rtimer_ext_now_hf
-                0x000000000000a120       0xa0 contiki-ng-dpp-cc430.a(rtimer-ext.o)
-                0x000000000000a120                rtimer_ext_now_hf
+                0x000000000000a2c8       0xa0 contiki-ng-dpp-cc430.a(rtimer-ext.o)
+                0x000000000000a2c8                rtimer_ext_now_hf
  .text.rtimer_ext_now_lf_hw
-                0x000000000000a1c0        0xe contiki-ng-dpp-cc430.a(rtimer-ext.o)
-                0x000000000000a1c0                rtimer_ext_now_lf_hw
+                0x000000000000a368        0xe contiki-ng-dpp-cc430.a(rtimer-ext.o)
+                0x000000000000a368                rtimer_ext_now_lf_hw
  .text.rtimer_ext_now_lf
-                0x000000000000a1ce       0xa4 contiki-ng-dpp-cc430.a(rtimer-ext.o)
-                0x000000000000a1ce                rtimer_ext_now_lf
+                0x000000000000a376       0xa4 contiki-ng-dpp-cc430.a(rtimer-ext.o)
+                0x000000000000a376                rtimer_ext_now_lf
  .text.rtimer_ext_reset
-                0x000000000000a272       0x6e contiki-ng-dpp-cc430.a(rtimer-ext.o)
-                0x000000000000a272                rtimer_ext_reset
+                0x000000000000a41a       0x6e contiki-ng-dpp-cc430.a(rtimer-ext.o)
+                0x000000000000a41a                rtimer_ext_reset
  .text.rtimer_ext_schedule
-                0x000000000000a2e0      0x10e contiki-ng-dpp-cc430.a(rtimer-ext.o)
-                0x000000000000a2e0                rtimer_ext_schedule
+                0x000000000000a488      0x10e contiki-ng-dpp-cc430.a(rtimer-ext.o)
+                0x000000000000a488                rtimer_ext_schedule
  .text.rtimer_ext_next_expiration
-                0x000000000000a3ee       0x34 contiki-ng-dpp-cc430.a(rtimer-ext.o)
-                0x000000000000a3ee                rtimer_ext_next_expiration
+                0x000000000000a596       0x34 contiki-ng-dpp-cc430.a(rtimer-ext.o)
+                0x000000000000a596                rtimer_ext_next_expiration
  .text.timer0_a0_interrupt
-                0x000000000000a422       0xac contiki-ng-dpp-cc430.a(rtimer-ext.o)
-                0x000000000000a422                timer0_a0_interrupt
-                0x000000000000a422                __isr_55
+                0x000000000000a5ca       0xac contiki-ng-dpp-cc430.a(rtimer-ext.o)
+                0x000000000000a5ca                timer0_a0_interrupt
+                0x000000000000a5ca                __isr_55
  .text.timer0_a1_interrupt
-                0x000000000000a4ce      0x18e contiki-ng-dpp-cc430.a(rtimer-ext.o)
-                0x000000000000a4ce                __isr_54
-                0x000000000000a4ce                timer0_a1_interrupt
+                0x000000000000a676      0x18e contiki-ng-dpp-cc430.a(rtimer-ext.o)
+                0x000000000000a676                __isr_54
+                0x000000000000a676                timer0_a1_interrupt
  .text.timer1_a0_interrupt
-                0x000000000000a65c       0xac contiki-ng-dpp-cc430.a(rtimer-ext.o)
-                0x000000000000a65c                __isr_51
-                0x000000000000a65c                timer1_a0_interrupt
+                0x000000000000a804       0xac contiki-ng-dpp-cc430.a(rtimer-ext.o)
+                0x000000000000a804                __isr_51
+                0x000000000000a804                timer1_a0_interrupt
  .text.timer1_a1_interrupt
-                0x000000000000a708      0x136 contiki-ng-dpp-cc430.a(rtimer-ext.o)
-                0x000000000000a708                timer1_a1_interrupt
-                0x000000000000a708                __isr_50
+                0x000000000000a8b0      0x136 contiki-ng-dpp-cc430.a(rtimer-ext.o)
+                0x000000000000a8b0                timer1_a1_interrupt
+                0x000000000000a8b0                __isr_50
  .text.autostart_start
-                0x000000000000a83e       0x16 contiki-ng-dpp-cc430.a(autostart.o)
-                0x000000000000a83e                autostart_start
+                0x000000000000a9e6       0x16 contiki-ng-dpp-cc430.a(autostart.o)
+                0x000000000000a9e6                autostart_start
  .text.energest_init
-                0x000000000000a854        0x2 contiki-ng-dpp-cc430.a(energest.o)
-                0x000000000000a854                energest_init
+                0x000000000000a9fc        0x2 contiki-ng-dpp-cc430.a(energest.o)
+                0x000000000000a9fc                energest_init
  .text.update_time
-                0x000000000000a856       0x70 contiki-ng-dpp-cc430.a(etimer.o)
+                0x000000000000a9fe       0x70 contiki-ng-dpp-cc430.a(etimer.o)
  .text.etimer_request_poll
-                0x000000000000a8c6        0xa contiki-ng-dpp-cc430.a(etimer.o)
-                0x000000000000a8c6                etimer_request_poll
+                0x000000000000aa6e        0xa contiki-ng-dpp-cc430.a(etimer.o)
+                0x000000000000aa6e                etimer_request_poll
  .text.process_thread_etimer_process
-                0x000000000000a8d0       0xc0 contiki-ng-dpp-cc430.a(etimer.o)
+                0x000000000000aa78       0xc0 contiki-ng-dpp-cc430.a(etimer.o)
  .text.add_timer
-                0x000000000000a990       0x40 contiki-ng-dpp-cc430.a(etimer.o)
+                0x000000000000ab38       0x40 contiki-ng-dpp-cc430.a(etimer.o)
  .text.etimer_set
-                0x000000000000a9d0       0x12 contiki-ng-dpp-cc430.a(etimer.o)
-                0x000000000000a9d0                etimer_set
+                0x000000000000ab78       0x12 contiki-ng-dpp-cc430.a(etimer.o)
+                0x000000000000ab78                etimer_set
  .text.log_lladdr
-                0x000000000000a9e2       0x40 contiki-ng-dpp-cc430.a(log.o)
-                0x000000000000a9e2                log_lladdr
+                0x000000000000ab8a       0x40 contiki-ng-dpp-cc430.a(log.o)
+                0x000000000000ab8a                log_lladdr
  .text.process_thread_ctimer_process
-                0x000000000000aa22       0x9c contiki-ng-dpp-cc430.a(ctimer.o)
+                0x000000000000abca       0x9c contiki-ng-dpp-cc430.a(ctimer.o)
  .text.ctimer_init
-                0x000000000000aabe       0x18 contiki-ng-dpp-cc430.a(ctimer.o)
-                0x000000000000aabe                ctimer_init
+                0x000000000000ac66       0x18 contiki-ng-dpp-cc430.a(ctimer.o)
+                0x000000000000ac66                ctimer_init
  .text.call_process
-                0x000000000000aad6       0x46 contiki-ng-dpp-cc430.a(process.o)
+                0x000000000000ac7e       0x46 contiki-ng-dpp-cc430.a(process.o)
  .text.exit_process
-                0x000000000000ab1c       0x8a contiki-ng-dpp-cc430.a(process.o)
- .text.do_poll  0x000000000000aba6       0x30 contiki-ng-dpp-cc430.a(process.o)
+                0x000000000000acc4       0x8a contiki-ng-dpp-cc430.a(process.o)
+ .text.do_poll  0x000000000000ad4e       0x30 contiki-ng-dpp-cc430.a(process.o)
  .text.process_init
-                0x000000000000abd6       0x18 contiki-ng-dpp-cc430.a(process.o)
-                0x000000000000abd6                process_init
+                0x000000000000ad7e       0x18 contiki-ng-dpp-cc430.a(process.o)
+                0x000000000000ad7e                process_init
  .text.process_run
-                0x000000000000abee       0x8c contiki-ng-dpp-cc430.a(process.o)
-                0x000000000000abee                process_run
+                0x000000000000ad96       0x8c contiki-ng-dpp-cc430.a(process.o)
+                0x000000000000ad96                process_run
  .text.process_nevents
-                0x000000000000ac7a        0xe contiki-ng-dpp-cc430.a(process.o)
-                0x000000000000ac7a                process_nevents
+                0x000000000000ae22        0xe contiki-ng-dpp-cc430.a(process.o)
+                0x000000000000ae22                process_nevents
  .text.process_post
-                0x000000000000ac88       0x3e contiki-ng-dpp-cc430.a(process.o)
-                0x000000000000ac88                process_post
+                0x000000000000ae30       0x3e contiki-ng-dpp-cc430.a(process.o)
+                0x000000000000ae30                process_post
  .text.process_post_synch
-                0x000000000000acc6       0x12 contiki-ng-dpp-cc430.a(process.o)
-                0x000000000000acc6                process_post_synch
+                0x000000000000ae6e       0x12 contiki-ng-dpp-cc430.a(process.o)
+                0x000000000000ae6e                process_post_synch
  .text.process_start
-                0x000000000000acd8       0x32 contiki-ng-dpp-cc430.a(process.o)
-                0x000000000000acd8                process_start
+                0x000000000000ae80       0x32 contiki-ng-dpp-cc430.a(process.o)
+                0x000000000000ae80                process_start
  .text.process_poll
-                0x000000000000ad0a       0x18 contiki-ng-dpp-cc430.a(process.o)
-                0x000000000000ad0a                process_poll
+                0x000000000000aeb2       0x18 contiki-ng-dpp-cc430.a(process.o)
+                0x000000000000aeb2                process_poll
  .text.rtimer_init
-                0x000000000000ad22        0x6 contiki-ng-dpp-cc430.a(rtimer.o)
-                0x000000000000ad22                rtimer_init
+                0x000000000000aeca        0x6 contiki-ng-dpp-cc430.a(rtimer.o)
+                0x000000000000aeca                rtimer_init
  .text.timer_set
-                0x000000000000ad28       0x1c contiki-ng-dpp-cc430.a(timer.o)
-                0x000000000000ad28                timer_set
+                0x000000000000aed0       0x1c contiki-ng-dpp-cc430.a(timer.o)
+                0x000000000000aed0                timer_set
  .text.timer_expired
-                0x000000000000ad44       0x2a contiki-ng-dpp-cc430.a(timer.o)
-                0x000000000000ad44                timer_expired
+                0x000000000000aeec       0x2a contiki-ng-dpp-cc430.a(timer.o)
+                0x000000000000aeec                timer_expired
  .text.list_init
-                0x000000000000ad6e        0x6 contiki-ng-dpp-cc430.a(list.o)
-                0x000000000000ad6e                list_init
+                0x000000000000af16        0x6 contiki-ng-dpp-cc430.a(list.o)
+                0x000000000000af16                list_init
  .text.list_head
-                0x000000000000ad74        0x4 contiki-ng-dpp-cc430.a(list.o)
-                0x000000000000ad74                list_head
+                0x000000000000af1c        0x4 contiki-ng-dpp-cc430.a(list.o)
+                0x000000000000af1c                list_head
  .text.list_tail
-                0x000000000000ad78       0x12 contiki-ng-dpp-cc430.a(list.o)
-                0x000000000000ad78                list_tail
+                0x000000000000af20       0x12 contiki-ng-dpp-cc430.a(list.o)
+                0x000000000000af20                list_tail
  .text.list_pop
-                0x000000000000ad8a        0xe contiki-ng-dpp-cc430.a(list.o)
-                0x000000000000ad8a                list_pop
+                0x000000000000af32        0xe contiki-ng-dpp-cc430.a(list.o)
+                0x000000000000af32                list_pop
  .text.list_remove
-                0x000000000000ad98       0x34 contiki-ng-dpp-cc430.a(list.o)
-                0x000000000000ad98                list_remove
+                0x000000000000af40       0x34 contiki-ng-dpp-cc430.a(list.o)
+                0x000000000000af40                list_remove
  .text.list_add
-                0x000000000000adcc       0x26 contiki-ng-dpp-cc430.a(list.o)
-                0x000000000000adcc                list_add
+                0x000000000000af74       0x26 contiki-ng-dpp-cc430.a(list.o)
+                0x000000000000af74                list_add
  .text.memb_init
-                0x000000000000adf2       0x36 contiki-ng-dpp-cc430.a(memb.o)
-                0x000000000000adf2                memb_init
+                0x000000000000af9a       0x36 contiki-ng-dpp-cc430.a(memb.o)
+                0x000000000000af9a                memb_init
  .text.memb_alloc
-                0x000000000000ae28       0x3e contiki-ng-dpp-cc430.a(memb.o)
-                0x000000000000ae28                memb_alloc
+                0x000000000000afd0       0x3e contiki-ng-dpp-cc430.a(memb.o)
+                0x000000000000afd0                memb_alloc
  .text.memb_free
-                0x000000000000ae66       0x3a contiki-ng-dpp-cc430.a(memb.o)
-                0x000000000000ae66                memb_free
+                0x000000000000b00e       0x3a contiki-ng-dpp-cc430.a(memb.o)
+                0x000000000000b00e                memb_free
  .text.random_init
-                0x000000000000aea0        0x6 contiki-ng-dpp-cc430.a(random.o)
-                0x000000000000aea0                random_init
+                0x000000000000b048        0x6 contiki-ng-dpp-cc430.a(random.o)
+                0x000000000000b048                random_init
  .text.random_rand
-                0x000000000000aea6        0x6 contiki-ng-dpp-cc430.a(random.o)
-                0x000000000000aea6                random_rand
+                0x000000000000b04e        0x6 contiki-ng-dpp-cc430.a(random.o)
+                0x000000000000b04e                random_rand
  .text.netstack_init
-                0x000000000000aeac        0xe contiki-ng-dpp-cc430.a(netstack.o)
-                0x000000000000aeac                netstack_init
+                0x000000000000b054        0xe contiki-ng-dpp-cc430.a(netstack.o)
+                0x000000000000b054                netstack_init
  .text.linkaddr_copy
-                0x000000000000aeba        0x8 contiki-ng-dpp-cc430.a(linkaddr.o)
-                0x000000000000aeba                linkaddr_copy
+                0x000000000000b062        0x8 contiki-ng-dpp-cc430.a(linkaddr.o)
+                0x000000000000b062                linkaddr_copy
  .text.send_packet
-                0x000000000000aec2        0x2 contiki-ng-dpp-cc430.a(nullmac.o)
+                0x000000000000b06a        0x2 contiki-ng-dpp-cc430.a(nullmac.o)
  .text.packet_input
-                0x000000000000aec4        0x2 contiki-ng-dpp-cc430.a(nullmac.o)
- .text.on       0x000000000000aec6        0x4 contiki-ng-dpp-cc430.a(nullmac.o)
- .text.off      0x000000000000aeca        0x4 contiki-ng-dpp-cc430.a(nullmac.o)
- .text.init     0x000000000000aece        0x2 contiki-ng-dpp-cc430.a(nullmac.o)
- .text.init     0x000000000000aed0        0x6 contiki-ng-dpp-cc430.a(nullnet.o)
- .text.output   0x000000000000aed6       0x42 contiki-ng-dpp-cc430.a(nullnet.o)
- .text.input    0x000000000000af18       0x34 contiki-ng-dpp-cc430.a(nullnet.o)
+                0x000000000000b06c        0x2 contiki-ng-dpp-cc430.a(nullmac.o)
+ .text.on       0x000000000000b06e        0x4 contiki-ng-dpp-cc430.a(nullmac.o)
+ .text.off      0x000000000000b072        0x4 contiki-ng-dpp-cc430.a(nullmac.o)
+ .text.init     0x000000000000b076        0x2 contiki-ng-dpp-cc430.a(nullmac.o)
+ .text.init     0x000000000000b078        0x6 contiki-ng-dpp-cc430.a(nullnet.o)
+ .text.output   0x000000000000b07e       0x42 contiki-ng-dpp-cc430.a(nullnet.o)
+ .text.input    0x000000000000b0c0       0x34 contiki-ng-dpp-cc430.a(nullnet.o)
  .text.SetVCoreUp
-                0x000000000000af4c       0xc6 contiki-ng-dpp-cc430.a(pmm.o)
-                0x000000000000af4c                SetVCoreUp
+                0x000000000000b0f4       0xc6 contiki-ng-dpp-cc430.a(pmm.o)
+                0x000000000000b0f4                SetVCoreUp
  .text.SetVCoreDown
-                0x000000000000b012       0x94 contiki-ng-dpp-cc430.a(pmm.o)
-                0x000000000000b012                SetVCoreDown
+                0x000000000000b1ba       0x94 contiki-ng-dpp-cc430.a(pmm.o)
+                0x000000000000b1ba                SetVCoreDown
  .text.SetVCore
-                0x000000000000b0a6       0x3e contiki-ng-dpp-cc430.a(pmm.o)
-                0x000000000000b0a6                SetVCore
- .text.init     0x000000000000b0e4        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
- .text.prepare  0x000000000000b0e8        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
+                0x000000000000b24e       0x3e contiki-ng-dpp-cc430.a(pmm.o)
+                0x000000000000b24e                SetVCore
+ .text.init     0x000000000000b28c        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
+ .text.prepare  0x000000000000b290        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
  .text.transmit
-                0x000000000000b0ec        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
- .text.send     0x000000000000b0f0        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
+                0x000000000000b294        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
+ .text.send     0x000000000000b298        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
  .text.radio_read
-                0x000000000000b0f4        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
+                0x000000000000b29c        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
  .text.channel_clear
-                0x000000000000b0f8        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
+                0x000000000000b2a0        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
  .text.receiving_packet
-                0x000000000000b0fc        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
+                0x000000000000b2a4        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
  .text.pending_packet
-                0x000000000000b100        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
- .text.on       0x000000000000b104        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
- .text.off      0x000000000000b108        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
+                0x000000000000b2a8        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
+ .text.on       0x000000000000b2ac        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
+ .text.off      0x000000000000b2b0        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
  .text.get_value
-                0x000000000000b10c        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
+                0x000000000000b2b4        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
  .text.set_value
-                0x000000000000b110        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
+                0x000000000000b2b8        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
  .text.get_object
-                0x000000000000b114        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
+                0x000000000000b2bc        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
  .text.set_object
-                0x000000000000b118        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
+                0x000000000000b2c0        0x4 contiki-ng-dpp-cc430.a(nullradio.o)
  .text.packetbuf_datalen
-                0x000000000000b11c        0x6 contiki-ng-dpp-cc430.a(packetbuf.o)
-                0x000000000000b11c                packetbuf_datalen
+                0x000000000000b2c4        0x6 contiki-ng-dpp-cc430.a(packetbuf.o)
+                0x000000000000b2c4                packetbuf_datalen
  .text.packetbuf_hdrlen
-                0x000000000000b122        0xa contiki-ng-dpp-cc430.a(packetbuf.o)
-                0x000000000000b122                packetbuf_hdrlen
+                0x000000000000b2ca        0xa contiki-ng-dpp-cc430.a(packetbuf.o)
+                0x000000000000b2ca                packetbuf_hdrlen
  .text.packetbuf_dataptr
-                0x000000000000b12c        0xc contiki-ng-dpp-cc430.a(packetbuf.o)
-                0x000000000000b12c                packetbuf_dataptr
+                0x000000000000b2d4        0xc contiki-ng-dpp-cc430.a(packetbuf.o)
+                0x000000000000b2d4                packetbuf_dataptr
  .text.packetbuf_attr_clear
-                0x000000000000b138       0x28 contiki-ng-dpp-cc430.a(packetbuf.o)
-                0x000000000000b138                packetbuf_attr_clear
+                0x000000000000b2e0       0x28 contiki-ng-dpp-cc430.a(packetbuf.o)
+                0x000000000000b2e0                packetbuf_attr_clear
  .text.packetbuf_clear
-                0x000000000000b160       0x12 contiki-ng-dpp-cc430.a(packetbuf.o)
-                0x000000000000b160                packetbuf_clear
+                0x000000000000b308       0x12 contiki-ng-dpp-cc430.a(packetbuf.o)
+                0x000000000000b308                packetbuf_clear
  .text.packetbuf_copyfrom
-                0x000000000000b172       0x2a contiki-ng-dpp-cc430.a(packetbuf.o)
-                0x000000000000b172                packetbuf_copyfrom
+                0x000000000000b31a       0x2a contiki-ng-dpp-cc430.a(packetbuf.o)
+                0x000000000000b31a                packetbuf_copyfrom
  .text.packetbuf_set_addr
-                0x000000000000b19c       0x14 contiki-ng-dpp-cc430.a(packetbuf.o)
-                0x000000000000b19c                packetbuf_set_addr
+                0x000000000000b344       0x14 contiki-ng-dpp-cc430.a(packetbuf.o)
+                0x000000000000b344                packetbuf_set_addr
  .text.packetbuf_addr
-                0x000000000000b1b0        0xe contiki-ng-dpp-cc430.a(packetbuf.o)
-                0x000000000000b1b0                packetbuf_addr
- .text.libgcc   0x000000000000b1be       0x58 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_muldi3.o)
-                0x000000000000b1be                __muldi3
-                0x000000000000b1d8                __xabi_muldi3
- .text.libgcc   0x000000000000b216       0x22 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod16.o)
-                0x000000000000b216                __udivhi3
-                0x000000000000b216                __ext_udivmod16
-                0x000000000000b230                __umodhi3
- .text.libgcc   0x000000000000b238       0x38 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod32.o)
-                0x000000000000b238                __udivsi3
-                0x000000000000b238                __ext_udivmod32
-                0x000000000000b266                __umodsi3
- .text.libgcc   0x000000000000b270       0xbc /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod64.o)
-                0x000000000000b270                __xabi_udivmod64
-                0x000000000000b2c2                __udivdi3
-                0x000000000000b2dc                __umoddi3
-                0x000000000000b2fe                __udivmoddi4
- .text          0x000000000000b32c       0xe4 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcpy.o)
-                0x000000000000b32c                memcpy
- .text          0x000000000000b410       0x5c /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memset.o)
-                0x000000000000b410                memset
- .text          0x000000000000b46c       0x1e /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(printf.o)
-                0x000000000000b46c                printf
-                0x000000000000b47c                vprintf
- .text          0x000000000000b48a      0x818 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(vuprintf.o)
-                0x000000000000b606                vuprintf
- .text          0x000000000000bca2       0x2c /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(puts.o)
-                0x000000000000bca2                puts
- .text          0x000000000000bcce       0x54 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(rand.o)
-                0x000000000000bcce                rand_r
-                0x000000000000bcf2                rand
-                0x000000000000bd18                srand
- .text.libgcc   0x000000000000bd22       0x2a /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_mulsi3.o)
-                0x000000000000bd22                __mulsi3
- .text.crt0     0x000000000000bd4c        0x2 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_unexpected_.o)
-                0x000000000000bd4c                _unexpected_
-                0x000000000000bd4e                . = ALIGN (0x2)
+                0x000000000000b358        0xe contiki-ng-dpp-cc430.a(packetbuf.o)
+                0x000000000000b358                packetbuf_addr
+ .text.libgcc   0x000000000000b366       0x58 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_muldi3.o)
+                0x000000000000b366                __muldi3
+                0x000000000000b380                __xabi_muldi3
+ .text.libgcc   0x000000000000b3be       0x22 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod16.o)
+                0x000000000000b3be                __udivhi3
+                0x000000000000b3be                __ext_udivmod16
+                0x000000000000b3d8                __umodhi3
+ .text.libgcc   0x000000000000b3e0       0x38 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod32.o)
+                0x000000000000b3e0                __udivsi3
+                0x000000000000b3e0                __ext_udivmod32
+                0x000000000000b40e                __umodsi3
+ .text.libgcc   0x000000000000b418       0xbc /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod64.o)
+                0x000000000000b418                __xabi_udivmod64
+                0x000000000000b46a                __udivdi3
+                0x000000000000b484                __umoddi3
+                0x000000000000b4a6                __udivmoddi4
+ .text          0x000000000000b4d4       0xe4 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcpy.o)
+                0x000000000000b4d4                memcpy
+ .text          0x000000000000b5b8       0x5c /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memset.o)
+                0x000000000000b5b8                memset
+ .text          0x000000000000b614       0x1e /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(printf.o)
+                0x000000000000b614                printf
+                0x000000000000b624                vprintf
+ .text          0x000000000000b632      0x818 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(vuprintf.o)
+                0x000000000000b7ae                vuprintf
+ .text          0x000000000000be4a       0x2c /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(puts.o)
+                0x000000000000be4a                puts
+ .text          0x000000000000be76       0x54 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(rand.o)
+                0x000000000000be76                rand_r
+                0x000000000000be9a                rand
+                0x000000000000bec0                srand
+ .text.libgcc   0x000000000000beca       0x2a /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_mulsi3.o)
+                0x000000000000beca                __mulsi3
+ .text.crt0     0x000000000000bef4        0x2 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_unexpected_.o)
+                0x000000000000bef4                _unexpected_
+                0x000000000000bef6                . = ALIGN (0x2)
 
-.rodata         0x000000000000bd4e      0x344
-                0x000000000000bd4e                . = ALIGN (0x2)
+.rodata         0x000000000000bef6      0x2fe
+                0x000000000000bef6                . = ALIGN (0x2)
  *(.rodata .rodata.* .gnu.linkonce.r.*)
  .rodata.process_thread_design_project_process
-                0x000000000000bd4e       0x74 group-project.o
+                0x000000000000bef6       0x65 group-project.o
  .rodata.schedule_sync_timer
-                0x000000000000bdc2       0x2a group-project.o
- .rodata.reset_slot_timer
-                0x000000000000bdec       0x12 group-project.o
+                0x000000000000bf5b       0x3f group-project.o
  .rodata.autostart_processes
-                0x000000000000bdfe        0x4 group-project.o
-                0x000000000000bdfe                autostart_processes
- .rodata        0x000000000000be02       0x25 group-project.o
- .rodata.generate_new_data
-                0x000000000000be27       0x3a obj_dpp-cc430/data-generator.o
- .rodata        0x000000000000be61       0x55 obj_dpp-cc430/contiki-main.o
+                0x000000000000bf9a        0x4 group-project.o
+                0x000000000000bf9a                autostart_processes
+ .rodata        0x000000000000bf9e       0x25 group-project.o
+ .rodata        0x000000000000bfc3       0x55 obj_dpp-cc430/contiki-main.o
  .rodata.platform_init_stage_one
-                0x000000000000beb6       0xa3 contiki-ng-dpp-cc430.a(platform.o)
+                0x000000000000c018       0xa3 contiki-ng-dpp-cc430.a(platform.o)
  .rodata.platform_init_stage_three
-                0x000000000000bf59       0x33 contiki-ng-dpp-cc430.a(platform.o)
- .rodata.CSWTCH.27
-                0x000000000000bf8c       0x1f contiki-ng-dpp-cc430.a(platform.o)
+                0x000000000000c0bb       0x33 contiki-ng-dpp-cc430.a(platform.o)
+ .rodata.CSWTCH.43
+                0x000000000000c0ee       0x1f contiki-ng-dpp-cc430.a(platform.o)
  .rodata.rf1a_init
-                0x000000000000bfab       0x46 contiki-ng-dpp-cc430.a(rf1a.o)
- *fill*         0x000000000000bff1        0x1 00
+                0x000000000000c10d       0x46 contiki-ng-dpp-cc430.a(rf1a.o)
+ *fill*         0x000000000000c153        0x1 00
  .rodata.radio_interrupt
-                0x000000000000bff2       0x1a contiki-ng-dpp-cc430.a(rf1a.o)
- .rodata.pa_values.2779
-                0x000000000000c00c        0x6 contiki-ng-dpp-cc430.a(rf1a.o)
- .rodata        0x000000000000c012        0xc contiki-ng-dpp-cc430.a(etimer.o)
+                0x000000000000c154       0x1a contiki-ng-dpp-cc430.a(rf1a.o)
+ .rodata.pa_values.2811
+                0x000000000000c16e        0x6 contiki-ng-dpp-cc430.a(rf1a.o)
+ .rodata        0x000000000000c174        0xc contiki-ng-dpp-cc430.a(etimer.o)
  .rodata.log_lladdr
-                0x000000000000c01e       0x14 contiki-ng-dpp-cc430.a(log.o)
- .rodata        0x000000000000c032        0xf contiki-ng-dpp-cc430.a(ctimer.o)
- *fill*         0x000000000000c041        0x1 00
+                0x000000000000c180       0x14 contiki-ng-dpp-cc430.a(log.o)
+ .rodata        0x000000000000c194        0xf contiki-ng-dpp-cc430.a(ctimer.o)
+ *fill*         0x000000000000c1a3        0x1 00
  .rodata.linkaddr_null
-                0x000000000000c042        0x8 contiki-ng-dpp-cc430.a(linkaddr.o)
-                0x000000000000c042                linkaddr_null
- .rodata        0x000000000000c04a        0x8 contiki-ng-dpp-cc430.a(nullmac.o)
+                0x000000000000c1a4        0x8 contiki-ng-dpp-cc430.a(linkaddr.o)
+                0x000000000000c1a4                linkaddr_null
+ .rodata        0x000000000000c1ac        0x8 contiki-ng-dpp-cc430.a(nullmac.o)
  .rodata.nullmac_driver
-                0x000000000000c052        0xc contiki-ng-dpp-cc430.a(nullmac.o)
-                0x000000000000c052                nullmac_driver
- .rodata        0x000000000000c05e        0x8 contiki-ng-dpp-cc430.a(nullnet.o)
+                0x000000000000c1b4        0xc contiki-ng-dpp-cc430.a(nullmac.o)
+                0x000000000000c1b4                nullmac_driver
+ .rodata        0x000000000000c1c0        0x8 contiki-ng-dpp-cc430.a(nullnet.o)
  .rodata.nullnet_driver
-                0x000000000000c066        0x8 contiki-ng-dpp-cc430.a(nullnet.o)
-                0x000000000000c066                nullnet_driver
+                0x000000000000c1c8        0x8 contiki-ng-dpp-cc430.a(nullnet.o)
+                0x000000000000c1c8                nullnet_driver
  .rodata.nullradio_driver
-                0x000000000000c06e       0x1c contiki-ng-dpp-cc430.a(nullradio.o)
-                0x000000000000c06e                nullradio_driver
- .rodata        0x000000000000c08a        0x7 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(vuprintf.o)
-                0x000000000000c092                . = ALIGN (0x2)
- *fill*         0x000000000000c091        0x1 00
-                0x000000000000c092                _etext = .
+                0x000000000000c1d0       0x1c contiki-ng-dpp-cc430.a(nullradio.o)
+                0x000000000000c1d0                nullradio_driver
+ .rodata        0x000000000000c1ec        0x7 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(vuprintf.o)
+                0x000000000000c1f4                . = ALIGN (0x2)
+ *fill*         0x000000000000c1f3        0x1 00
+                0x000000000000c1f4                _etext = .
 
-.data           0x0000000000001c00       0x5c load address 0x000000000000c092
+.data           0x0000000000001c00       0x5c load address 0x000000000000c1f4
                 0x0000000000001c00                . = ALIGN (0x2)
                 0x0000000000001c00                PROVIDE (__data_start, .)
  *(.data .data.* .gnu.linkonce.d.*)
@@ -1825,10 +1821,10 @@ LOAD /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a
  .data          0x0000000000001c58        0x4 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(rand.o)
                 0x0000000000001c5c                . = ALIGN (0x2)
                 0x0000000000001c5c                _edata = .
-                0x000000000000c092                PROVIDE (__data_load_start, LOADADDR (.data))
+                0x000000000000c1f4                PROVIDE (__data_load_start, LOADADDR (.data))
                 0x000000000000005c                PROVIDE (__data_size, SIZEOF (.data))
 
-.bss            0x0000000000001c5c      0xb36 load address 0x000000000000c0ee
+.bss            0x0000000000001c5c      0xe70 load address 0x000000000000c250
                 0x0000000000001c5c                PROVIDE (__bss_start, .)
  *(.bss .bss.*)
  .bss.receive_sink
@@ -1851,152 +1847,156 @@ LOAD /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a
                 0x0000000000001d30        0x2 group-project.o
  .bss.writing_queue_list
                 0x0000000000001d32        0x2 group-project.o
- .bss.timeout_ms
-                0x0000000000001d34        0x2 group-project.o
- .bss.firstpacket
-                0x0000000000001d36        0x1 group-project.o
- .bss.last_sync
-                0x0000000000001d37        0x1 group-project.o
- .bss.first_sync
-                0x0000000000001d38        0x1 group-project.o
- *fill*         0x0000000000001d39        0x1 00
  .bss.last_time
-                0x0000000000001d3a        0x8 group-project.o
+                0x0000000000001d34        0x8 group-project.o
  .bss.first_time
-                0x0000000000001d42        0x8 group-project.o
+                0x0000000000001d3c        0x8 group-project.o
+ .bss.last_sync
+                0x0000000000001d44        0x1 group-project.o
+ .bss.first_sync
+                0x0000000000001d45        0x1 group-project.o
+ .bss.sync_time
+                0x0000000000001d46        0x8 group-project.o
+ .bss.slot_time
+                0x0000000000001d4e        0x8 group-project.o
+ .bss.timeout_ms
+                0x0000000000001d56        0x2 group-project.o
+ .bss.firstpacket
+                0x0000000000001d58        0x1 group-project.o
+ *fill*         0x0000000000001d59        0x1 00
  .bss.sync_packet
-                0x0000000000001d4a        0x2 group-project.o
+                0x0000000000001d5a        0x2 group-project.o
  .bss.packet_len
-                0x0000000000001d4c        0x1 group-project.o
- *fill*         0x0000000000001d4d        0x1 00
+                0x0000000000001d5c        0x1 group-project.o
+ *fill*         0x0000000000001d5d        0x1 00
  .bss.sync_packet_rcv
-                0x0000000000001d4e        0x2 group-project.o
+                0x0000000000001d5e        0x2 group-project.o
  .bss.timestamp
-                0x0000000000001d50        0x8 group-project.o
+                0x0000000000001d60        0x8 group-project.o
  .bss.writing_memb_memb_count
-                0x0000000000001d58       0xc8 group-project.o
+                0x0000000000001d68       0xc8 group-project.o
  .bss.writing_memb_memb_mem
-                0x0000000000001e20      0x640 group-project.o
+                0x0000000000001e30      0x640 group-project.o
  .bss.radio_state
-                0x0000000000002460        0x1 obj_dpp-cc430/basic-radio.o
-                0x0000000000002460                radio_state
- *fill*         0x0000000000002461        0x1 00
+                0x0000000000002470        0x1 obj_dpp-cc430/basic-radio.o
+                0x0000000000002470                radio_state
+ *fill*         0x0000000000002471        0x1 00
  .bss.packet_queue_list
-                0x0000000000002462        0x2 obj_dpp-cc430/data-generator.o
- .bss.seqn.2616
-                0x0000000000002464        0x1 obj_dpp-cc430/data-generator.o
+                0x0000000000002472        0x2 obj_dpp-cc430/data-generator.o
+ .bss.seqn.2648
+                0x0000000000002474        0x1 obj_dpp-cc430/data-generator.o
  .bss.packet_memb_memb_count
-                0x0000000000002465        0xa obj_dpp-cc430/data-generator.o
- *fill*         0x000000000000246f        0x1 00
+                0x0000000000002475       0x64 obj_dpp-cc430/data-generator.o
+ *fill*         0x00000000000024d9        0x1 00
  .bss.packet_memb_memb_mem
-                0x0000000000002470       0x50 obj_dpp-cc430/data-generator.o
- .bss.rst_flag  0x00000000000024c0        0x2 contiki-ng-dpp-cc430.a(platform.o)
+                0x00000000000024da      0x320 obj_dpp-cc430/data-generator.o
+ .bss.rst_flag  0x00000000000027fa        0x2 contiki-ng-dpp-cc430.a(platform.o)
  .bss.prescaler
-                0x00000000000024c2        0x4 contiki-ng-dpp-cc430.a(uart.o)
- .bss.mod       0x00000000000024c6        0x4 contiki-ng-dpp-cc430.a(uart.o)
+                0x00000000000027fc        0x4 contiki-ng-dpp-cc430.a(uart.o)
+ .bss.mod       0x0000000000002800        0x4 contiki-ng-dpp-cc430.a(uart.o)
  .bss.rf1a_buffer_len
-                0x00000000000024ca        0x1 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000002804        0x1 contiki-ng-dpp-cc430.a(rf1a.o)
  .bss.packet_len_max
-                0x00000000000024cb        0x1 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000002805        0x1 contiki-ng-dpp-cc430.a(rf1a.o)
  .bss.packet_len
-                0x00000000000024cc        0x1 contiki-ng-dpp-cc430.a(rf1a.o)
- *fill*         0x00000000000024cd        0x1 00
+                0x0000000000002806        0x1 contiki-ng-dpp-cc430.a(rf1a.o)
+ *fill*         0x0000000000002807        0x1 00
  .bss.rf1a_buffer
-                0x00000000000024ce       0x72 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000002808       0x72 contiki-ng-dpp-cc430.a(rf1a.o)
  .bss.header_len_rx
-                0x0000000000002540        0x1 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x000000000000287a        0x1 contiki-ng-dpp-cc430.a(rf1a.o)
  .bss.header_len_notified
-                0x0000000000002541        0x1 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x000000000000287b        0x1 contiki-ng-dpp-cc430.a(rf1a.o)
  .bss.timestamp
-                0x0000000000002542        0x8 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x000000000000287c        0x8 contiki-ng-dpp-cc430.a(rf1a.o)
  .bss.wait_timeout
-                0x000000000000254a        0x2 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000002884        0x2 contiki-ng-dpp-cc430.a(rf1a.o)
  .bss.rxoff_mode
-                0x000000000000254c        0x2 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000002886        0x2 contiki-ng-dpp-cc430.a(rf1a.o)
  .bss.txoff_mode
-                0x000000000000254e        0x2 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x0000000000002888        0x2 contiki-ng-dpp-cc430.a(rf1a.o)
  .bss.rf1a_state
-                0x0000000000002550        0x2 contiki-ng-dpp-cc430.a(rf1a.o)
+                0x000000000000288a        0x2 contiki-ng-dpp-cc430.a(rf1a.o)
  .bss.rf1a_buffer_start
-                0x0000000000002552        0x1 contiki-ng-dpp-cc430.a(rf1a.o)
- *fill*         0x0000000000002553        0x1 00
+                0x000000000000288c        0x1 contiki-ng-dpp-cc430.a(rf1a.o)
+ *fill*         0x000000000000288d        0x1 00
  .bss.clock_count
-                0x0000000000002554        0x4 contiki-ng-dpp-cc430.a(rtimer-ext.o)
- .bss.rt        0x0000000000002558       0x70 contiki-ng-dpp-cc430.a(rtimer-ext.o)
+                0x000000000000288e        0x4 contiki-ng-dpp-cc430.a(rtimer-ext.o)
+ .bss.rt        0x0000000000002892       0x70 contiki-ng-dpp-cc430.a(rtimer-ext.o)
  .bss.timerlist
-                0x00000000000025c8        0x2 contiki-ng-dpp-cc430.a(etimer.o)
+                0x0000000000002902        0x2 contiki-ng-dpp-cc430.a(etimer.o)
  .bss.next_expiration
-                0x00000000000025ca        0x4 contiki-ng-dpp-cc430.a(etimer.o)
+                0x0000000000002904        0x4 contiki-ng-dpp-cc430.a(etimer.o)
  .bss.initialized
-                0x00000000000025ce        0x1 contiki-ng-dpp-cc430.a(ctimer.o)
- *fill*         0x00000000000025cf        0x1 00
+                0x0000000000002908        0x1 contiki-ng-dpp-cc430.a(ctimer.o)
+ *fill*         0x0000000000002909        0x1 00
  .bss.ctimer_list_list
-                0x00000000000025d0        0x2 contiki-ng-dpp-cc430.a(ctimer.o)
+                0x000000000000290a        0x2 contiki-ng-dpp-cc430.a(ctimer.o)
  .bss.poll_requested
-                0x00000000000025d2        0x1 contiki-ng-dpp-cc430.a(process.o)
- *fill*         0x00000000000025d3        0x1 00
+                0x000000000000290c        0x1 contiki-ng-dpp-cc430.a(process.o)
+ *fill*         0x000000000000290d        0x1 00
  .bss.process_current
-                0x00000000000025d4        0x2 contiki-ng-dpp-cc430.a(process.o)
-                0x00000000000025d4                process_current
+                0x000000000000290e        0x2 contiki-ng-dpp-cc430.a(process.o)
+                0x000000000000290e                process_current
  .bss.process_list
-                0x00000000000025d6        0x2 contiki-ng-dpp-cc430.a(process.o)
-                0x00000000000025d6                process_list
+                0x0000000000002910        0x2 contiki-ng-dpp-cc430.a(process.o)
+                0x0000000000002910                process_list
  .bss.lastevent
-                0x00000000000025d8        0x1 contiki-ng-dpp-cc430.a(process.o)
- .bss.fevent    0x00000000000025d9        0x1 contiki-ng-dpp-cc430.a(process.o)
- .bss.nevents   0x00000000000025da        0x1 contiki-ng-dpp-cc430.a(process.o)
- *fill*         0x00000000000025db        0x1 00
- .bss.events    0x00000000000025dc       0xc0 contiki-ng-dpp-cc430.a(process.o)
+                0x0000000000002912        0x1 contiki-ng-dpp-cc430.a(process.o)
+ .bss.fevent    0x0000000000002913        0x1 contiki-ng-dpp-cc430.a(process.o)
+ .bss.nevents   0x0000000000002914        0x1 contiki-ng-dpp-cc430.a(process.o)
+ *fill*         0x0000000000002915        0x1 00
+ .bss.events    0x0000000000002916       0xc0 contiki-ng-dpp-cc430.a(process.o)
  .bss.current_callback
-                0x000000000000269c        0x2 contiki-ng-dpp-cc430.a(nullnet.o)
- .bss.bufptr    0x000000000000269e        0x2 contiki-ng-dpp-cc430.a(packetbuf.o)
- .bss.buflen    0x00000000000026a0        0x2 contiki-ng-dpp-cc430.a(packetbuf.o)
- .bss.hdrlen    0x00000000000026a2        0x1 contiki-ng-dpp-cc430.a(packetbuf.o)
- *fill*         0x00000000000026a3        0x1 00
+                0x00000000000029d6        0x2 contiki-ng-dpp-cc430.a(nullnet.o)
+ .bss.bufptr    0x00000000000029d8        0x2 contiki-ng-dpp-cc430.a(packetbuf.o)
+ .bss.buflen    0x00000000000029da        0x2 contiki-ng-dpp-cc430.a(packetbuf.o)
+ .bss.hdrlen    0x00000000000029dc        0x1 contiki-ng-dpp-cc430.a(packetbuf.o)
+ *fill*         0x00000000000029dd        0x1 00
  .bss.packetbuf_aligned
-                0x00000000000026a4       0x80 contiki-ng-dpp-cc430.a(packetbuf.o)
+                0x00000000000029de       0x80 contiki-ng-dpp-cc430.a(packetbuf.o)
  *(COMMON)
- COMMON         0x0000000000002724        0x3 obj_dpp-cc430/basic-radio.o
-                0x0000000000002724                radio_payload
-                0x0000000000002726                radio_payload_len
- *fill*         0x0000000000002727        0x1 00
- COMMON         0x0000000000002728        0x2 contiki-ng-dpp-cc430.a(node-id.o)
-                0x0000000000002728                node_id
- COMMON         0x000000000000272a       0x10 contiki-ng-dpp-cc430.a(rtimer-ext.o)
-                0x000000000000272a                ta1_sw_ext
-                0x0000000000002732                ta0_sw_ext
- COMMON         0x000000000000273a       0x22 contiki-ng-dpp-cc430.a(dc-stat.o)
-                0x000000000000273a                dc_stat_starttime_cpu
-                0x000000000000273c                dc_stat_starttime_rf_tx
-                0x000000000000273e                dc_stat_isr
-                0x0000000000002740                dc_stat_resettime
-                0x0000000000002748                dc_stat_sum_cpu
-                0x000000000000274c                dc_stat_sum_rf_tx
-                0x0000000000002750                dc_stat_sum_rf_rx
-                0x0000000000002754                dc_stat_starttime_rf_rx
-                0x0000000000002756                dc_stat_starttime_rf
-                0x0000000000002758                dc_stat_sum_rf
- COMMON         0x000000000000275c        0x8 contiki-ng-dpp-cc430.a(linkaddr.o)
-                0x000000000000275c                linkaddr_node_addr
- COMMON         0x0000000000002764        0x4 contiki-ng-dpp-cc430.a(nullnet.o)
-                0x0000000000002764                nullnet_buf
-                0x0000000000002766                nullnet_len
- COMMON         0x0000000000002768       0x2a contiki-ng-dpp-cc430.a(packetbuf.o)
-                0x0000000000002768                packetbuf_addrs
-                0x0000000000002778                packetbuf_attrs
-                0x0000000000002792                . = ALIGN (0x2)
-                0x0000000000002792                PROVIDE (__bss_end, .)
-                0x0000000000000b36                PROVIDE (__bss_size, SIZEOF (.bss))
+ COMMON         0x0000000000002a5e        0x3 obj_dpp-cc430/basic-radio.o
+                0x0000000000002a5e                radio_payload
+                0x0000000000002a60                radio_payload_len
+ *fill*         0x0000000000002a61        0x1 00
+ COMMON         0x0000000000002a62        0x2 contiki-ng-dpp-cc430.a(node-id.o)
+                0x0000000000002a62                node_id
+ COMMON         0x0000000000002a64       0x10 contiki-ng-dpp-cc430.a(rtimer-ext.o)
+                0x0000000000002a64                ta1_sw_ext
+                0x0000000000002a6c                ta0_sw_ext
+ COMMON         0x0000000000002a74       0x22 contiki-ng-dpp-cc430.a(dc-stat.o)
+                0x0000000000002a74                dc_stat_starttime_cpu
+                0x0000000000002a76                dc_stat_starttime_rf_tx
+                0x0000000000002a78                dc_stat_isr
+                0x0000000000002a7a                dc_stat_resettime
+                0x0000000000002a82                dc_stat_sum_cpu
+                0x0000000000002a86                dc_stat_sum_rf_tx
+                0x0000000000002a8a                dc_stat_sum_rf_rx
+                0x0000000000002a8e                dc_stat_starttime_rf_rx
+                0x0000000000002a90                dc_stat_starttime_rf
+                0x0000000000002a92                dc_stat_sum_rf
+ COMMON         0x0000000000002a96        0x8 contiki-ng-dpp-cc430.a(linkaddr.o)
+                0x0000000000002a96                linkaddr_node_addr
+ COMMON         0x0000000000002a9e        0x4 contiki-ng-dpp-cc430.a(nullnet.o)
+                0x0000000000002a9e                nullnet_buf
+                0x0000000000002aa0                nullnet_len
+ COMMON         0x0000000000002aa2       0x2a contiki-ng-dpp-cc430.a(packetbuf.o)
+                0x0000000000002aa2                packetbuf_addrs
+                0x0000000000002ab2                packetbuf_attrs
+                0x0000000000002acc                . = ALIGN (0x2)
+                0x0000000000002acc                PROVIDE (__bss_end, .)
+                0x0000000000000e70                PROVIDE (__bss_size, SIZEOF (.bss))
 
-.noinit         0x0000000000002792        0x2 load address 0x000000000000c0ee
-                0x0000000000002792                PROVIDE (__noinit_start, .)
+.noinit         0x0000000000002acc        0x2 load address 0x000000000000c250
+                0x0000000000002acc                PROVIDE (__noinit_start, .)
  *(.noinit .noinit.*)
- .noinit.crt0   0x0000000000002792        0x2 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(__watchdog_support.o)
-                0x0000000000002792                __wdt_clear_value
-                0x0000000000002794                . = ALIGN (0x2)
-                0x0000000000002794                PROVIDE (__noinit_end, .)
-                0x0000000000002794                . = ALIGN (0x2)
-                0x0000000000002794                _end = .
+ .noinit.crt0   0x0000000000002acc        0x2 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(__watchdog_support.o)
+                0x0000000000002acc                __wdt_clear_value
+                0x0000000000002ace                . = ALIGN (0x2)
+                0x0000000000002ace                PROVIDE (__noinit_end, .)
+                0x0000000000002ace                . = ALIGN (0x2)
+                0x0000000000002ace                _end = .
 
 .infomem        0x0000000000001800        0x0
  *(.infomem)
@@ -2172,317 +2172,317 @@ LOAD /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x0000000000000000     0x800a
+.debug_info     0x0000000000000000     0x8107
  *(.debug_info)
- .debug_info    0x0000000000000000      0x884 group-project.o
- .debug_info    0x0000000000000884      0x388 obj_dpp-cc430/basic-radio.o
- .debug_info    0x0000000000000c0c      0x4ad obj_dpp-cc430/data-generator.o
- .debug_info    0x00000000000010b9      0x62f obj_dpp-cc430/contiki-main.o
- .debug_info    0x00000000000016e8      0x329 contiki-ng-dpp-cc430.a(platform.o)
- .debug_info    0x0000000000001a11       0xc8 contiki-ng-dpp-cc430.a(node-id.o)
- .debug_info    0x0000000000001ad9      0x234 contiki-ng-dpp-cc430.a(uart.o)
- .debug_info    0x0000000000001d0d      0x103 contiki-ng-dpp-cc430.a(watchdog.o)
- .debug_info    0x0000000000001e10      0x1be contiki-ng-dpp-cc430.a(soc.o)
- .debug_info    0x0000000000001fce      0xcd5 contiki-ng-dpp-cc430.a(rf1a.o)
- .debug_info    0x0000000000002ca3      0x7ea contiki-ng-dpp-cc430.a(rtimer-ext.o)
- .debug_info    0x000000000000348d      0x1b1 contiki-ng-dpp-cc430.a(autostart.o)
- .debug_info    0x000000000000363e       0xab contiki-ng-dpp-cc430.a(energest.o)
- .debug_info    0x00000000000036e9      0x4ec contiki-ng-dpp-cc430.a(etimer.o)
- .debug_info    0x0000000000003bd5      0x301 contiki-ng-dpp-cc430.a(log.o)
- .debug_info    0x0000000000003ed6      0x493 contiki-ng-dpp-cc430.a(ctimer.o)
- .debug_info    0x0000000000004369      0x533 contiki-ng-dpp-cc430.a(process.o)
- .debug_info    0x000000000000489c      0x1b7 contiki-ng-dpp-cc430.a(rtimer.o)
- .debug_info    0x0000000000004a53      0x17f contiki-ng-dpp-cc430.a(timer.o)
- .debug_info    0x0000000000004bd2      0x129 contiki-ng-dpp-cc430.a(dc-stat.o)
- .debug_info    0x0000000000004cfb      0x334 contiki-ng-dpp-cc430.a(list.o)
- .debug_info    0x000000000000502f      0x1db contiki-ng-dpp-cc430.a(memb.o)
- .debug_info    0x000000000000520a       0xa4 contiki-ng-dpp-cc430.a(random.o)
- .debug_info    0x00000000000052ae      0x583 contiki-ng-dpp-cc430.a(netstack.o)
- .debug_info    0x0000000000005831      0x17d contiki-ng-dpp-cc430.a(linkaddr.o)
- .debug_info    0x00000000000059ae      0x1ac contiki-ng-dpp-cc430.a(nullmac.o)
- .debug_info    0x0000000000005b5a      0x373 contiki-ng-dpp-cc430.a(nullnet.o)
- .debug_info    0x0000000000005ecd      0x1cb contiki-ng-dpp-cc430.a(pmm.o)
- .debug_info    0x0000000000006098      0x4bd contiki-ng-dpp-cc430.a(nullradio.o)
- .debug_info    0x0000000000006555      0x539 contiki-ng-dpp-cc430.a(packetbuf.o)
- .debug_info    0x0000000000006a8e       0xf6 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_muldi3.o)
- .debug_info    0x0000000000006b84       0xf6 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod16.o)
- .debug_info    0x0000000000006c7a       0xf6 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod32.o)
- .debug_info    0x0000000000006d70       0xf6 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod64.o)
- .debug_info    0x0000000000006e66       0xa4 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(strcmp.o)
- .debug_info    0x0000000000006f0a       0xe8 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcmp.o)
- .debug_info    0x0000000000006ff2      0x111 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcpy.o)
- .debug_info    0x0000000000007103       0xfe /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memset.o)
- .debug_info    0x0000000000007201      0x105 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(printf.o)
- .debug_info    0x0000000000007306      0x565 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(vuprintf.o)
- .debug_info    0x000000000000786b       0x96 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(puts.o)
- .debug_info    0x0000000000007901      0x13f /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(rand.o)
- .debug_info    0x0000000000007a40       0xf6 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_mulsi3.o)
- .debug_info    0x0000000000007b36       0xce /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(__watchdog_support.o)
- .debug_info    0x0000000000007c04       0xce /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(__init_stack.o)
- .debug_info    0x0000000000007cd2       0xce /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_copy_data.o)
- .debug_info    0x0000000000007da0       0xce /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_clear_bss.o)
- .debug_info    0x0000000000007e6e       0xce /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_endless_loop__.o)
- .debug_info    0x0000000000007f3c       0xce /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_unexpected_.o)
+ .debug_info    0x0000000000000000      0x992 group-project.o
+ .debug_info    0x0000000000000992      0x388 obj_dpp-cc430/basic-radio.o
+ .debug_info    0x0000000000000d1a      0x49c obj_dpp-cc430/data-generator.o
+ .debug_info    0x00000000000011b6      0x62f obj_dpp-cc430/contiki-main.o
+ .debug_info    0x00000000000017e5      0x329 contiki-ng-dpp-cc430.a(platform.o)
+ .debug_info    0x0000000000001b0e       0xc8 contiki-ng-dpp-cc430.a(node-id.o)
+ .debug_info    0x0000000000001bd6      0x234 contiki-ng-dpp-cc430.a(uart.o)
+ .debug_info    0x0000000000001e0a      0x103 contiki-ng-dpp-cc430.a(watchdog.o)
+ .debug_info    0x0000000000001f0d      0x1be contiki-ng-dpp-cc430.a(soc.o)
+ .debug_info    0x00000000000020cb      0xcd5 contiki-ng-dpp-cc430.a(rf1a.o)
+ .debug_info    0x0000000000002da0      0x7ea contiki-ng-dpp-cc430.a(rtimer-ext.o)
+ .debug_info    0x000000000000358a      0x1b1 contiki-ng-dpp-cc430.a(autostart.o)
+ .debug_info    0x000000000000373b       0xab contiki-ng-dpp-cc430.a(energest.o)
+ .debug_info    0x00000000000037e6      0x4ec contiki-ng-dpp-cc430.a(etimer.o)
+ .debug_info    0x0000000000003cd2      0x301 contiki-ng-dpp-cc430.a(log.o)
+ .debug_info    0x0000000000003fd3      0x493 contiki-ng-dpp-cc430.a(ctimer.o)
+ .debug_info    0x0000000000004466      0x533 contiki-ng-dpp-cc430.a(process.o)
+ .debug_info    0x0000000000004999      0x1b7 contiki-ng-dpp-cc430.a(rtimer.o)
+ .debug_info    0x0000000000004b50      0x17f contiki-ng-dpp-cc430.a(timer.o)
+ .debug_info    0x0000000000004ccf      0x129 contiki-ng-dpp-cc430.a(dc-stat.o)
+ .debug_info    0x0000000000004df8      0x334 contiki-ng-dpp-cc430.a(list.o)
+ .debug_info    0x000000000000512c      0x1db contiki-ng-dpp-cc430.a(memb.o)
+ .debug_info    0x0000000000005307       0xa4 contiki-ng-dpp-cc430.a(random.o)
+ .debug_info    0x00000000000053ab      0x583 contiki-ng-dpp-cc430.a(netstack.o)
+ .debug_info    0x000000000000592e      0x17d contiki-ng-dpp-cc430.a(linkaddr.o)
+ .debug_info    0x0000000000005aab      0x1ac contiki-ng-dpp-cc430.a(nullmac.o)
+ .debug_info    0x0000000000005c57      0x373 contiki-ng-dpp-cc430.a(nullnet.o)
+ .debug_info    0x0000000000005fca      0x1cb contiki-ng-dpp-cc430.a(pmm.o)
+ .debug_info    0x0000000000006195      0x4bd contiki-ng-dpp-cc430.a(nullradio.o)
+ .debug_info    0x0000000000006652      0x539 contiki-ng-dpp-cc430.a(packetbuf.o)
+ .debug_info    0x0000000000006b8b       0xf6 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_muldi3.o)
+ .debug_info    0x0000000000006c81       0xf6 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod16.o)
+ .debug_info    0x0000000000006d77       0xf6 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod32.o)
+ .debug_info    0x0000000000006e6d       0xf6 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod64.o)
+ .debug_info    0x0000000000006f63       0xa4 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(strcmp.o)
+ .debug_info    0x0000000000007007       0xe8 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcmp.o)
+ .debug_info    0x00000000000070ef      0x111 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcpy.o)
+ .debug_info    0x0000000000007200       0xfe /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memset.o)
+ .debug_info    0x00000000000072fe      0x105 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(printf.o)
+ .debug_info    0x0000000000007403      0x565 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(vuprintf.o)
+ .debug_info    0x0000000000007968       0x96 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(puts.o)
+ .debug_info    0x00000000000079fe      0x13f /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(rand.o)
+ .debug_info    0x0000000000007b3d       0xf6 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_mulsi3.o)
+ .debug_info    0x0000000000007c33       0xce /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(__watchdog_support.o)
+ .debug_info    0x0000000000007d01       0xce /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(__init_stack.o)
+ .debug_info    0x0000000000007dcf       0xce /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_copy_data.o)
+ .debug_info    0x0000000000007e9d       0xce /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_clear_bss.o)
+ .debug_info    0x0000000000007f6b       0xce /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_endless_loop__.o)
+ .debug_info    0x0000000000008039       0xce /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_unexpected_.o)
  *(.gnu.linkonce.wi.*)
 
-.debug_abbrev   0x0000000000000000     0x3198
+.debug_abbrev   0x0000000000000000     0x3187
  *(.debug_abbrev)
  .debug_abbrev  0x0000000000000000      0x290 group-project.o
  .debug_abbrev  0x0000000000000290      0x166 obj_dpp-cc430/basic-radio.o
- .debug_abbrev  0x00000000000003f6      0x207 obj_dpp-cc430/data-generator.o
- .debug_abbrev  0x00000000000005fd      0x189 obj_dpp-cc430/contiki-main.o
- .debug_abbrev  0x0000000000000786      0x15e contiki-ng-dpp-cc430.a(platform.o)
- .debug_abbrev  0x00000000000008e4       0x85 contiki-ng-dpp-cc430.a(node-id.o)
- .debug_abbrev  0x0000000000000969      0x11d contiki-ng-dpp-cc430.a(uart.o)
- .debug_abbrev  0x0000000000000a86       0x91 contiki-ng-dpp-cc430.a(watchdog.o)
- .debug_abbrev  0x0000000000000b17       0x8f contiki-ng-dpp-cc430.a(soc.o)
- .debug_abbrev  0x0000000000000ba6      0x351 contiki-ng-dpp-cc430.a(rf1a.o)
- .debug_abbrev  0x0000000000000ef7      0x31a contiki-ng-dpp-cc430.a(rtimer-ext.o)
- .debug_abbrev  0x0000000000001211       0xf7 contiki-ng-dpp-cc430.a(autostart.o)
- .debug_abbrev  0x0000000000001308       0x65 contiki-ng-dpp-cc430.a(energest.o)
- .debug_abbrev  0x000000000000136d      0x27c contiki-ng-dpp-cc430.a(etimer.o)
- .debug_abbrev  0x00000000000015e9      0x13b contiki-ng-dpp-cc430.a(log.o)
- .debug_abbrev  0x0000000000001724      0x1b5 contiki-ng-dpp-cc430.a(ctimer.o)
- .debug_abbrev  0x00000000000018d9      0x30d contiki-ng-dpp-cc430.a(process.o)
- .debug_abbrev  0x0000000000001be6      0x12c contiki-ng-dpp-cc430.a(rtimer.o)
- .debug_abbrev  0x0000000000001d12       0xfa contiki-ng-dpp-cc430.a(timer.o)
- .debug_abbrev  0x0000000000001e0c       0x48 contiki-ng-dpp-cc430.a(dc-stat.o)
- .debug_abbrev  0x0000000000001e54      0x15e contiki-ng-dpp-cc430.a(list.o)
- .debug_abbrev  0x0000000000001fb2       0xec contiki-ng-dpp-cc430.a(memb.o)
- .debug_abbrev  0x000000000000209e       0x69 contiki-ng-dpp-cc430.a(random.o)
- .debug_abbrev  0x0000000000002107      0x1bd contiki-ng-dpp-cc430.a(netstack.o)
- .debug_abbrev  0x00000000000022c4       0xd4 contiki-ng-dpp-cc430.a(linkaddr.o)
- .debug_abbrev  0x0000000000002398      0x109 contiki-ng-dpp-cc430.a(nullmac.o)
- .debug_abbrev  0x00000000000024a1      0x192 contiki-ng-dpp-cc430.a(nullnet.o)
- .debug_abbrev  0x0000000000002633       0xb3 contiki-ng-dpp-cc430.a(pmm.o)
- .debug_abbrev  0x00000000000026e6      0x191 contiki-ng-dpp-cc430.a(nullradio.o)
- .debug_abbrev  0x0000000000002877      0x1f9 contiki-ng-dpp-cc430.a(packetbuf.o)
- .debug_abbrev  0x0000000000002a70       0x14 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_muldi3.o)
- .debug_abbrev  0x0000000000002a84       0x14 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod16.o)
- .debug_abbrev  0x0000000000002a98       0x14 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod32.o)
- .debug_abbrev  0x0000000000002aac       0x14 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod64.o)
- .debug_abbrev  0x0000000000002ac0       0x60 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(strcmp.o)
- .debug_abbrev  0x0000000000002b20       0x9b /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcmp.o)
- .debug_abbrev  0x0000000000002bbb       0xa6 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcpy.o)
- .debug_abbrev  0x0000000000002c61       0x9c /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memset.o)
- .debug_abbrev  0x0000000000002cfd       0xd0 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(printf.o)
- .debug_abbrev  0x0000000000002dcd      0x1ef /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(vuprintf.o)
- .debug_abbrev  0x0000000000002fbc       0x60 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(puts.o)
- .debug_abbrev  0x000000000000301c       0xf0 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(rand.o)
- .debug_abbrev  0x000000000000310c       0x14 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_mulsi3.o)
- .debug_abbrev  0x0000000000003120       0x14 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(__watchdog_support.o)
- .debug_abbrev  0x0000000000003134       0x14 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(__init_stack.o)
- .debug_abbrev  0x0000000000003148       0x14 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_copy_data.o)
- .debug_abbrev  0x000000000000315c       0x14 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_clear_bss.o)
- .debug_abbrev  0x0000000000003170       0x14 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_endless_loop__.o)
- .debug_abbrev  0x0000000000003184       0x14 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_unexpected_.o)
+ .debug_abbrev  0x00000000000003f6      0x1f6 obj_dpp-cc430/data-generator.o
+ .debug_abbrev  0x00000000000005ec      0x189 obj_dpp-cc430/contiki-main.o
+ .debug_abbrev  0x0000000000000775      0x15e contiki-ng-dpp-cc430.a(platform.o)
+ .debug_abbrev  0x00000000000008d3       0x85 contiki-ng-dpp-cc430.a(node-id.o)
+ .debug_abbrev  0x0000000000000958      0x11d contiki-ng-dpp-cc430.a(uart.o)
+ .debug_abbrev  0x0000000000000a75       0x91 contiki-ng-dpp-cc430.a(watchdog.o)
+ .debug_abbrev  0x0000000000000b06       0x8f contiki-ng-dpp-cc430.a(soc.o)
+ .debug_abbrev  0x0000000000000b95      0x351 contiki-ng-dpp-cc430.a(rf1a.o)
+ .debug_abbrev  0x0000000000000ee6      0x31a contiki-ng-dpp-cc430.a(rtimer-ext.o)
+ .debug_abbrev  0x0000000000001200       0xf7 contiki-ng-dpp-cc430.a(autostart.o)
+ .debug_abbrev  0x00000000000012f7       0x65 contiki-ng-dpp-cc430.a(energest.o)
+ .debug_abbrev  0x000000000000135c      0x27c contiki-ng-dpp-cc430.a(etimer.o)
+ .debug_abbrev  0x00000000000015d8      0x13b contiki-ng-dpp-cc430.a(log.o)
+ .debug_abbrev  0x0000000000001713      0x1b5 contiki-ng-dpp-cc430.a(ctimer.o)
+ .debug_abbrev  0x00000000000018c8      0x30d contiki-ng-dpp-cc430.a(process.o)
+ .debug_abbrev  0x0000000000001bd5      0x12c contiki-ng-dpp-cc430.a(rtimer.o)
+ .debug_abbrev  0x0000000000001d01       0xfa contiki-ng-dpp-cc430.a(timer.o)
+ .debug_abbrev  0x0000000000001dfb       0x48 contiki-ng-dpp-cc430.a(dc-stat.o)
+ .debug_abbrev  0x0000000000001e43      0x15e contiki-ng-dpp-cc430.a(list.o)
+ .debug_abbrev  0x0000000000001fa1       0xec contiki-ng-dpp-cc430.a(memb.o)
+ .debug_abbrev  0x000000000000208d       0x69 contiki-ng-dpp-cc430.a(random.o)
+ .debug_abbrev  0x00000000000020f6      0x1bd contiki-ng-dpp-cc430.a(netstack.o)
+ .debug_abbrev  0x00000000000022b3       0xd4 contiki-ng-dpp-cc430.a(linkaddr.o)
+ .debug_abbrev  0x0000000000002387      0x109 contiki-ng-dpp-cc430.a(nullmac.o)
+ .debug_abbrev  0x0000000000002490      0x192 contiki-ng-dpp-cc430.a(nullnet.o)
+ .debug_abbrev  0x0000000000002622       0xb3 contiki-ng-dpp-cc430.a(pmm.o)
+ .debug_abbrev  0x00000000000026d5      0x191 contiki-ng-dpp-cc430.a(nullradio.o)
+ .debug_abbrev  0x0000000000002866      0x1f9 contiki-ng-dpp-cc430.a(packetbuf.o)
+ .debug_abbrev  0x0000000000002a5f       0x14 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_muldi3.o)
+ .debug_abbrev  0x0000000000002a73       0x14 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod16.o)
+ .debug_abbrev  0x0000000000002a87       0x14 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod32.o)
+ .debug_abbrev  0x0000000000002a9b       0x14 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod64.o)
+ .debug_abbrev  0x0000000000002aaf       0x60 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(strcmp.o)
+ .debug_abbrev  0x0000000000002b0f       0x9b /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcmp.o)
+ .debug_abbrev  0x0000000000002baa       0xa6 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcpy.o)
+ .debug_abbrev  0x0000000000002c50       0x9c /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memset.o)
+ .debug_abbrev  0x0000000000002cec       0xd0 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(printf.o)
+ .debug_abbrev  0x0000000000002dbc      0x1ef /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(vuprintf.o)
+ .debug_abbrev  0x0000000000002fab       0x60 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(puts.o)
+ .debug_abbrev  0x000000000000300b       0xf0 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(rand.o)
+ .debug_abbrev  0x00000000000030fb       0x14 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_mulsi3.o)
+ .debug_abbrev  0x000000000000310f       0x14 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(__watchdog_support.o)
+ .debug_abbrev  0x0000000000003123       0x14 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(__init_stack.o)
+ .debug_abbrev  0x0000000000003137       0x14 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_copy_data.o)
+ .debug_abbrev  0x000000000000314b       0x14 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_clear_bss.o)
+ .debug_abbrev  0x000000000000315f       0x14 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_endless_loop__.o)
+ .debug_abbrev  0x0000000000003173       0x14 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_unexpected_.o)
 
-.debug_line     0x0000000000000000     0x3b25
+.debug_line     0x0000000000000000     0x3b52
  *(.debug_line)
- .debug_line    0x0000000000000000      0x355 group-project.o
- .debug_line    0x0000000000000355      0x1c3 obj_dpp-cc430/basic-radio.o
- .debug_line    0x0000000000000518      0x182 obj_dpp-cc430/data-generator.o
- .debug_line    0x000000000000069a      0x1e7 obj_dpp-cc430/contiki-main.o
- .debug_line    0x0000000000000881      0x18b contiki-ng-dpp-cc430.a(platform.o)
- .debug_line    0x0000000000000a0c       0xa7 contiki-ng-dpp-cc430.a(node-id.o)
- .debug_line    0x0000000000000ab3      0x10e contiki-ng-dpp-cc430.a(uart.o)
- .debug_line    0x0000000000000bc1       0xd9 contiki-ng-dpp-cc430.a(watchdog.o)
- .debug_line    0x0000000000000c9a      0x11f contiki-ng-dpp-cc430.a(soc.o)
- .debug_line    0x0000000000000db9      0x5d6 contiki-ng-dpp-cc430.a(rf1a.o)
- .debug_line    0x000000000000138f      0x4c9 contiki-ng-dpp-cc430.a(rtimer-ext.o)
- .debug_line    0x0000000000001858       0x8f contiki-ng-dpp-cc430.a(autostart.o)
- .debug_line    0x00000000000018e7       0xa6 contiki-ng-dpp-cc430.a(energest.o)
- .debug_line    0x000000000000198d      0x25a contiki-ng-dpp-cc430.a(etimer.o)
- .debug_line    0x0000000000001be7      0x122 contiki-ng-dpp-cc430.a(log.o)
- .debug_line    0x0000000000001d09      0x1dc contiki-ng-dpp-cc430.a(ctimer.o)
- .debug_line    0x0000000000001ee5      0x1bd contiki-ng-dpp-cc430.a(process.o)
- .debug_line    0x00000000000020a2       0xeb contiki-ng-dpp-cc430.a(rtimer.o)
- .debug_line    0x000000000000218d      0x105 contiki-ng-dpp-cc430.a(timer.o)
- .debug_line    0x0000000000002292       0x78 contiki-ng-dpp-cc430.a(dc-stat.o)
- .debug_line    0x000000000000230a      0x13f contiki-ng-dpp-cc430.a(list.o)
- .debug_line    0x0000000000002449       0xd2 contiki-ng-dpp-cc430.a(memb.o)
- .debug_line    0x000000000000251b       0x54 contiki-ng-dpp-cc430.a(random.o)
- .debug_line    0x000000000000256f      0x15b contiki-ng-dpp-cc430.a(netstack.o)
- .debug_line    0x00000000000026ca       0xb6 contiki-ng-dpp-cc430.a(linkaddr.o)
- .debug_line    0x0000000000002780       0xa5 contiki-ng-dpp-cc430.a(nullmac.o)
- .debug_line    0x0000000000002825      0x13d contiki-ng-dpp-cc430.a(nullnet.o)
- .debug_line    0x0000000000002962      0x130 contiki-ng-dpp-cc430.a(pmm.o)
- .debug_line    0x0000000000002a92      0x138 contiki-ng-dpp-cc430.a(nullradio.o)
- .debug_line    0x0000000000002bca      0x20c contiki-ng-dpp-cc430.a(packetbuf.o)
- .debug_line    0x0000000000002dd6       0xc3 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_muldi3.o)
- .debug_line    0x0000000000002e99       0xa7 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod16.o)
- .debug_line    0x0000000000002f40       0xb2 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod32.o)
- .debug_line    0x0000000000002ff2       0xe0 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod64.o)
- .debug_line    0x00000000000030d2       0x49 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(strcmp.o)
- .debug_line    0x000000000000311b       0x73 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcmp.o)
- .debug_line    0x000000000000318e       0xe9 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcpy.o)
- .debug_line    0x0000000000003277       0xc8 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memset.o)
- .debug_line    0x000000000000333f       0x72 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(printf.o)
- .debug_line    0x00000000000033b1      0x2ce /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(vuprintf.o)
- .debug_line    0x000000000000367f       0x4d /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(puts.o)
- .debug_line    0x00000000000036cc       0x4f /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(rand.o)
- .debug_line    0x000000000000371b       0xad /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_mulsi3.o)
- .debug_line    0x00000000000037c8       0x8f /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(__watchdog_support.o)
- .debug_line    0x0000000000003857       0x8d /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(__init_stack.o)
- .debug_line    0x00000000000038e4       0x93 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_copy_data.o)
- .debug_line    0x0000000000003977       0x93 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_clear_bss.o)
- .debug_line    0x0000000000003a0a       0x8e /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_endless_loop__.o)
- .debug_line    0x0000000000003a98       0x8d /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_unexpected_.o)
+ .debug_line    0x0000000000000000      0x387 group-project.o
+ .debug_line    0x0000000000000387      0x1c3 obj_dpp-cc430/basic-radio.o
+ .debug_line    0x000000000000054a      0x176 obj_dpp-cc430/data-generator.o
+ .debug_line    0x00000000000006c0      0x1e7 obj_dpp-cc430/contiki-main.o
+ .debug_line    0x00000000000008a7      0x192 contiki-ng-dpp-cc430.a(platform.o)
+ .debug_line    0x0000000000000a39       0xa7 contiki-ng-dpp-cc430.a(node-id.o)
+ .debug_line    0x0000000000000ae0      0x10e contiki-ng-dpp-cc430.a(uart.o)
+ .debug_line    0x0000000000000bee       0xd9 contiki-ng-dpp-cc430.a(watchdog.o)
+ .debug_line    0x0000000000000cc7      0x11f contiki-ng-dpp-cc430.a(soc.o)
+ .debug_line    0x0000000000000de6      0x5d6 contiki-ng-dpp-cc430.a(rf1a.o)
+ .debug_line    0x00000000000013bc      0x4c9 contiki-ng-dpp-cc430.a(rtimer-ext.o)
+ .debug_line    0x0000000000001885       0x8f contiki-ng-dpp-cc430.a(autostart.o)
+ .debug_line    0x0000000000001914       0xa6 contiki-ng-dpp-cc430.a(energest.o)
+ .debug_line    0x00000000000019ba      0x25a contiki-ng-dpp-cc430.a(etimer.o)
+ .debug_line    0x0000000000001c14      0x122 contiki-ng-dpp-cc430.a(log.o)
+ .debug_line    0x0000000000001d36      0x1dc contiki-ng-dpp-cc430.a(ctimer.o)
+ .debug_line    0x0000000000001f12      0x1bd contiki-ng-dpp-cc430.a(process.o)
+ .debug_line    0x00000000000020cf       0xeb contiki-ng-dpp-cc430.a(rtimer.o)
+ .debug_line    0x00000000000021ba      0x105 contiki-ng-dpp-cc430.a(timer.o)
+ .debug_line    0x00000000000022bf       0x78 contiki-ng-dpp-cc430.a(dc-stat.o)
+ .debug_line    0x0000000000002337      0x13f contiki-ng-dpp-cc430.a(list.o)
+ .debug_line    0x0000000000002476       0xd2 contiki-ng-dpp-cc430.a(memb.o)
+ .debug_line    0x0000000000002548       0x54 contiki-ng-dpp-cc430.a(random.o)
+ .debug_line    0x000000000000259c      0x15b contiki-ng-dpp-cc430.a(netstack.o)
+ .debug_line    0x00000000000026f7       0xb6 contiki-ng-dpp-cc430.a(linkaddr.o)
+ .debug_line    0x00000000000027ad       0xa5 contiki-ng-dpp-cc430.a(nullmac.o)
+ .debug_line    0x0000000000002852      0x13d contiki-ng-dpp-cc430.a(nullnet.o)
+ .debug_line    0x000000000000298f      0x130 contiki-ng-dpp-cc430.a(pmm.o)
+ .debug_line    0x0000000000002abf      0x138 contiki-ng-dpp-cc430.a(nullradio.o)
+ .debug_line    0x0000000000002bf7      0x20c contiki-ng-dpp-cc430.a(packetbuf.o)
+ .debug_line    0x0000000000002e03       0xc3 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_muldi3.o)
+ .debug_line    0x0000000000002ec6       0xa7 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod16.o)
+ .debug_line    0x0000000000002f6d       0xb2 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod32.o)
+ .debug_line    0x000000000000301f       0xe0 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_udivmod64.o)
+ .debug_line    0x00000000000030ff       0x49 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(strcmp.o)
+ .debug_line    0x0000000000003148       0x73 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcmp.o)
+ .debug_line    0x00000000000031bb       0xe9 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcpy.o)
+ .debug_line    0x00000000000032a4       0xc8 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memset.o)
+ .debug_line    0x000000000000336c       0x72 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(printf.o)
+ .debug_line    0x00000000000033de      0x2ce /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(vuprintf.o)
+ .debug_line    0x00000000000036ac       0x4d /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(puts.o)
+ .debug_line    0x00000000000036f9       0x4f /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(rand.o)
+ .debug_line    0x0000000000003748       0xad /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libgcc.a(_mulsi3.o)
+ .debug_line    0x00000000000037f5       0x8f /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(__watchdog_support.o)
+ .debug_line    0x0000000000003884       0x8d /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(__init_stack.o)
+ .debug_line    0x0000000000003911       0x93 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_copy_data.o)
+ .debug_line    0x00000000000039a4       0x93 /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_clear_bss.o)
+ .debug_line    0x0000000000003a37       0x8e /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_endless_loop__.o)
+ .debug_line    0x0000000000003ac5       0x8d /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a(_unexpected_.o)
 
-.debug_frame    0x0000000000000000     0x1480
+.debug_frame    0x0000000000000000     0x145a
  *(.debug_frame)
- .debug_frame   0x0000000000000000      0x1f6 group-project.o
- .debug_frame   0x00000000000001f6       0xa8 obj_dpp-cc430/basic-radio.o
- .debug_frame   0x000000000000029e       0x9a obj_dpp-cc430/data-generator.o
- .debug_frame   0x0000000000000338       0x84 obj_dpp-cc430/contiki-main.o
- .debug_frame   0x00000000000003bc       0x8e contiki-ng-dpp-cc430.a(platform.o)
- .debug_frame   0x000000000000044a       0x2a contiki-ng-dpp-cc430.a(node-id.o)
- .debug_frame   0x0000000000000474       0x4e contiki-ng-dpp-cc430.a(uart.o)
- .debug_frame   0x00000000000004c2       0x4e contiki-ng-dpp-cc430.a(watchdog.o)
- .debug_frame   0x0000000000000510       0x3a contiki-ng-dpp-cc430.a(soc.o)
- .debug_frame   0x000000000000054a      0x29a contiki-ng-dpp-cc430.a(rf1a.o)
- .debug_frame   0x00000000000007e4      0x216 contiki-ng-dpp-cc430.a(rtimer-ext.o)
- .debug_frame   0x00000000000009fa       0x36 contiki-ng-dpp-cc430.a(autostart.o)
- .debug_frame   0x0000000000000a30       0x36 contiki-ng-dpp-cc430.a(energest.o)
- .debug_frame   0x0000000000000a66      0x102 contiki-ng-dpp-cc430.a(etimer.o)
- .debug_frame   0x0000000000000b68       0x9e contiki-ng-dpp-cc430.a(log.o)
- .debug_frame   0x0000000000000c06       0xb0 contiki-ng-dpp-cc430.a(ctimer.o)
- .debug_frame   0x0000000000000cb6       0xe0 contiki-ng-dpp-cc430.a(process.o)
- .debug_frame   0x0000000000000d96       0x36 contiki-ng-dpp-cc430.a(rtimer.o)
- .debug_frame   0x0000000000000dcc       0x68 contiki-ng-dpp-cc430.a(timer.o)
- .debug_frame   0x0000000000000e34       0xc0 contiki-ng-dpp-cc430.a(list.o)
- .debug_frame   0x0000000000000ef4       0x72 contiki-ng-dpp-cc430.a(memb.o)
- .debug_frame   0x0000000000000f66       0x2a contiki-ng-dpp-cc430.a(random.o)
- .debug_frame   0x0000000000000f90       0x4c contiki-ng-dpp-cc430.a(netstack.o)
- .debug_frame   0x0000000000000fdc       0x36 contiki-ng-dpp-cc430.a(linkaddr.o)
- .debug_frame   0x0000000000001012       0x4e contiki-ng-dpp-cc430.a(nullmac.o)
- .debug_frame   0x0000000000001060       0x54 contiki-ng-dpp-cc430.a(nullnet.o)
- .debug_frame   0x00000000000010b4       0x44 contiki-ng-dpp-cc430.a(pmm.o)
- .debug_frame   0x00000000000010f8       0xba contiki-ng-dpp-cc430.a(nullradio.o)
- .debug_frame   0x00000000000011b2      0x128 contiki-ng-dpp-cc430.a(packetbuf.o)
- .debug_frame   0x00000000000012da       0x1e /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(strcmp.o)
- .debug_frame   0x00000000000012f8       0x24 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcmp.o)
- .debug_frame   0x000000000000131c       0x2c /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcpy.o)
- .debug_frame   0x0000000000001348       0x2a /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memset.o)
- .debug_frame   0x0000000000001372       0x2a /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(printf.o)
- .debug_frame   0x000000000000139c       0x84 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(vuprintf.o)
- .debug_frame   0x0000000000001420       0x24 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(puts.o)
- .debug_frame   0x0000000000001444       0x3c /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(rand.o)
+ .debug_frame   0x0000000000000000      0x1e2 group-project.o
+ .debug_frame   0x00000000000001e2       0xa8 obj_dpp-cc430/basic-radio.o
+ .debug_frame   0x000000000000028a       0x88 obj_dpp-cc430/data-generator.o
+ .debug_frame   0x0000000000000312       0x84 obj_dpp-cc430/contiki-main.o
+ .debug_frame   0x0000000000000396       0x8e contiki-ng-dpp-cc430.a(platform.o)
+ .debug_frame   0x0000000000000424       0x2a contiki-ng-dpp-cc430.a(node-id.o)
+ .debug_frame   0x000000000000044e       0x4e contiki-ng-dpp-cc430.a(uart.o)
+ .debug_frame   0x000000000000049c       0x4e contiki-ng-dpp-cc430.a(watchdog.o)
+ .debug_frame   0x00000000000004ea       0x3a contiki-ng-dpp-cc430.a(soc.o)
+ .debug_frame   0x0000000000000524      0x29a contiki-ng-dpp-cc430.a(rf1a.o)
+ .debug_frame   0x00000000000007be      0x216 contiki-ng-dpp-cc430.a(rtimer-ext.o)
+ .debug_frame   0x00000000000009d4       0x36 contiki-ng-dpp-cc430.a(autostart.o)
+ .debug_frame   0x0000000000000a0a       0x36 contiki-ng-dpp-cc430.a(energest.o)
+ .debug_frame   0x0000000000000a40      0x102 contiki-ng-dpp-cc430.a(etimer.o)
+ .debug_frame   0x0000000000000b42       0x9e contiki-ng-dpp-cc430.a(log.o)
+ .debug_frame   0x0000000000000be0       0xb0 contiki-ng-dpp-cc430.a(ctimer.o)
+ .debug_frame   0x0000000000000c90       0xe0 contiki-ng-dpp-cc430.a(process.o)
+ .debug_frame   0x0000000000000d70       0x36 contiki-ng-dpp-cc430.a(rtimer.o)
+ .debug_frame   0x0000000000000da6       0x68 contiki-ng-dpp-cc430.a(timer.o)
+ .debug_frame   0x0000000000000e0e       0xc0 contiki-ng-dpp-cc430.a(list.o)
+ .debug_frame   0x0000000000000ece       0x72 contiki-ng-dpp-cc430.a(memb.o)
+ .debug_frame   0x0000000000000f40       0x2a contiki-ng-dpp-cc430.a(random.o)
+ .debug_frame   0x0000000000000f6a       0x4c contiki-ng-dpp-cc430.a(netstack.o)
+ .debug_frame   0x0000000000000fb6       0x36 contiki-ng-dpp-cc430.a(linkaddr.o)
+ .debug_frame   0x0000000000000fec       0x4e contiki-ng-dpp-cc430.a(nullmac.o)
+ .debug_frame   0x000000000000103a       0x54 contiki-ng-dpp-cc430.a(nullnet.o)
+ .debug_frame   0x000000000000108e       0x44 contiki-ng-dpp-cc430.a(pmm.o)
+ .debug_frame   0x00000000000010d2       0xba contiki-ng-dpp-cc430.a(nullradio.o)
+ .debug_frame   0x000000000000118c      0x128 contiki-ng-dpp-cc430.a(packetbuf.o)
+ .debug_frame   0x00000000000012b4       0x1e /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(strcmp.o)
+ .debug_frame   0x00000000000012d2       0x24 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcmp.o)
+ .debug_frame   0x00000000000012f6       0x2c /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcpy.o)
+ .debug_frame   0x0000000000001322       0x2a /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memset.o)
+ .debug_frame   0x000000000000134c       0x2a /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(printf.o)
+ .debug_frame   0x0000000000001376       0x84 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(vuprintf.o)
+ .debug_frame   0x00000000000013fa       0x24 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(puts.o)
+ .debug_frame   0x000000000000141e       0x3c /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(rand.o)
 
-.debug_str      0x0000000000000000     0x2bc5
+.debug_str      0x0000000000000000     0x2be5
  *(.debug_str)
- .debug_str     0x0000000000000000      0x4d5 group-project.o
-                                        0x599 (size before relaxing)
- .debug_str     0x00000000000004d5      0x305 obj_dpp-cc430/basic-radio.o
+ .debug_str     0x0000000000000000      0x50b group-project.o
+                                        0x5cf (size before relaxing)
+ .debug_str     0x000000000000050b      0x305 obj_dpp-cc430/basic-radio.o
                                         0x44b (size before relaxing)
- .debug_str     0x00000000000007da       0xd3 obj_dpp-cc430/data-generator.o
-                                        0x3b6 (size before relaxing)
- .debug_str     0x00000000000008ad      0x309 obj_dpp-cc430/contiki-main.o
+ .debug_str     0x0000000000000810       0xbd obj_dpp-cc430/data-generator.o
+                                        0x3a2 (size before relaxing)
+ .debug_str     0x00000000000008cd      0x309 obj_dpp-cc430/contiki-main.o
                                         0x4d3 (size before relaxing)
- .debug_str     0x0000000000000bb6      0x194 contiki-ng-dpp-cc430.a(platform.o)
+ .debug_str     0x0000000000000bd6      0x194 contiki-ng-dpp-cc430.a(platform.o)
                                         0x3f0 (size before relaxing)
- .debug_str     0x0000000000000d4a       0x47 contiki-ng-dpp-cc430.a(node-id.o)
+ .debug_str     0x0000000000000d6a       0x47 contiki-ng-dpp-cc430.a(node-id.o)
                                         0x141 (size before relaxing)
- .debug_str     0x0000000000000d91       0xda contiki-ng-dpp-cc430.a(uart.o)
+ .debug_str     0x0000000000000db1       0xda contiki-ng-dpp-cc430.a(uart.o)
                                         0x25f (size before relaxing)
- .debug_str     0x0000000000000e6b       0x92 contiki-ng-dpp-cc430.a(watchdog.o)
+ .debug_str     0x0000000000000e8b       0x92 contiki-ng-dpp-cc430.a(watchdog.o)
                                         0x17f (size before relaxing)
- .debug_str     0x0000000000000efd       0xac contiki-ng-dpp-cc430.a(soc.o)
+ .debug_str     0x0000000000000f1d       0xac contiki-ng-dpp-cc430.a(soc.o)
                                         0x23e (size before relaxing)
- .debug_str     0x0000000000000fa9      0x614 contiki-ng-dpp-cc430.a(rf1a.o)
+ .debug_str     0x0000000000000fc9      0x614 contiki-ng-dpp-cc430.a(rf1a.o)
                                         0xa86 (size before relaxing)
- .debug_str     0x00000000000015bd      0x341 contiki-ng-dpp-cc430.a(rtimer-ext.o)
+ .debug_str     0x00000000000015dd      0x341 contiki-ng-dpp-cc430.a(rtimer-ext.o)
                                         0x64c (size before relaxing)
- .debug_str     0x00000000000018fe       0x38 contiki-ng-dpp-cc430.a(autostart.o)
+ .debug_str     0x000000000000191e       0x38 contiki-ng-dpp-cc430.a(autostart.o)
                                         0x16c (size before relaxing)
- .debug_str     0x0000000000001936       0x4d contiki-ng-dpp-cc430.a(energest.o)
+ .debug_str     0x0000000000001956       0x4d contiki-ng-dpp-cc430.a(energest.o)
                                         0x133 (size before relaxing)
- .debug_str     0x0000000000001983      0x157 contiki-ng-dpp-cc430.a(etimer.o)
+ .debug_str     0x00000000000019a3      0x157 contiki-ng-dpp-cc430.a(etimer.o)
                                         0x2e9 (size before relaxing)
- .debug_str     0x0000000000001ada      0x17b contiki-ng-dpp-cc430.a(log.o)
+ .debug_str     0x0000000000001afa      0x17b contiki-ng-dpp-cc430.a(log.o)
                                         0x299 (size before relaxing)
- .debug_str     0x0000000000001c55       0xd6 contiki-ng-dpp-cc430.a(ctimer.o)
+ .debug_str     0x0000000000001c75       0xd6 contiki-ng-dpp-cc430.a(ctimer.o)
                                         0x276 (size before relaxing)
- .debug_str     0x0000000000001d2b      0x154 contiki-ng-dpp-cc430.a(process.o)
+ .debug_str     0x0000000000001d4b      0x154 contiki-ng-dpp-cc430.a(process.o)
                                         0x2a2 (size before relaxing)
- .debug_str     0x0000000000001e7f       0xb1 contiki-ng-dpp-cc430.a(rtimer.o)
+ .debug_str     0x0000000000001e9f       0xb1 contiki-ng-dpp-cc430.a(rtimer.o)
                                         0x1b7 (size before relaxing)
- .debug_str     0x0000000000001f30       0x25 contiki-ng-dpp-cc430.a(timer.o)
+ .debug_str     0x0000000000001f50       0x25 contiki-ng-dpp-cc430.a(timer.o)
                                         0x164 (size before relaxing)
- .debug_str     0x0000000000001f55       0x17 contiki-ng-dpp-cc430.a(dc-stat.o)
+ .debug_str     0x0000000000001f75       0x17 contiki-ng-dpp-cc430.a(dc-stat.o)
                                         0x1cb (size before relaxing)
- .debug_str     0x0000000000001f6c       0xa6 contiki-ng-dpp-cc430.a(list.o)
+ .debug_str     0x0000000000001f8c       0xa6 contiki-ng-dpp-cc430.a(list.o)
                                         0x19e (size before relaxing)
- .debug_str     0x0000000000002012       0x5a contiki-ng-dpp-cc430.a(memb.o)
+ .debug_str     0x0000000000002032       0x5a contiki-ng-dpp-cc430.a(memb.o)
                                         0x147 (size before relaxing)
- .debug_str     0x000000000000206c       0x2e contiki-ng-dpp-cc430.a(random.o)
+ .debug_str     0x000000000000208c       0x2e contiki-ng-dpp-cc430.a(random.o)
                                         0x110 (size before relaxing)
- .debug_str     0x000000000000209a      0x26c contiki-ng-dpp-cc430.a(netstack.o)
+ .debug_str     0x00000000000020ba      0x26c contiki-ng-dpp-cc430.a(netstack.o)
                                         0x3f2 (size before relaxing)
- .debug_str     0x0000000000002306       0x56 contiki-ng-dpp-cc430.a(linkaddr.o)
+ .debug_str     0x0000000000002326       0x56 contiki-ng-dpp-cc430.a(linkaddr.o)
                                         0x16d (size before relaxing)
- .debug_str     0x000000000000235c       0x3c contiki-ng-dpp-cc430.a(nullmac.o)
+ .debug_str     0x000000000000237c       0x3c contiki-ng-dpp-cc430.a(nullmac.o)
                                         0x15c (size before relaxing)
- .debug_str     0x0000000000002398      0x213 contiki-ng-dpp-cc430.a(nullnet.o)
+ .debug_str     0x00000000000023b8      0x213 contiki-ng-dpp-cc430.a(nullnet.o)
                                         0x3b5 (size before relaxing)
- .debug_str     0x00000000000025ab       0x81 contiki-ng-dpp-cc430.a(pmm.o)
+ .debug_str     0x00000000000025cb       0x81 contiki-ng-dpp-cc430.a(pmm.o)
                                         0x1e6 (size before relaxing)
- .debug_str     0x000000000000262c       0x7a contiki-ng-dpp-cc430.a(nullradio.o)
+ .debug_str     0x000000000000264c       0x7a contiki-ng-dpp-cc430.a(nullradio.o)
                                         0x246 (size before relaxing)
- .debug_str     0x00000000000026a6      0x1f4 contiki-ng-dpp-cc430.a(packetbuf.o)
+ .debug_str     0x00000000000026c6      0x1f4 contiki-ng-dpp-cc430.a(packetbuf.o)
                                         0x4cc (size before relaxing)
- .debug_str     0x000000000000289a       0x4c /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(strcmp.o)
+ .debug_str     0x00000000000028ba       0x4c /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(strcmp.o)
                                         0x100 (size before relaxing)
- .debug_str     0x00000000000028e6       0x19 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcmp.o)
+ .debug_str     0x0000000000002906       0x19 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcmp.o)
                                         0x107 (size before relaxing)
- .debug_str     0x00000000000028ff       0x2d /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcpy.o)
+ .debug_str     0x000000000000291f       0x2d /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcpy.o)
                                         0x122 (size before relaxing)
- .debug_str     0x000000000000292c       0x26 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memset.o)
+ .debug_str     0x000000000000294c       0x26 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memset.o)
                                         0x120 (size before relaxing)
- .debug_str     0x0000000000002952       0x40 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(printf.o)
+ .debug_str     0x0000000000002972       0x40 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(printf.o)
                                         0x136 (size before relaxing)
- .debug_str     0x0000000000002992      0x1f9 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(vuprintf.o)
+ .debug_str     0x00000000000029b2      0x1f9 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(vuprintf.o)
                                         0x381 (size before relaxing)
- .debug_str     0x0000000000002b8b       0x15 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(puts.o)
+ .debug_str     0x0000000000002bab       0x15 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(puts.o)
                                          0xfc (size before relaxing)
- .debug_str     0x0000000000002ba0       0x25 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(rand.o)
+ .debug_str     0x0000000000002bc0       0x25 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(rand.o)
                                         0x11b (size before relaxing)
 
-.debug_loc      0x0000000000000000     0x2bda
+.debug_loc      0x0000000000000000     0x2bf6
  *(.debug_loc)
- .debug_loc     0x0000000000000000      0x5a5 group-project.o
- .debug_loc     0x00000000000005a5      0x13d obj_dpp-cc430/basic-radio.o
- .debug_loc     0x00000000000006e2       0xc7 obj_dpp-cc430/data-generator.o
- .debug_loc     0x00000000000007a9       0xde obj_dpp-cc430/contiki-main.o
- .debug_loc     0x0000000000000887       0xb7 contiki-ng-dpp-cc430.a(platform.o)
- .debug_loc     0x000000000000093e        0xb contiki-ng-dpp-cc430.a(uart.o)
- .debug_loc     0x0000000000000949       0x14 contiki-ng-dpp-cc430.a(soc.o)
- .debug_loc     0x000000000000095d      0x53e contiki-ng-dpp-cc430.a(rf1a.o)
- .debug_loc     0x0000000000000e9b      0x2e6 contiki-ng-dpp-cc430.a(rtimer-ext.o)
- .debug_loc     0x0000000000001181       0x56 contiki-ng-dpp-cc430.a(autostart.o)
- .debug_loc     0x00000000000011d7      0x292 contiki-ng-dpp-cc430.a(etimer.o)
- .debug_loc     0x0000000000001469      0x157 contiki-ng-dpp-cc430.a(log.o)
- .debug_loc     0x00000000000015c0      0x237 contiki-ng-dpp-cc430.a(ctimer.o)
- .debug_loc     0x00000000000017f7      0x248 contiki-ng-dpp-cc430.a(process.o)
- .debug_loc     0x0000000000001a3f       0x5b contiki-ng-dpp-cc430.a(rtimer.o)
- .debug_loc     0x0000000000001a9a       0xb1 contiki-ng-dpp-cc430.a(timer.o)
- .debug_loc     0x0000000000001b4b      0x1a8 contiki-ng-dpp-cc430.a(list.o)
- .debug_loc     0x0000000000001cf3      0x166 contiki-ng-dpp-cc430.a(memb.o)
- .debug_loc     0x0000000000001e59        0xb contiki-ng-dpp-cc430.a(random.o)
- .debug_loc     0x0000000000001e64       0x90 contiki-ng-dpp-cc430.a(netstack.o)
- .debug_loc     0x0000000000001ef4       0x3e contiki-ng-dpp-cc430.a(linkaddr.o)
- .debug_loc     0x0000000000001f32       0x3a contiki-ng-dpp-cc430.a(nullnet.o)
- .debug_loc     0x0000000000001f6c       0x92 contiki-ng-dpp-cc430.a(pmm.o)
- .debug_loc     0x0000000000001ffe       0x58 contiki-ng-dpp-cc430.a(nullradio.o)
- .debug_loc     0x0000000000002056      0x164 contiki-ng-dpp-cc430.a(packetbuf.o)
- .debug_loc     0x00000000000021ba       0x24 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(strcmp.o)
- .debug_loc     0x00000000000021de       0x5e /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcmp.o)
- .debug_loc     0x000000000000223c      0x1b7 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcpy.o)
- .debug_loc     0x00000000000023f3       0xc3 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memset.o)
- .debug_loc     0x00000000000024b6       0x38 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(printf.o)
- .debug_loc     0x00000000000024ee      0x697 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(vuprintf.o)
- .debug_loc     0x0000000000002b85       0x26 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(puts.o)
- .debug_loc     0x0000000000002bab       0x2f /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(rand.o)
+ .debug_loc     0x0000000000000000      0x5e1 group-project.o
+ .debug_loc     0x00000000000005e1      0x13d obj_dpp-cc430/basic-radio.o
+ .debug_loc     0x000000000000071e       0xa7 obj_dpp-cc430/data-generator.o
+ .debug_loc     0x00000000000007c5       0xde obj_dpp-cc430/contiki-main.o
+ .debug_loc     0x00000000000008a3       0xb7 contiki-ng-dpp-cc430.a(platform.o)
+ .debug_loc     0x000000000000095a        0xb contiki-ng-dpp-cc430.a(uart.o)
+ .debug_loc     0x0000000000000965       0x14 contiki-ng-dpp-cc430.a(soc.o)
+ .debug_loc     0x0000000000000979      0x53e contiki-ng-dpp-cc430.a(rf1a.o)
+ .debug_loc     0x0000000000000eb7      0x2e6 contiki-ng-dpp-cc430.a(rtimer-ext.o)
+ .debug_loc     0x000000000000119d       0x56 contiki-ng-dpp-cc430.a(autostart.o)
+ .debug_loc     0x00000000000011f3      0x292 contiki-ng-dpp-cc430.a(etimer.o)
+ .debug_loc     0x0000000000001485      0x157 contiki-ng-dpp-cc430.a(log.o)
+ .debug_loc     0x00000000000015dc      0x237 contiki-ng-dpp-cc430.a(ctimer.o)
+ .debug_loc     0x0000000000001813      0x248 contiki-ng-dpp-cc430.a(process.o)
+ .debug_loc     0x0000000000001a5b       0x5b contiki-ng-dpp-cc430.a(rtimer.o)
+ .debug_loc     0x0000000000001ab6       0xb1 contiki-ng-dpp-cc430.a(timer.o)
+ .debug_loc     0x0000000000001b67      0x1a8 contiki-ng-dpp-cc430.a(list.o)
+ .debug_loc     0x0000000000001d0f      0x166 contiki-ng-dpp-cc430.a(memb.o)
+ .debug_loc     0x0000000000001e75        0xb contiki-ng-dpp-cc430.a(random.o)
+ .debug_loc     0x0000000000001e80       0x90 contiki-ng-dpp-cc430.a(netstack.o)
+ .debug_loc     0x0000000000001f10       0x3e contiki-ng-dpp-cc430.a(linkaddr.o)
+ .debug_loc     0x0000000000001f4e       0x3a contiki-ng-dpp-cc430.a(nullnet.o)
+ .debug_loc     0x0000000000001f88       0x92 contiki-ng-dpp-cc430.a(pmm.o)
+ .debug_loc     0x000000000000201a       0x58 contiki-ng-dpp-cc430.a(nullradio.o)
+ .debug_loc     0x0000000000002072      0x164 contiki-ng-dpp-cc430.a(packetbuf.o)
+ .debug_loc     0x00000000000021d6       0x24 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(strcmp.o)
+ .debug_loc     0x00000000000021fa       0x5e /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcmp.o)
+ .debug_loc     0x0000000000002258      0x1b7 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memcpy.o)
+ .debug_loc     0x000000000000240f       0xc3 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(memset.o)
+ .debug_loc     0x00000000000024d2       0x38 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(printf.o)
+ .debug_loc     0x000000000000250a      0x697 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(vuprintf.o)
+ .debug_loc     0x0000000000002ba1       0x26 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(puts.o)
+ .debug_loc     0x0000000000002bc7       0x2f /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(rand.o)
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -2490,39 +2490,39 @@ LOAD /usr/lib/gcc/msp430/4.6.3/mcpu-430x/mmpy-16/libcrt0.a
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x0000000000000000      0x444
+.debug_ranges   0x0000000000000000      0x474
  *(.debug_ranges)
- .debug_ranges  0x0000000000000000       0x2c group-project.o
- .debug_ranges  0x000000000000002c       0x2c obj_dpp-cc430/basic-radio.o
- .debug_ranges  0x0000000000000058       0x18 obj_dpp-cc430/data-generator.o
- .debug_ranges  0x0000000000000070        0x8 obj_dpp-cc430/contiki-main.o
- .debug_ranges  0x0000000000000078       0x20 contiki-ng-dpp-cc430.a(platform.o)
- .debug_ranges  0x0000000000000098        0xc contiki-ng-dpp-cc430.a(node-id.o)
- .debug_ranges  0x00000000000000a4       0x18 contiki-ng-dpp-cc430.a(uart.o)
- .debug_ranges  0x00000000000000bc       0x18 contiki-ng-dpp-cc430.a(watchdog.o)
- .debug_ranges  0x00000000000000d4        0xc contiki-ng-dpp-cc430.a(soc.o)
- .debug_ranges  0x00000000000000e0       0x90 contiki-ng-dpp-cc430.a(rf1a.o)
- .debug_ranges  0x0000000000000170       0x70 contiki-ng-dpp-cc430.a(rtimer-ext.o)
- .debug_ranges  0x00000000000001e0        0xc contiki-ng-dpp-cc430.a(autostart.o)
- .debug_ranges  0x00000000000001ec       0x10 contiki-ng-dpp-cc430.a(energest.o)
- .debug_ranges  0x00000000000001fc       0x40 contiki-ng-dpp-cc430.a(etimer.o)
- .debug_ranges  0x000000000000023c       0x24 contiki-ng-dpp-cc430.a(log.o)
- .debug_ranges  0x0000000000000260       0x24 contiki-ng-dpp-cc430.a(ctimer.o)
- .debug_ranges  0x0000000000000284       0x38 contiki-ng-dpp-cc430.a(process.o)
- .debug_ranges  0x00000000000002bc       0x10 contiki-ng-dpp-cc430.a(rtimer.o)
- .debug_ranges  0x00000000000002cc       0x18 contiki-ng-dpp-cc430.a(timer.o)
- .debug_ranges  0x00000000000002e4       0x34 contiki-ng-dpp-cc430.a(list.o)
- .debug_ranges  0x0000000000000318       0x18 contiki-ng-dpp-cc430.a(memb.o)
- .debug_ranges  0x0000000000000330        0xc contiki-ng-dpp-cc430.a(random.o)
- .debug_ranges  0x000000000000033c       0x14 contiki-ng-dpp-cc430.a(netstack.o)
- .debug_ranges  0x0000000000000350       0x10 contiki-ng-dpp-cc430.a(linkaddr.o)
- .debug_ranges  0x0000000000000360       0x18 contiki-ng-dpp-cc430.a(nullmac.o)
- .debug_ranges  0x0000000000000378       0x14 contiki-ng-dpp-cc430.a(nullnet.o)
- .debug_ranges  0x000000000000038c       0x10 contiki-ng-dpp-cc430.a(pmm.o)
- .debug_ranges  0x000000000000039c       0x3c contiki-ng-dpp-cc430.a(nullradio.o)
- .debug_ranges  0x00000000000003d8       0x54 contiki-ng-dpp-cc430.a(packetbuf.o)
- .debug_ranges  0x000000000000042c       0x18 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(vuprintf.o)
+ .debug_ranges  0x0000000000000000       0x5c group-project.o
+ .debug_ranges  0x000000000000005c       0x2c obj_dpp-cc430/basic-radio.o
+ .debug_ranges  0x0000000000000088       0x18 obj_dpp-cc430/data-generator.o
+ .debug_ranges  0x00000000000000a0        0x8 obj_dpp-cc430/contiki-main.o
+ .debug_ranges  0x00000000000000a8       0x20 contiki-ng-dpp-cc430.a(platform.o)
+ .debug_ranges  0x00000000000000c8        0xc contiki-ng-dpp-cc430.a(node-id.o)
+ .debug_ranges  0x00000000000000d4       0x18 contiki-ng-dpp-cc430.a(uart.o)
+ .debug_ranges  0x00000000000000ec       0x18 contiki-ng-dpp-cc430.a(watchdog.o)
+ .debug_ranges  0x0000000000000104        0xc contiki-ng-dpp-cc430.a(soc.o)
+ .debug_ranges  0x0000000000000110       0x90 contiki-ng-dpp-cc430.a(rf1a.o)
+ .debug_ranges  0x00000000000001a0       0x70 contiki-ng-dpp-cc430.a(rtimer-ext.o)
+ .debug_ranges  0x0000000000000210        0xc contiki-ng-dpp-cc430.a(autostart.o)
+ .debug_ranges  0x000000000000021c       0x10 contiki-ng-dpp-cc430.a(energest.o)
+ .debug_ranges  0x000000000000022c       0x40 contiki-ng-dpp-cc430.a(etimer.o)
+ .debug_ranges  0x000000000000026c       0x24 contiki-ng-dpp-cc430.a(log.o)
+ .debug_ranges  0x0000000000000290       0x24 contiki-ng-dpp-cc430.a(ctimer.o)
+ .debug_ranges  0x00000000000002b4       0x38 contiki-ng-dpp-cc430.a(process.o)
+ .debug_ranges  0x00000000000002ec       0x10 contiki-ng-dpp-cc430.a(rtimer.o)
+ .debug_ranges  0x00000000000002fc       0x18 contiki-ng-dpp-cc430.a(timer.o)
+ .debug_ranges  0x0000000000000314       0x34 contiki-ng-dpp-cc430.a(list.o)
+ .debug_ranges  0x0000000000000348       0x18 contiki-ng-dpp-cc430.a(memb.o)
+ .debug_ranges  0x0000000000000360        0xc contiki-ng-dpp-cc430.a(random.o)
+ .debug_ranges  0x000000000000036c       0x14 contiki-ng-dpp-cc430.a(netstack.o)
+ .debug_ranges  0x0000000000000380       0x10 contiki-ng-dpp-cc430.a(linkaddr.o)
+ .debug_ranges  0x0000000000000390       0x18 contiki-ng-dpp-cc430.a(nullmac.o)
+ .debug_ranges  0x00000000000003a8       0x14 contiki-ng-dpp-cc430.a(nullnet.o)
+ .debug_ranges  0x00000000000003bc       0x10 contiki-ng-dpp-cc430.a(pmm.o)
+ .debug_ranges  0x00000000000003cc       0x3c contiki-ng-dpp-cc430.a(nullradio.o)
+ .debug_ranges  0x0000000000000408       0x54 contiki-ng-dpp-cc430.a(packetbuf.o)
+ .debug_ranges  0x000000000000045c       0x18 /usr/lib/gcc/msp430/4.6.3/../../../../msp430/lib/mcpu-430x/mmpy-16/libc.a(vuprintf.o)
                 0x0000000000002bfe                PROVIDE (__stack, (ORIGIN (ram) + 0xffe))
-                0x000000000000c092                PROVIDE (__data_start_rom, _etext)
-                0x000000000000c0ee                PROVIDE (__data_end_rom, (_etext + SIZEOF (.data)))
+                0x000000000000c1f4                PROVIDE (__data_start_rom, _etext)
+                0x000000000000c250                PROVIDE (__data_end_rom, (_etext + SIZEOF (.data)))
 OUTPUT(group-project.dpp-cc430 elf32-msp430)
